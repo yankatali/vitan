@@ -1,10 +1,10 @@
 
-interface ItemsComponentProps {
+interface ItemComponentProps {
     image: string,
     title: string,
 }
 
-export const ItemsComponent = ({ image, title}: ItemsComponentProps) => {
+export const ItemComponent = ({ image, title}: ItemComponentProps) => {
     return (
         <div className="flex flex-col items-center text-[#2c2b2a]">
             <img

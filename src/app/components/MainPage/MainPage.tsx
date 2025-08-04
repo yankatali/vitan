@@ -1,6 +1,6 @@
 import {MainPageConfig} from "@/types/main";
 import {SearchComponent} from "@/app/components/Search/SearchComponent";
-import {ItemsComponent} from "@/app/ItemsComponent/ItemsComponent";
+import {ItemComponent} from "@/app/ItemComponent/ItemComponent";
 
 interface MainPageProps {
     config: MainPageConfig;
@@ -25,14 +25,13 @@ export const MainPage  = ({config}: MainPageProps) => {
         <div className="flex flex-col gap-3 h-screen">
             <div className="px-5 py-3 shrink-0"><SearchComponent/></div>
                 <div className="flex-1 overflow-y-auto grid grid-cols-2 md:grid-cols-3 gap-4 p-4">
-                    {products.map((product, index) => (
-                        <ItemsComponent
-                            key={index}
+                    {products.map((product) => (
+                        <ItemComponent
+                            key={product.title}
                             image={product.image}
                             title={product.title}
                         />
                     ))}
-
                 </div>
         </div>
 
