@@ -29,7 +29,7 @@ const Header = ({config}: Props) => {
                     <Link
                         key={url}
                         href={url}
-                        className="flex flex-col items-center text-teal-300 hover:text-blue-800"
+                        className="flex flex-col items-center text-[#a79d96] hover:text-[#17150c]"
                     >
                         {Icon && <Icon size={isLg ? 20 : 26} />}
                         <span className="text-xs">{label}</span>
@@ -40,15 +40,15 @@ const Header = ({config}: Props) => {
     );
     return (
         <>
-            <header className="w-full bg-teal-100 px-6 py-4 shadow-md">
+            <header className="w-full px-6 py-4">
                 <div className={`flex items-center ${isLg ? 'justify-between' : 'justify-center'}`}>
-                    <strong className="text-xl text-teal-400">{config.title}</strong>
+                    <strong className="text-xl text-[#11100d]">{config.title}</strong>
                     {isLg && <nav className="flex items-center gap-6">{navItems}</nav>}
                 </div>
             </header>
 
             {!isLg && (
-                <nav className="fixed inset-x-0 bottom-0 flex justify-around bg-white/80 backdrop-blur border-t border-teal-200 py-2">
+                <nav className="fixed inset-x-0 bottom-0 flex justify-around bg-white/80 backdrop-blur border-t border-[#a79d96] py-2">
                     {navItems}
                 </nav>
             )}
