@@ -20,7 +20,6 @@ export const useProductList = ({
     const [hasMore, setHasMore] = useState(initialProducts.hasMore);
     const [isLoading, setIsLoading] = useState(false);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
-    const [isGridScrolled, setIsGridScrolled] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const skipInitialFetch = useRef(true);
     const gridRef = useRef<HTMLDivElement | null>(null);
@@ -152,26 +151,11 @@ export const useProductList = ({
         return () => observer.disconnect();
     }, [loadMore]);
 
-    useEffect(() => {
-        const node = gridRef.current;
-        if (!node) return;
-
-        const handleScroll = () => {
-            setIsGridScrolled(node.scrollTop > 8);
-        };
-
-        handleScroll();
-        node.addEventListener("scroll", handleScroll, {passive: true});
-
-        return () => node.removeEventListener("scroll", handleScroll);
-    }, []);
-
     return {
         availableCategories,
         error,
         hasMore,
         gridRef,
-        isGridScrolled,
         isLoading,
         items,
         loadMoreRef,

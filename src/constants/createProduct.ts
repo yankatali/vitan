@@ -50,7 +50,7 @@ export const CREATE_PRODUCT_MODAL_CLASS_NAMES = {
     existingImage: "h-full w-full object-cover",
     existingImageRemoveButton: "absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-[var(--destructive)] text-white shadow-lg shadow-black/15",
     imageAddInput: "sr-only",
-    imageAddTile: "flex h-20 w-24 shrink-0 cursor-pointer items-center justify-center rounded-[var(--radius-sm)] bg-[var(--fill)] text-[var(--accent-press)] transition-transform hover:scale-[1.03] active:scale-[0.96]",
+    imageAddTile: "flex h-20 w-24 shrink-0 cursor-pointer items-center justify-center rounded-[var(--radius-sm)] bg-[var(--fill)] text-[var(--text-secondary)] transition-transform hover:scale-[1.03] active:scale-[0.96]",
     error: "rounded-[var(--radius-sm)] bg-[rgba(255,59,48,0.1)] px-4 py-3 text-sm text-[var(--destructive)]",
     actions: "sticky bottom-0 z-10 -mx-5 flex flex-wrap justify-end gap-3 border-t border-[var(--separator)] bg-[var(--glass-tint-thick)] px-5 pb-1 pt-3 backdrop-blur-xl min-[744px]:-mx-6 min-[744px]:px-6",
     secondaryButton: "rounded-[var(--radius-capsule)] bg-[var(--fill)] px-5 py-2.5 text-sm font-semibold text-[var(--text-primary)] transition-transform hover:bg-[var(--fill-secondary)] active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-50",

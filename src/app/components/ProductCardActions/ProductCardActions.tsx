@@ -1,7 +1,6 @@
 "use client";
 
 import CartIcon from "@/app/components/icon/CartIcon";
-import WishlistIcon from "@/app/components/icon/WishlistIcon";
 import {PencilIcon} from "@/app/components/icon/PencilIcon";
 import {TrashIcon} from "@/app/components/icon/TrashIcon";
 import {ProductEditModal} from "@/app/components/ProductEditModal/ProductEditModal";
@@ -23,18 +22,6 @@ const getCartButtonClassName = (isInCart: boolean) => {
     return PRODUCT_CARD_ACTION_CLASS_NAMES.cartButton;
 };
 
-const getFavoriteButtonClassName = (isFavorite: boolean) => {
-    if (isFavorite) return PRODUCT_CARD_ACTION_CLASS_NAMES.activeFavoriteButton;
-
-    return PRODUCT_CARD_ACTION_CLASS_NAMES.iconButton;
-};
-
-const getFavoriteButtonLabel = (isFavorite: boolean) => {
-    if (isFavorite) return PRODUCT_CARD_ACTION_LABELS.favoriteActive;
-
-    return PRODUCT_CARD_ACTION_LABELS.favorite;
-};
-
 const getDeleteButtonLabel = (isDeleting: boolean) => {
     if (isDeleting) return PRODUCT_CARD_ACTION_LABELS.deleting;
 
@@ -53,10 +40,8 @@ export const ProductCardActions = ({
         handleCartAdd,
         handleCartRemove,
         handleDelete,
-        handleFavoriteToggle,
         isDeleting,
         isEditOpen,
-        isFavorite,
         isInCart,
         openEdit,
     } = useProductCardActions({onProductChanged, product});
@@ -73,28 +58,18 @@ export const ProductCardActions = ({
 
     return (
         <div className={PRODUCT_CARD_ACTION_CLASS_NAMES.wrapper}>
-            <div className={showAdminActions ? PRODUCT_CARD_ACTION_CLASS_NAMES.adminRow : PRODUCT_CARD_ACTION_CLASS_NAMES.row}>
-                <button
-                    type="button"
-                    onClick={handleCartButtonClick}
-                    className={getCartButtonClassName(isInCart)}
-                    aria-pressed={isInCart}
-                >
-                    <CartIcon size={18} />
-                    {getCartButtonLabel(isInCart)}
-                </button>
+            <button
+                type="button"
+                onClick={handleCartButtonClick}
+                className={getCartButtonClassName(isInCart)}
+                aria-pressed={isInCart}
+            >
+                <CartIcon size={18} />
+                {getCartButtonLabel(isInCart)}
+            </button>
 
-                <button
-                    type="button"
-                    onClick={handleFavoriteToggle}
-                    className={getFavoriteButtonClassName(isFavorite)}
-                    aria-label={getFavoriteButtonLabel(isFavorite)}
-                    aria-pressed={isFavorite}
-                >
-                    <WishlistIcon size={18} filled={isFavorite} />
-                </button>
-
-                {showAdminActions && (
+            {showAdminActions && (
+                <div className={PRODUCT_CARD_ACTION_CLASS_NAMES.adminRow}>
                     <button
                         type="button"
                         onClick={openEdit}
@@ -103,9 +78,7 @@ export const ProductCardActions = ({
                     >
                         <PencilIcon />
                     </button>
-                )}
 
-                {showAdminActions && (
                     <button
                         type="button"
                         onClick={() => setIsConfirmOpen(true)}
@@ -115,8 +88,8 @@ export const ProductCardActions = ({
                     >
                         <TrashIcon />
                     </button>
-                )}
-            </div>
+                </div>
+            )}
 
             {error && <p className={PRODUCT_CARD_ACTION_CLASS_NAMES.error}>{error}</p>}
 

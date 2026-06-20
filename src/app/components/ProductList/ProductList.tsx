@@ -22,7 +22,7 @@ const getCategoryButtonClassName = (isSelected: boolean) => {
 
 const getSortOptionButtonClassName = (isSelected: boolean) => {
     const baseClassName = "inline-flex min-h-11 w-full items-center justify-between gap-3 rounded-[var(--radius-sm)] px-3 text-left text-[15px] leading-none tracking-[-0.1px] transition-all duration-200 active:scale-[0.98]";
-    if (isSelected) return `${baseClassName} bg-[var(--vitan-tint)] font-semibold text-[var(--accent-press)]`;
+    if (isSelected) return `${baseClassName} bg-black/8 font-semibold text-[var(--text-primary)]`;
 
     return `${baseClassName} font-medium text-[var(--text-primary)] hover:bg-[var(--fill)]`;
 };
@@ -87,7 +87,6 @@ export const ProductList = ({
         error,
         gridRef,
         hasMore,
-        isGridScrolled,
         isLoading,
         items,
         loadMoreRef,
@@ -164,7 +163,7 @@ export const ProductList = ({
                 <FilterIcon />
                 {PRODUCT_CATEGORY_LABELS.filters}
                 {isFilterActive && (
-                    <span className="grid h-5 min-w-5 place-items-center rounded-full bg-[var(--accent)] px-1.5 text-xs font-bold leading-5 text-white">
+                    <span className="grid h-5 min-w-5 place-items-center rounded-full bg-[#1c1c1e] px-1.5 text-xs font-bold leading-5 text-white">
                         1
                     </span>
                 )}
@@ -188,7 +187,7 @@ export const ProductList = ({
             >
                 <SortIcon />
                 {isSortActive && (
-                    <span className="absolute right-0.5 top-0.5 h-2.5 w-2.5 rounded-full bg-[var(--accent)] ring-2 ring-white" />
+                    <span className="absolute right-0.5 top-0.5 h-2.5 w-2.5 rounded-full bg-[#1c1c1e] ring-2 ring-white" />
                 )}
             </button>
 
@@ -214,48 +213,46 @@ export const ProductList = ({
     return (
         <div className={rootClassName}>
             <div className={toolbarClassName}>
-                {shouldShowToolbarTitleGroup && (
-                    <div className={PRODUCT_LIST_CLASS_NAMES.mainPageToolbarTitleGroup}>
-                        {shouldShowToolbarCategories && isGridScrolled && (
-                            filterDropdown
-                        )}
-
-                        {toolbarTitle && <h2 className={PRODUCT_LIST_CLASS_NAMES.mainPageToolbarTitle}>{toolbarTitle}</h2>}
-                    </div>
-                )}
-
-                <div className={searchWrapperClassName}>
-                    <SearchComponent
-                        value={query}
-                        onChange={setQuery}
-                        placeholder={searchPlaceholder}
-                    />
-                </div>
-
-                <div className={PRODUCT_LIST_CLASS_NAMES.mainPageActions}>
-                    {Boolean(desktopToolbarNavItems.length) && (
-                        <nav className={PRODUCT_LIST_CLASS_NAMES.mainPageToolbarNav}>
-                            {desktopToolbarNavItems}
-                        </nav>
-                    )}
-
-                    {showCreateProductButton && (
-                        <div className={productCreatorWrapperClassName}>
-                            <ProductCreator
-                                categoryOptions={availableCategories}
-                                onProductCreated={refreshProducts}
-                            />
+                <div className={PRODUCT_LIST_CLASS_NAMES.mainPageToolbarInner}>
+                    {shouldShowToolbarTitleGroup && (
+                        <div className={PRODUCT_LIST_CLASS_NAMES.mainPageToolbarTitleGroup}>
+                            {toolbarTitle && <h2 className={PRODUCT_LIST_CLASS_NAMES.mainPageToolbarTitle}>{toolbarTitle}</h2>}
                         </div>
                     )}
-                </div>
-            </div>
 
-            {(shouldShowToolbarCategories || shouldShowToolbarSort) && !isGridScrolled && (
-                <div className={PRODUCT_LIST_CLASS_NAMES.categoryInlineRow}>
-                    <div>{shouldShowToolbarCategories && filterDropdown}</div>
-                    <div>{shouldShowToolbarSort && sortDropdown}</div>
+                    <div className={searchWrapperClassName}>
+                        <SearchComponent
+                            value={query}
+                            onChange={setQuery}
+                            placeholder={searchPlaceholder}
+                        />
+                    </div>
+
+                    <div className={PRODUCT_LIST_CLASS_NAMES.mainPageActions}>
+                        {Boolean(desktopToolbarNavItems.length) && (
+                            <nav className={PRODUCT_LIST_CLASS_NAMES.mainPageToolbarNav}>
+                                {desktopToolbarNavItems}
+                            </nav>
+                        )}
+
+                        {showCreateProductButton && (
+                            <div className={productCreatorWrapperClassName}>
+                                <ProductCreator
+                                    categoryOptions={availableCategories}
+                                    onProductCreated={refreshProducts}
+                                />
+                            </div>
+                        )}
+                    </div>
                 </div>
-            )}
+
+                {(shouldShowToolbarCategories || shouldShowToolbarSort) && (
+                    <div className={PRODUCT_LIST_CLASS_NAMES.categoryInlineRow}>
+                        <div>{shouldShowToolbarCategories && filterDropdown}</div>
+                        <div>{shouldShowToolbarSort && sortDropdown}</div>
+                    </div>
+                )}
+            </div>
 
             {shouldShowInlineCategories && (
                 <div className={filterWrapperClassName}>
