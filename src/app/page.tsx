@@ -1,3 +1,7 @@
-import getPage from "@/app/components/utils/getPage";
+import {renderPageByPath} from "@/app/components/utils/getPage";
 
-export default getPage;
+export const dynamic = "force-dynamic";
+
+export default async function HomePage() {
+    return renderPageByPath("/");
+}

@@ -1,0 +1,40 @@
+<!-- @dsCard group="Components" viewport="700x200" name="Navigation — TabBar" subtitle="Floating Liquid Glass bottom tab bar" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../../styles.css" />
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+<style>
+  body { margin: 0; }
+  .wrap { padding: 26px; box-sizing: border-box; min-height: 200px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+  .blob { position: absolute; border-radius: 50%; }
+</style>
+</head>
+<body>
+<div class="wrap vitan-canvas">
+  <div class="blob" style="width:160px;height:160px;background:var(--sys-blue);opacity:.5;top:-30px;left:80px"></div>
+  <div class="blob" style="width:130px;height:130px;background:var(--sys-pink);opacity:.45;bottom:-30px;right:120px"></div>
+  <div id="root"></div>
+</div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<script type="text/babel">
+  const { TabBar } = window.VitanDesignSystem_b00aee;
+  function Demo() {
+    const [tab, setTab] = React.useState("shop");
+    return (
+      <TabBar floating={false} value={tab} onChange={setTab} items={[
+        { value: "shop", label: "Shop", icon: "ph-storefront" },
+        { value: "favorites", label: "Favorites", icon: "ph-heart" },
+        { value: "cart", label: "Cart", icon: "ph-shopping-bag", badge: 3 },
+        { value: "profile", label: "Profile", icon: "ph-user" },
+      ]} />
+    );
+  }
+  ReactDOM.createRoot(document.getElementById("root")).render(<Demo />);
+</script>
+</body>
+</html>

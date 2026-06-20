@@ -9,6 +9,7 @@ export enum MediaSize {
 
     isUpMd = '(min-width: 744px)',
     isUpMdFigma = '(min-width: 768px)',
+    isUpDesktop = '(min-width: 1024px)',
     isUpLg = '(min-width: 1152px)',
     isUpXxl = '(min-width: 1440px)',
 }

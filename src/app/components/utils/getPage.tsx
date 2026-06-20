@@ -1,14 +1,87 @@
 import {getCtfPage} from "@/lib/getPage";
 import {getReactComponent} from "@/app/components/utils/getReactComponent";
-import {PageParams} from "@/types/page";
+import {CtfComponent, isRenderableCtfComponent, RenderableCtfComponent} from "@/types/ctfComponents";
+import {Fragment} from "react";
+import {getProducts} from "@/lib/products";
+import {getContentfulRevalidateSeconds} from "@/lib/cache";
+import {CatalogSortOption} from "@/types/catalog";
+import type {ProductsResult} from "@/types/product";
+import type {HeaderConfig} from "@/types/header";
 
-export default async function getPage({ params }: PageParams) {
-    const page = await getCtfPage(params.slug ? `/${params.slug}` : '/');
+const isCtfComponent = (value: unknown): value is CtfComponent => {
+    if (!value || typeof value !== "object") return false;
+    const entry = value as { fields?: { type?: unknown }, sys?: { id?: unknown } };
+    const fields = entry.fields;
+    const id = entry.sys?.id;
+
+    return Boolean(fields && Array.isArray(fields.type) && typeof fields.type[0] === "string" && typeof id === "string");
+};
+
+const normalizeCtfComponent = (component: Omit<CtfComponent, 'type' | 'config'>): CtfComponent => ({
+    ...component,
+    type: component.fields.type[0],
+    config: component.fields.config,
+} as CtfComponent);
+
+const getInitialProductSort = (components: RenderableCtfComponent[]): CatalogSortOption | null => {
+    const productListComponent = components.find(component => {
+        return component.type === "MainPage" || component.type === "Catalog";
+    });
+
+    if (!productListComponent) return null;
+
+    if (productListComponent.type === "Catalog") {
+        return productListComponent.config.defaultSort ?? "newest";
+    }
+
+    return "newest";
+};
+
+const getHeaderConfig = (components: RenderableCtfComponent[]): HeaderConfig | undefined => {
+    const headerComponent = components.find(component => component.type === "Header");
+    if (!headerComponent || headerComponent.type !== "Header") return undefined;
+
+    return headerComponent.config;
+};
+
+export async function renderPageByPath(path = "/") {
+    const page = await getCtfPage(path);
     if (!page?.fields) return null;
     const references = page?.fields.references;
 
     if (Array.isArray(references)) {
-        return references.map(ref => getReactComponent(ref))
+        const components: RenderableCtfComponent[] = [];
+        for (const reference of references) {
+            if (isCtfComponent(reference)) {
+                const component = normalizeCtfComponent(reference);
+
+                if (isRenderableCtfComponent(component)) {
+                    components.push(component);
+                }
+            }
+        }
+
+        const initialProductSort = getInitialProductSort(components);
+        const headerConfig = getHeaderConfig(components);
+        let initialProducts: ProductsResult | undefined;
+
+        if (initialProductSort) {
+            const revalidateSeconds = getContentfulRevalidateSeconds();
+
+            initialProducts = await getProducts({
+                limit: 100,
+                sortBy: initialProductSort,
+                revalidateSeconds,
+            });
+        }
+
+        const renderedComponents = components.map(ref => getReactComponent(ref, {headerConfig, initialProducts}));
+
+        return renderedComponents.map((component, index) => (
+            <Fragment key={components[index].sys.id}>
+                {component}
+            </Fragment>
+        ));
     }
 
     return null;

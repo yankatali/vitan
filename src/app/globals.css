@@ -1,7 +1,408 @@
 @import "tailwindcss";
 
+:root {
+    --vitan: #10c775;
+    --vitan-strong: #0ba862;
+    --vitan-soft: #5be0a8;
+    --vitan-tint: rgba(16, 199, 117, 0.14);
+    --sys-blue: #007aff;
+    --sys-pink: #ff2d55;
+    --sys-red: #ff3b30;
+    --label: rgba(0, 0, 0, 0.92);
+    --label-secondary: rgba(60, 60, 67, 0.6);
+    --label-tertiary: rgba(60, 60, 67, 0.3);
+    --label-quaternary: rgba(60, 60, 67, 0.18);
+    --fill: rgba(120, 120, 128, 0.12);
+    --fill-secondary: rgba(120, 120, 128, 0.16);
+    --fill-tertiary: rgba(118, 118, 128, 0.08);
+    --separator: rgba(60, 60, 67, 0.2);
+    --bg: #f2f2f7;
+    --bg-elevated: #ffffff;
+    --accent: var(--vitan);
+    --accent-press: var(--vitan-strong);
+    --text-primary: var(--label);
+    --text-secondary: var(--label-secondary);
+    --text-tertiary: var(--label-tertiary);
+    --text-on-accent: #ffffff;
+    --favorite: var(--sys-pink);
+    --destructive: var(--sys-red);
+    --surface-card: var(--bg-elevated);
+    --glass-blur-thin: 18px;
+    --glass-blur-regular: 30px;
+    --glass-blur-thick: 44px;
+    --glass-saturate: 180%;
+    --glass-tint-thin: rgba(255, 255, 255, 0.45);
+    --glass-tint-regular: rgba(255, 255, 255, 0.62);
+    --glass-tint-thick: rgba(255, 255, 255, 0.78);
+    --glass-rim: rgba(255, 255, 255, 0.65);
+    --glass-rim-strong: rgba(255, 255, 255, 0.85);
+    --glass-edge-shadow: rgba(0, 0, 0, 0.06);
+    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.04), 0 6px 16px rgba(0, 0, 0, 0.06);
+    --shadow-float: 0 4px 12px rgba(0, 0, 0, 0.08), 0 18px 40px rgba(0, 0, 0, 0.14);
+    --shadow-glass: 0 8px 30px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
+    --glass-specular:
+        inset 0 1px 0 0 var(--glass-rim-strong),
+        inset 1px 0 0 0 var(--glass-rim),
+        inset 0 -1px 0 0 var(--glass-edge-shadow);
+    --ease-glass: cubic-bezier(0.32, 0.72, 0, 1);
+    --ease-spring: cubic-bezier(0.5, 1.4, 0.4, 1);
+    --dur-fast: 0.18s;
+    --dur-base: 0.28s;
+    --dur-slow: 0.42s;
+    --radius-xs: 8px;
+    --radius-sm: 12px;
+    --radius-md: 16px;
+    --radius-lg: 20px;
+    --radius-xl: 26px;
+    --radius-2xl: 34px;
+    --radius-capsule: 999px;
+    --font-text: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", system-ui, sans-serif;
+    --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", system-ui, sans-serif;
+    --t-headline: 600 17px/22px var(--font-text);
+    --t-subhead: 400 15px/20px var(--font-text);
+    --t-footnote: 400 13px/18px var(--font-text);
+    --t-caption1: 400 12px/16px var(--font-text);
+}
+
+html {
+    min-height: 100%;
+    background:
+        radial-gradient(120% 80% at 12% 0%, rgba(16, 199, 117, 0.18), transparent 55%),
+        radial-gradient(110% 90% at 100% 8%, rgba(0, 122, 255, 0.16), transparent 55%),
+        radial-gradient(120% 100% at 80% 100%, rgba(175, 82, 222, 0.12), transparent 60%),
+        var(--bg);
+    background-attachment: fixed;
+}
+
+body {
+    min-height: 100%;
+    background: transparent;
+    color: var(--text-primary);
+    font-family: var(--font-text);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
 * {
     margin: 0;
 
 }
 
+button,
+a {
+
+    cursor: pointer;
+
+}
+
+.liquid-surface {
+    isolation: isolate;
+    overflow: hidden;
+    border: 0;
+    background:
+        radial-gradient(120% 90% at 12% 0%, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0) 52%),
+        radial-gradient(130% 110% at 100% 100%, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 58%),
+        rgba(255, 255, 255, 0.12);
+    box-shadow:
+        0 6px 16px rgba(23, 21, 12, 0.055),
+        0 1px 3px rgba(23, 21, 12, 0.035),
+        inset 0 1px 1px rgba(255, 255, 255, 0.92),
+        inset 0 -1px 1px rgba(23, 21, 12, 0.07),
+        inset 0 0 0 0.75px rgba(255, 255, 255, 0.5),
+        inset 18px 18px 34px rgba(255, 255, 255, 0.16),
+        inset -22px -24px 38px rgba(23, 21, 12, 0.035);
+    backdrop-filter: blur(34px) saturate(190%) contrast(1.08);
+    -webkit-backdrop-filter: blur(34px) saturate(190%) contrast(1.08);
+}
+
+:where(.liquid-surface):not(.absolute):not(.fixed):not(.sticky) {
+    position: relative;
+}
+
+.liquid-surface::before,
+.liquid-surface::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: inherit;
+    pointer-events: none;
+}
+
+.liquid-surface::before {
+    background:
+        radial-gradient(110% 80% at 0% 0%, rgba(255, 255, 255, 0.46), rgba(255, 255, 255, 0) 48%),
+        radial-gradient(95% 75% at 100% 0%, rgba(206, 223, 255, 0.14), rgba(255, 255, 255, 0) 54%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 42%, rgba(23, 21, 12, 0.03));
+}
+
+.liquid-surface::after {
+    inset: 0;
+    box-shadow:
+        inset 1px 1px 0 rgba(255, 255, 255, 0.7),
+        inset -1px -1px 0 rgba(23, 21, 12, 0.08);
+}
+
+.liquid-surface > * {
+    position: relative;
+    z-index: 1;
+}
+
+.liquid-popover {
+    isolation: isolate;
+    border: 0;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.72)),
+        rgba(255, 255, 255, 0.78);
+    box-shadow:
+        0 10px 24px rgba(23, 21, 12, 0.1),
+        0 2px 8px rgba(23, 21, 12, 0.055),
+        inset 0 1px 1px rgba(255, 255, 255, 0.95),
+        inset 0 -1px 1px rgba(23, 21, 12, 0.06),
+        inset 0 0 0 0.75px rgba(255, 255, 255, 0.62);
+    backdrop-filter: blur(22px) saturate(155%);
+    -webkit-backdrop-filter: blur(22px) saturate(155%);
+}
+
+.liquid-popover > * {
+    position: relative;
+    z-index: 1;
+}
+
+.liquid-modal {
+    isolation: isolate;
+    border: 0;
+    background:
+        radial-gradient(110% 80% at 12% 0%, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0) 54%),
+        radial-gradient(100% 90% at 100% 100%, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0) 58%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.68)),
+        rgba(255, 255, 255, 0.76);
+    box-shadow:
+        0 18px 48px rgba(23, 21, 12, 0.14),
+        0 2px 10px rgba(23, 21, 12, 0.06),
+        inset 0 1px 1px rgba(255, 255, 255, 0.98),
+        inset 0 -1px 1px rgba(23, 21, 12, 0.06),
+        inset 0 0 0 0.75px rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(30px) saturate(170%);
+    -webkit-backdrop-filter: blur(30px) saturate(170%);
+}
+
+.liquid-modal > * {
+    position: relative;
+    z-index: 1;
+}
+
+.liquid-control {
+    border: 0;
+    background:
+        radial-gradient(120% 140% at 50% -50%, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.12) 48%, rgba(255, 255, 255, 0) 72%),
+        rgba(255, 255, 255, 0.22);
+    box-shadow:
+        0 8px 18px rgba(23, 21, 12, 0.08),
+        inset 0 1px 1px rgba(255, 255, 255, 0.88),
+        inset 0 -1px 1px rgba(23, 21, 12, 0.08),
+        inset 0 0 0 0.75px rgba(255, 255, 255, 0.48);
+    backdrop-filter: blur(20px) saturate(175%) contrast(1.05);
+    -webkit-backdrop-filter: blur(20px) saturate(175%) contrast(1.05);
+}
+
+.liquid-control:focus,
+.liquid-control:focus-within,
+.liquid-control:focus-visible {
+    box-shadow:
+        0 0 0 3px rgba(255, 255, 255, 0.38),
+        0 8px 18px rgba(23, 21, 12, 0.08),
+        inset 0 1px 1px rgba(255, 255, 255, 0.92),
+        inset 0 -1px 1px rgba(23, 21, 12, 0.1),
+        inset 0 0 0 0.75px rgba(23, 21, 12, 0.18);
+}
+
+:where(.liquid-button, .liquid-button-soft, .liquid-button-danger, .liquid-button-success) {
+    border-radius: 100px;
+}
+
+.liquid-button,
+.liquid-button-soft,
+.liquid-button-danger,
+.liquid-button-success {
+    --liquid-bg-top: rgba(255, 255, 255, 0.28);
+    --liquid-bg-mid: rgba(255, 255, 255, 0.04);
+    --liquid-bg-bottom: rgba(255, 255, 255, 0.2);
+    --liquid-edge-light: rgba(255, 255, 255, 0.96);
+    --liquid-shadow-color: rgba(23, 21, 12, 0.07);
+    --liquid-focus-color: rgba(23, 21, 12, 0.14);
+    --liquid-text-color: #2c2b2a;
+    --liquid-text-shadow: none;
+    isolation: isolate;
+    overflow: hidden;
+    border: 0;
+    background:
+        radial-gradient(105% 135% at 50% -50%, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.13) 48%, rgba(255, 255, 255, 0) 74%),
+        linear-gradient(180deg, var(--liquid-bg-top) 0%, var(--liquid-bg-mid) 50%, var(--liquid-bg-bottom) 100%);
+    box-shadow:
+        0 2px 5px var(--liquid-shadow-color),
+        0 1px 1px rgba(23, 21, 12, 0.035),
+        inset 0 1px 1px var(--liquid-edge-light),
+        inset 0 -1px 1px rgba(23, 21, 12, 0.08),
+        inset 0 0 0 0.75px rgba(255, 255, 255, 0.56),
+        inset 7px 0 14px rgba(255, 255, 255, 0.14),
+        inset -7px -8px 14px rgba(23, 21, 12, 0.025);
+    color: var(--liquid-text-color);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+    letter-spacing: 0;
+    text-shadow: var(--liquid-text-shadow);
+    background-clip: padding-box;
+    backdrop-filter: blur(16px) saturate(190%) contrast(1.1);
+    -webkit-backdrop-filter: blur(16px) saturate(190%) contrast(1.1);
+    transform: translateZ(0);
+}
+
+:where(.liquid-button, .liquid-button-soft, .liquid-button-danger, .liquid-button-success):not(.absolute):not(.fixed):not(.sticky) {
+    position: relative;
+}
+
+.liquid-button-soft {
+    --liquid-bg-top: rgba(255, 255, 255, 0.34);
+    --liquid-bg-mid: rgba(255, 255, 255, 0.06);
+    --liquid-bg-bottom: rgba(255, 255, 255, 0.22);
+    --liquid-shadow-color: rgba(23, 21, 12, 0.055);
+}
+
+.liquid-button-selected {
+    --liquid-bg-top: rgba(255, 255, 255, 0.92);
+    --liquid-bg-mid: rgba(255, 255, 255, 0.56);
+    --liquid-bg-bottom: rgba(255, 255, 255, 0.72);
+    --liquid-shadow-color: rgba(23, 21, 12, 0.055);
+    background:
+        radial-gradient(110% 150% at 50% -70%, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.32) 48%, rgba(255, 255, 255, 0) 76%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.34)),
+        rgba(255, 255, 255, 0.56);
+    color: #09885c;
+    font-weight: 600;
+    box-shadow:
+        0 5px 14px rgba(23, 21, 12, 0.07),
+        0 1px 2px rgba(23, 21, 12, 0.035),
+        inset 0 1px 1px rgba(255, 255, 255, 0.98),
+        inset 0 -10px 18px rgba(255, 255, 255, 0.28),
+        inset 0 0 0 0.75px rgba(255, 255, 255, 0.76);
+}
+
+.liquid-button {
+    --liquid-bg-top: rgba(255, 255, 255, 0.3);
+    --liquid-bg-mid: rgba(255, 255, 255, 0.04);
+    --liquid-bg-bottom: rgba(255, 255, 255, 0.22);
+    --liquid-shadow-color: rgba(23, 21, 12, 0.065);
+}
+
+.liquid-button-danger {
+    --liquid-bg-top: rgba(255, 255, 255, 0.3);
+    --liquid-bg-mid: rgba(255, 255, 255, 0.04);
+    --liquid-bg-bottom: rgba(255, 255, 255, 0.22);
+    --liquid-shadow-color: rgba(23, 21, 12, 0.06);
+    --liquid-text-color: #8c2d1d;
+}
+
+.liquid-button-success {
+    --liquid-bg-top: rgba(255, 255, 255, 0.3);
+    --liquid-bg-mid: rgba(255, 255, 255, 0.04);
+    --liquid-bg-bottom: rgba(255, 255, 255, 0.22);
+    --liquid-shadow-color: rgba(23, 21, 12, 0.06);
+}
+
+.liquid-button:focus-visible,
+.liquid-button-soft:focus-visible,
+.liquid-button-danger:focus-visible,
+.liquid-button-success:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.88);
+    outline-offset: 2px;
+    box-shadow:
+        0 0 0 3px rgba(255, 255, 255, 0.42),
+        0 2px 5px var(--liquid-shadow-color),
+        0 1px 1px rgba(23, 21, 12, 0.035),
+        inset 0 1px 1px var(--liquid-edge-light),
+        inset 0 -1px 1px rgba(23, 21, 12, 0.08),
+        inset 0 0 0 0.75px rgba(255, 255, 255, 0.56),
+        inset 7px 0 14px rgba(255, 255, 255, 0.14),
+        inset -7px -8px 14px rgba(23, 21, 12, 0.025);
+}
+
+.liquid-button:disabled,
+.liquid-button-soft:disabled,
+.liquid-button-danger:disabled,
+.liquid-button-success:disabled {
+    filter: saturate(0.7);
+}
+
+.liquid-button-selected:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.9);
+    outline-offset: 2px;
+    box-shadow:
+        0 0 0 3px rgba(255, 255, 255, 0.42),
+        0 5px 14px rgba(23, 21, 12, 0.07),
+        0 1px 2px rgba(23, 21, 12, 0.035),
+        inset 0 1px 1px rgba(255, 255, 255, 0.98),
+        inset 0 -10px 18px rgba(255, 255, 255, 0.28),
+        inset 0 0 0 0.75px rgba(255, 255, 255, 0.76);
+}
+
+.liquid-nav-indicator {
+    position: absolute;
+    bottom: 0.5rem;
+    left: 0.5rem;
+    top: 0.5rem;
+    width: calc((100% - 1.5rem) / 3);
+    border-radius: 1.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.52);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.12)),
+        rgba(255, 255, 255, 0.38);
+    box-shadow:
+        0 6px 16px rgba(23, 21, 12, 0.075),
+        inset 0 -12px 20px rgba(255, 255, 255, 0.16);
+    transform: translateX(calc(var(--active-index, 0) * (100% + 0.25rem)));
+    transition:
+        transform 340ms cubic-bezier(0.2, 0.8, 0.2, 1),
+        width 340ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    backdrop-filter: blur(26px) saturate(180%);
+    -webkit-backdrop-filter: blur(26px) saturate(180%);
+}
+
+.vitan-product-card {
+    background: var(--surface-card);
+    box-shadow: var(--shadow-card);
+}
+
+.vitan-accent-button {
+    border: 0;
+    background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 88%, #fff) 0%, var(--accent) 100%);
+    color: var(--text-on-accent);
+    box-shadow:
+        inset 0 1px 0.5px rgba(255, 255, 255, 0.65),
+        0 1px 2px rgba(0, 0, 0, 0.1),
+        0 5px 14px rgba(0, 0, 0, 0.1);
+}
+
+.vitan-glass-chip {
+    background: var(--glass-tint-regular);
+    box-shadow: var(--glass-specular), var(--shadow-card);
+    backdrop-filter: blur(var(--glass-blur-regular)) saturate(var(--glass-saturate));
+    -webkit-backdrop-filter: blur(var(--glass-blur-regular)) saturate(var(--glass-saturate));
+}
+
+.vitan-sheet-panel {
+    background: var(--glass-tint-thick);
+    box-shadow: var(--glass-specular), var(--shadow-float);
+    backdrop-filter: blur(var(--glass-blur-thick)) saturate(var(--glass-saturate));
+    -webkit-backdrop-filter: blur(var(--glass-blur-thick)) saturate(var(--glass-saturate));
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+    }
+}

@@ -1,0 +1,34 @@
+/* ============================================================
+   Vitan — Spacing, radii, layout metrics (4pt grid)
+   ============================================================ */
+
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* iOS continuous-corner radii */
+  --radius-xs: 8px;
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --radius-xl: 26px;
+  --radius-2xl: 34px;
+  --radius-capsule: 999px;
+
+  /* hit targets */
+  --hit-min: 44px;
+
+  /* layout */
+  --content-max: 1100px;
+  --tabbar-height: 64px;
+  --header-height: 52px;
+  --gutter: 16px;
+}

@@ -1,0 +1,30 @@
+export const PRODUCT_LIST_CLASS_NAMES = {
+    mainPageContainer: "flex h-screen flex-col gap-2 text-[var(--text-primary)]",
+    mainPageRoot: "flex min-h-0 flex-1 flex-col gap-2",
+    mainPageToolbar: "vitan-sheet-panel sticky top-0 z-30 grid grid-cols-[auto_1fr_auto] items-center gap-2 rounded-b-[var(--radius-xl)] px-3 pb-3 pt-3 min-[744px]:px-4 min-[1024px]:gap-4 min-[1024px]:px-6",
+    mainPageToolbarTitleGroup: "flex items-center gap-3",
+    mainPageToolbarTitle: "cursor-pointer whitespace-nowrap text-[22px] font-bold leading-7 tracking-[-0.4px] text-[var(--text-primary)] min-[1024px]:text-[28px] min-[1024px]:leading-[34px]",
+    mainPageSearch: "min-w-0",
+    mainPageActions: "flex items-center justify-end gap-3",
+    mainPageToolbarNav: "hidden items-center gap-4 min-[1024px]:flex",
+    mainPageCreator: "flex justify-end",
+    mainPageFilters: "flex flex-wrap gap-2 px-4 min-[1024px]:px-6",
+    mainPageSort: "px-4 min-[1024px]:px-6",
+    mainPageGrid: "grid flex-1 auto-rows-[31rem] grid-cols-1 content-start items-stretch gap-[14px] overflow-y-auto p-4 pb-36 min-[744px]:auto-rows-[28rem] min-[744px]:grid-cols-2 min-[1100px]:auto-rows-[29rem] min-[1100px]:grid-cols-3 min-[1600px]:grid-cols-4 min-[1024px]:pb-4",
+    mainPageMessage: "col-span-full rounded-[var(--radius-xl)] px-6 py-16 text-center text-[15px] leading-5 text-[var(--text-secondary)]",
+    categoryDropdownWrapper: "relative h-10",
+    categoryDropdownButton: "vitan-accent-button inline-flex h-11 w-11 items-center justify-center rounded-full transition-transform duration-200 hover:scale-[1.04] active:scale-[0.96]",
+    filterButton: "vitan-glass-chip inline-flex h-10 items-center gap-2 rounded-[var(--radius-capsule)] px-4 text-[15px] font-semibold leading-none tracking-[-0.1px] text-[var(--text-primary)] transition-transform duration-200 hover:scale-[1.02] active:scale-[0.96]",
+    categoryDropdownMenu: "liquid-popover absolute left-0 top-[calc(100%+0.5rem)] z-[70] grid max-h-72 min-w-64 gap-2 overflow-y-auto rounded-[var(--radius-xl)] p-2",
+    categoryInlineRow: "relative z-20 flex w-full min-w-0 items-center justify-between gap-3 px-4 pb-3 pt-1 min-[1024px]:px-6",
+    sortDropdownWrapper: "relative h-10",
+    sortButton: "vitan-glass-chip relative inline-flex h-10 w-10 items-center justify-center rounded-[var(--radius-capsule)] text-[var(--text-primary)] transition-transform duration-200 hover:scale-[1.04] active:scale-[0.94]",
+    sortDropdownMenu: "liquid-popover absolute right-0 top-[calc(100%+0.5rem)] z-[70] grid min-w-64 gap-1 rounded-[var(--radius-xl)] p-2",
+    toolbarSortSelect: "vitan-glass-chip h-10 w-fit appearance-none rounded-[var(--radius-capsule)] px-3 pr-7 text-[15px] font-semibold text-[var(--text-primary)] outline-none transition-all [field-sizing:content]",
+};
+
+export const PRODUCT_CATEGORY_LABELS = {
+    all: "Категорії",
+    allOption: "Усі категорії",
+    filters: "Фільтри",
+};

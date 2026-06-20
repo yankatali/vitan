@@ -1,0 +1,16 @@
+export const PRODUCT_CARD_CLASS_NAMES = {
+    article: "vitan-product-card flex h-full min-w-0 flex-col overflow-hidden rounded-[var(--radius-lg)] transition-transform duration-200 hover:-translate-y-0.5 active:scale-[0.99]",
+    imageScroller: "flex w-full snap-x overflow-x-auto bg-[var(--fill)] [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+    imageButton: "group relative block h-72 w-full flex-none cursor-zoom-in snap-start overflow-hidden focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--accent)] min-[744px]:h-52 min-[1100px]:h-56 min-[1600px]:h-56",
+    image: "h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]",
+    imageDots: "-mt-6 mb-3 flex items-center justify-center gap-1.5",
+    imageDot: "h-1.5 w-1.5 rounded-full bg-white/65 shadow-sm shadow-black/20 transition-colors",
+    activeImageDot: "h-1.5 w-4 rounded-full bg-white shadow-sm shadow-black/25 transition-all",
+    content: "flex min-h-0 flex-1 flex-col gap-[7px] p-[13px]",
+    title: "line-clamp-1 min-w-0 break-words text-[17px] font-semibold leading-[22px] tracking-[-0.3px] text-[var(--text-primary)]",
+    category: "w-fit rounded-full bg-[var(--vitan-tint)] px-2.5 py-1 text-[12px] font-semibold leading-4 text-[var(--accent-press)]",
+    description: "line-clamp-2 text-[15px] leading-5 text-[var(--text-secondary)]",
+    footer: "mt-auto flex flex-col gap-2 pt-1.5",
+    priceUsd: "text-[18px] font-bold leading-6 tracking-[-0.2px] text-[var(--text-primary)]",
+    priceUah: "text-[13px] font-medium leading-[18px] text-[var(--accent-press)]",
+};

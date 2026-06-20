@@ -1,3 +1,4 @@
 export interface MainPageConfig {
-    lible: string;
+    label?: string;
+    title?: string;
 }

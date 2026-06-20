@@ -1,0 +1,31 @@
+<!-- @dsCard group="Glass" viewport="700x220" name="Liquid Glass Materials" subtitle="thin / regular / thick over the canvas" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { margin: 0; }
+  .canvas { padding: 26px; min-height: 220px; box-sizing: border-box; }
+  .row { display: flex; gap: 16px; }
+  .pane { flex: 1; height: 130px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: var(--label); }
+  .pane b { font: 600 15px/1 var(--font-text); }
+  .pane span { font: 400 11px/1 var(--font-mono); color: var(--label-secondary); }
+  /* decorative shapes behind glass so the blur is visible */
+  .canvas { position: relative; overflow: hidden; }
+  .blob { position: absolute; border-radius: 50%; filter: blur(2px); }
+</style>
+</head>
+<body>
+  <div class="canvas vitan-canvas">
+    <div class="blob" style="width:120px;height:120px;background:var(--sys-orange);top:-20px;left:60px"></div>
+    <div class="blob" style="width:90px;height:90px;background:var(--sys-blue);bottom:-10px;left:280px"></div>
+    <div class="blob" style="width:110px;height:110px;background:var(--sys-pink);top:30px;right:40px"></div>
+    <div class="row">
+      <div class="pane glass-thin"><b>Thin</b><span>blur 18</span></div>
+      <div class="pane glass"><b>Regular</b><span>blur 30</span></div>
+      <div class="pane glass-thick"><b>Thick</b><span>blur 44</span></div>
+    </div>
+  </div>
+</body>
+</html>

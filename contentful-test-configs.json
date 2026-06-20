@@ -1,0 +1,74 @@
+{
+  "page": {
+    "name": "/",
+    "references": [
+      "header-vitan",
+      "catalog-home"
+    ]
+  },
+  "pageComponents": [
+    {
+      "entryId": "header-vitan",
+      "type": ["Header"],
+      "config": {
+        "title": "Vitan",
+        "headerButtons": [
+          { "url": "/", "label": "Покупки", "iconName": "shop" },
+          { "url": "/wishlist", "label": "Вибране", "iconName": "wishlist" },
+          { "url": "/cart", "label": "Кошик", "iconName": "cart" }
+        ]
+      }
+    },
+    {
+      "entryId": "catalog-home",
+      "type": ["Catalog"],
+      "config": {
+        "title": "Каталог",
+        "searchPlaceholder": "Пошук товару",
+        "defaultSort": "newest",
+        "sortOptions": ["newest", "priceAsc", "priceDesc", "titleAsc"],
+        "categories": ["Посуд", "Декор"],
+        "currency": {
+          "base": "USD",
+          "target": "UAH",
+          "rateProvider": "NBU",
+          "revalidateSeconds": 3600
+        }
+      },
+      "references": [
+        "item-plate-026",
+        "item-vase-018"
+      ]
+    },
+    {
+      "entryId": "item-plate-026",
+      "type": ["Item"],
+      "config": {
+        "sku": "PLATE-026-BEIGE",
+        "slug": "linen-plate-26-beige",
+        "title": "Тарілка Linen 26 см",
+        "description": "Керамічна тарілка для щоденного використання.",
+        "category": "Посуд",
+        "priceUsd": 29.9,
+        "imageUrl": "https://via.placeholder.com/560x420?text=Linen+Plate+26",
+        "imageAlt": "Тарілка Linen 26 см",
+        "isActive": true
+      }
+    },
+    {
+      "entryId": "item-vase-018",
+      "type": ["Item"],
+      "config": {
+        "sku": "VASE-018-MATTE",
+        "slug": "matte-vase-18-sand",
+        "title": "Ваза Matte 18 см",
+        "description": "Мінімалістична ваза для сухоцвітів.",
+        "category": "Декор",
+        "priceUsd": 24.5,
+        "imageUrl": "https://via.placeholder.com/560x420?text=Matte+Vase+18",
+        "imageAlt": "Ваза Matte 18 см",
+        "isActive": true
+      }
+    }
+  ]
+}

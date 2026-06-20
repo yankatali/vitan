@@ -1,17 +1,19 @@
 
 export default function WishlistIcon({
-                                         size = 24,
-                                         className = '',
-                                     }: {
+    size = 24,
+    className = "",
+    filled = false,
+}: {
     size?: number;
     className?: string;
+    filled?: boolean;
 }) {
     return (
         <svg
             width={size}
             height={size}
             viewBox="0 0 24 24"
-            fill="none"
+            fill={filled ? "currentColor" : "none"}
             stroke="currentColor"
             strokeWidth="1.5"
             strokeLinecap="round"

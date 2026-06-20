@@ -1,0 +1,88 @@
+/* ============================================================
+   Vitan — Color tokens
+   Apple iOS-26 system palette + Vitan brand accent.
+   Colors are tuned to read well THROUGH translucent glass.
+   ============================================================ */
+
+:root {
+  /* ---- Vitan brand ---- */
+  --vitan: #10C775;            /* signature vibrant green (vitality) */
+  --vitan-strong: #0BA862;
+  --vitan-soft: #5BE0A8;
+  --vitan-tint: rgba(16, 199, 117, 0.14);
+
+  /* ---- iOS system colors (light) ---- */
+  --sys-blue: #007AFF;
+  --sys-green: #34C759;
+  --sys-indigo: #5856D6;
+  --sys-orange: #FF9500;
+  --sys-pink: #FF2D55;
+  --sys-purple: #AF52DE;
+  --sys-red: #FF3B30;
+  --sys-teal: #30B0C7;
+  --sys-cyan: #32ADE6;
+  --sys-yellow: #FFCC00;
+  --sys-mint: #00C7BE;
+
+  /* ---- Labels (black w/ alpha, iOS convention) ---- */
+  --label: rgba(0, 0, 0, 0.92);
+  --label-secondary: rgba(60, 60, 67, 0.60);
+  --label-tertiary: rgba(60, 60, 67, 0.30);
+  --label-quaternary: rgba(60, 60, 67, 0.18);
+
+  /* ---- Fills (translucent grays for chips/fields) ---- */
+  --fill: rgba(120, 120, 128, 0.12);
+  --fill-secondary: rgba(120, 120, 128, 0.16);
+  --fill-tertiary: rgba(118, 118, 128, 0.08);
+
+  /* ---- Separators ---- */
+  --separator: rgba(60, 60, 67, 0.20);
+  --separator-opaque: #D1D1D6;
+
+  /* ---- Backgrounds ---- */
+  --bg: #F2F2F7;               /* grouped system background */
+  --bg-elevated: #FFFFFF;
+  --bg-secondary: #FFFFFF;
+  --bg-tertiary: #F2F2F7;
+
+  /* ---- Semantic aliases ---- */
+  --accent: var(--vitan);
+  --accent-press: var(--vitan-strong);
+  --text-primary: var(--label);
+  --text-secondary: var(--label-secondary);
+  --text-tertiary: var(--label-tertiary);
+  --text-on-accent: #FFFFFF;
+  --price: var(--label);
+  --favorite: var(--sys-pink);
+  --destructive: var(--sys-red);
+  --surface-card: var(--bg-elevated);
+}
+
+/* Dark scope — apply on a container with [data-theme="dark"] */
+[data-theme="dark"] {
+  --label: rgba(255, 255, 255, 0.96);
+  --label-secondary: rgba(235, 235, 245, 0.60);
+  --label-tertiary: rgba(235, 235, 245, 0.30);
+  --label-quaternary: rgba(235, 235, 245, 0.18);
+
+  --fill: rgba(120, 120, 128, 0.36);
+  --fill-secondary: rgba(120, 120, 128, 0.32);
+  --fill-tertiary: rgba(118, 118, 128, 0.24);
+
+  --separator: rgba(84, 84, 88, 0.65);
+  --separator-opaque: #38383A;
+
+  --bg: #000000;
+  --bg-elevated: #1C1C1E;
+  --bg-secondary: #1C1C1E;
+  --bg-tertiary: #2C2C2E;
+
+  --sys-blue: #0A84FF;
+  --sys-green: #30D158;
+  --sys-red: #FF453A;
+  --sys-pink: #FF375F;
+  --sys-orange: #FF9F0A;
+
+  --vitan: #1DDB87;
+  --text-on-accent: #04130C;
+}

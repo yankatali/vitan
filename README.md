@@ -1,5 +1,20 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Local Demo (without Contentful setup)
+
+To preview the catalog UI immediately with test products from `contentful-test-configs.json`, run:
+
+```bash
+USE_LOCAL_CONTENTFUL_FIXTURE=true npm run dev
+```
+
+Then open [http://localhost:3000](http://localhost:3000).
+
+When this env is enabled:
+- the app uses local test content,
+- `/`, `/wishlist`, `/cart` will render demo content,
+- USD->UAH conversion still uses live NBU rate (with caching).
+
 ## Getting Started
 
 First, run the development server:

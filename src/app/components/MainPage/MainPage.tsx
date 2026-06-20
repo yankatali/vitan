@@ -1,39 +1,40 @@
-import {MainPageConfig} from "@/types/main";
-import {SearchComponent} from "@/app/components/Search/SearchComponent";
-import {ItemComponent} from "@/app/ItemComponent/ItemComponent";
+"use client";
+
+import {ProductList} from "@/app/components/ProductList/ProductList";
+import {PRODUCT_LIST_CLASS_NAMES} from "@/constants/productListLayout";
+import type {HeaderConfig} from "@/types/header";
+import type {MainPageConfig} from "@/types/main";
+import type {ProductsResult} from "@/types/product";
 
 interface MainPageProps {
     config: MainPageConfig;
+    headerConfig?: HeaderConfig;
+    initialProducts: ProductsResult;
 }
 
-const products = [
-    {
-        image: "https://via.placeholder.com/300x200?text=Modern+Plates",
-        title: "Product 1",
-    },
-    {
-        image: "https://via.placeholder.com/300x200",
-        title: "Product 2",
-    },
-    {
-        image: "https://via.placeholder.com/300x200",
-        title: "Product 3",
-    },
-];
-export const MainPage  = ({config}: MainPageProps) => {
+export const MainPage = ({config, headerConfig, initialProducts}: MainPageProps) => {
+    const heading = headerConfig?.title ?? config.label ?? config.title;
+
     return (
-        <div className="flex flex-col gap-3 h-screen">
-            <div className="px-5 py-3 shrink-0"><SearchComponent/></div>
-                <div className="flex-1 overflow-y-auto grid grid-cols-2 md:grid-cols-3 gap-4 p-4">
-                    {products.map((product) => (
-                        <ItemComponent
-                            key={product.title}
-                            image={product.image}
-                            title={product.title}
-                        />
-                    ))}
-                </div>
+        <div className={PRODUCT_LIST_CLASS_NAMES.mainPageContainer}>
+            <ProductList
+                initialProducts={initialProducts}
+                toolbarButtons={headerConfig?.headerButtons}
+                toolbarTitle={heading}
+                showCategories
+                showSort
+                showCategoryOnCard
+                showCreateProductButton
+                showDeleteProductButton
+                rootClassName={PRODUCT_LIST_CLASS_NAMES.mainPageRoot}
+                toolbarClassName={PRODUCT_LIST_CLASS_NAMES.mainPageToolbar}
+                searchWrapperClassName={PRODUCT_LIST_CLASS_NAMES.mainPageSearch}
+                productCreatorWrapperClassName={PRODUCT_LIST_CLASS_NAMES.mainPageCreator}
+                filterWrapperClassName={PRODUCT_LIST_CLASS_NAMES.mainPageFilters}
+                sortWrapperClassName={PRODUCT_LIST_CLASS_NAMES.mainPageSort}
+                gridClassName={PRODUCT_LIST_CLASS_NAMES.mainPageGrid}
+                messageClassName={PRODUCT_LIST_CLASS_NAMES.mainPageMessage}
+            />
         </div>
-
-    )
-}
+    );
+};
