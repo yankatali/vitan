@@ -7,7 +7,7 @@ export const CART_CLASS_NAMES = {
     title: "whitespace-nowrap text-[17px] font-bold leading-[22px] text-[var(--text-primary)]",
     content: `grid gap-4 pt-2 pb-[160px] lg:pb-4 ${PAGE_CONTENT_PX}`,
     emptyState: "liquid-surface rounded-3xl p-6 text-sm text-[#6b615b]",
-    list: `grid grid-cols-2 content-start items-stretch ${CARD_GRID_GAP} md:grid-cols-3 lg:grid-cols-4`,
+    list: `grid grid-cols-2 content-start items-stretch ${CARD_GRID_GAP} md:grid-cols-3 xl:grid-cols-4`,
     item: "liquid-surface grid grid-cols-[80px_1fr] gap-3 rounded-3xl p-2 md:grid-cols-[120px_1fr_auto] md:items-center",
     image: "aspect-square w-full rounded-3xl object-cover",
     imagePlaceholder: "flex aspect-square w-full items-center justify-center rounded-3xl bg-[rgba(255,255,255,0.15)] text-[var(--text-tertiary)] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.06)]",
