@@ -19,6 +19,7 @@ export const MainPage = ({config, headerConfig, initialProducts, pricingConfig}:
 
     return (
         <div className={PRODUCT_LIST_CLASS_NAMES.mainPageContainer}>
+
             <ProductList
                 initialProducts={initialProducts}
                 pricingConfig={pricingConfig}
