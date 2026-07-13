@@ -3,6 +3,7 @@ import type { AboutUsConfig } from './about';
 import type { MainPageConfig } from './main';
 import type { CatalogConfig } from './catalog';
 import type { ItemConfig } from './item';
+import type { PricingConfig } from './pricingConfig';
 import type { ProductsResult } from './product';
 
 interface ComponentSys {
@@ -52,4 +53,5 @@ export const isRenderableCtfComponent = (component: CtfComponent): component is 
 export interface GetReactComponentOptions {
     headerConfig?: HeaderConfig;
     initialProducts?: ProductsResult;
+    pricingConfig?: PricingConfig | null;
 }

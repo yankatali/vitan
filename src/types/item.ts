@@ -5,7 +5,10 @@ export interface ItemConfig {
     title: string;
     description: string;
     category: string;
-    priceUsd: number;
+    priceUsd?: number;
+    priceUah: number | null;
+    priceUahWholesale?: number | null;
+    wholesaleDescription?: string;
     imageUrl: string;
     imageUrls?: string[];
     imageAlt?: string;
@@ -22,6 +25,8 @@ export interface ItemComponentProps {
     description?: string;
     priceUsd?: number;
     priceUah?: number | null;
+    priceUahWholesale?: number | null;
+    wholesaleDescription?: string;
     category?: string;
     showProductActions?: boolean;
     showAdminActions?: boolean;

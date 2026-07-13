@@ -26,9 +26,12 @@ export async function GET(request: NextRequest) {
 
     try {
         const revalidateSeconds = getContentfulRevalidateSeconds();
+        const categoriesParam = params.get("categories");
+        const category = categoriesParam ? categoriesParam.split(",").filter(Boolean) : undefined;
+
         const products = await getProducts({
             query: params.get("query") ?? undefined,
-            category: params.get("category") ?? undefined,
+            category,
             sortBy: getSortParam(params.get("sortBy")),
             skip: getNumberParam(params.get("skip")),
             limit: getNumberParam(params.get("limit")),
@@ -36,7 +39,10 @@ export async function GET(request: NextRequest) {
         });
 
         return NextResponse.json(products, {
-            headers: getProductsApiCacheHeaders(),
+            headers: {
+                ...getProductsApiCacheHeaders(),
+                "CDN-Cache-Control": "no-store",
+            },
         });
     } catch (error) {
         let message = "Unable to load products";

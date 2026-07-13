@@ -1,27 +1,34 @@
 "use client";
 
-import {useState} from "react";
+import Link from "next/link";
+import {useEffect, useMemo, useRef, useState} from "react";
 import {SearchComponent} from "@/app/components/Search/SearchComponent";
 import {PRODUCT_CREATOR_WRAPPER_CLASS_NAME, PRODUCT_SORT_LABELS, PRODUCT_SORT_OPTIONS} from "@/constants/products";
 import {PRODUCT_CATEGORY_LABELS, PRODUCT_LIST_CLASS_NAMES} from "@/constants/productListLayout";
-import {HEADER_HOME_ICON_NAME} from "@/constants/header";
-import {getHeaderNavItems} from "@/app/components/Header/Header";
-import {useSavedProductCounts} from "@/app/components/Header/useSavedProductCounts";
 import {useProductList} from "@/app/components/ProductList/useProductList";
 import {ProductListResults} from "@/app/components/ProductList/ProductListResults";
 import {ProductCreator} from "@/app/components/ProductCreator/ProductCreator";
+import {FiltersSheet} from "@/app/components/FiltersSheet/FiltersSheet";
+import {PageHeader} from "@/app/components/PageHeader/PageHeader";
 import type {CatalogSortOption} from "@/types/catalog";
 import type {ProductListProps} from "@/types/productList";
+import type {PricingConfig} from "@/types/pricingConfig";
+
+const getUahPrice = (priceUsd: number | undefined, config: PricingConfig | null | undefined): number | null => {
+    if (!priceUsd || !config?.usdToUahRate) return null;
+    const markup = config.retailMarkup ?? 30;
+    return Math.round(priceUsd * (1 + markup / 100) * config.usdToUahRate);
+};
 
 const getCategoryButtonClassName = (isSelected: boolean) => {
-    const baseClassName = "inline-flex min-h-10 items-center gap-2 rounded-[var(--radius-capsule)] px-4 text-[15px] font-semibold leading-none tracking-[-0.1px] transition-all duration-200 active:scale-[0.94]";
+    const baseClassName = "inline-flex min-h-10 items-center gap-2 rounded-[var(--radius-lg)] px-4 text-[15px] font-semibold leading-none tracking-[-0.1px] transition-all duration-200 active:scale-[0.94]";
     if (isSelected) return `${baseClassName} vitan-accent-button text-white`;
 
     return `${baseClassName} bg-[var(--fill)] text-[var(--text-primary)] hover:bg-[var(--fill-secondary)]`;
 };
 
 const getSortOptionButtonClassName = (isSelected: boolean) => {
-    const baseClassName = "inline-flex min-h-11 w-full items-center justify-between gap-3 rounded-[var(--radius-sm)] px-3 text-left text-[15px] leading-none tracking-[-0.1px] transition-all duration-200 active:scale-[0.98]";
+    const baseClassName = "inline-flex min-h-11 w-full items-center justify-between gap-3 rounded-[var(--radius-lg)] px-4 text-left text-[15px] leading-none tracking-[-0.1px] transition-all duration-200 active:scale-[0.98]";
     if (isSelected) return `${baseClassName} bg-black/8 font-semibold text-[var(--text-primary)]`;
 
     return `${baseClassName} font-medium text-[var(--text-primary)] hover:bg-[var(--fill)]`;
@@ -68,9 +75,9 @@ export const ProductList = ({
     showCreateProductButton = false,
     showDeleteProductButton = false,
     usdToUahRate = null,
+    pricingConfig,
     rootClassName,
     productCreatorWrapperClassName = PRODUCT_CREATOR_WRAPPER_CLASS_NAME,
-    toolbarButtons = [],
     toolbarClassName,
     toolbarTitle,
     searchWrapperClassName,
@@ -81,7 +88,10 @@ export const ProductList = ({
 }: ProductListProps) => {
     const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
     const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
-    const savedProductCounts = useSavedProductCounts();
+    const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+    const [priceMin, setPriceMin] = useState(0);
+    const [priceMax, setPriceMax] = useState(0);
+    const priceInitialized = useRef(false);
     const {
         availableCategories,
         error,
@@ -92,9 +102,9 @@ export const ProductList = ({
         loadMoreRef,
         query,
         refreshProducts,
-        selectedCategory,
+        selectedCategories,
         setQuery,
-        setSelectedCategory,
+        setSelectedCategories,
         setSortBy,
         sortBy,
     } = useProductList({
@@ -102,82 +112,110 @@ export const ProductList = ({
         defaultSort,
         categories,
     });
+    // Price range
+    const {absoluteMin, absoluteMax} = useMemo(() => {
+        const prices = items
+            .map(i => getUahPrice(i.priceUsd, pricingConfig))
+            .filter((p): p is number => p !== null);
+        if (!prices.length) return {absoluteMin: 0, absoluteMax: 0};
+        return {absoluteMin: Math.floor(Math.min(...prices)), absoluteMax: Math.ceil(Math.max(...prices))};
+    }, [items, pricingConfig]);
+
+    useEffect(() => {
+        if (absoluteMax > absoluteMin && !priceInitialized.current) {
+            setPriceMin(absoluteMin);
+            setPriceMax(absoluteMax);
+            priceInitialized.current = true;
+        }
+    }, [absoluteMin, absoluteMax]);
+
+    const isPriceFilterActive = absoluteMax > absoluteMin && (priceMin > absoluteMin || priceMax < absoluteMax);
+    const activeFilterCount = selectedCategories.length + (isPriceFilterActive ? 1 : 0);
+
+    const filteredItems = useMemo(() => {
+        if (!isPriceFilterActive) return items;
+        return items.filter(item => {
+            const price = getUahPrice(item.priceUsd, pricingConfig);
+            if (price === null) return true;
+            return price >= priceMin && price <= priceMax;
+        });
+    }, [items, isPriceFilterActive, priceMin, priceMax, pricingConfig]);
+
+    const handleClear = () => {
+        setSelectedCategories([]);
+        setPriceMin(absoluteMin);
+        setPriceMax(absoluteMax);
+    };
+
     const shouldShowToolbarCategories = showCategories && Boolean(toolbarClassName);
     const shouldShowInlineCategories = showCategories && !toolbarClassName;
     const shouldShowToolbarTitleGroup = Boolean(toolbarTitle) || shouldShowToolbarCategories;
     const shouldShowToolbarSort = showSort && Boolean(toolbarClassName);
     const shouldShowInlineSort = showSort && !toolbarClassName;
-    const isFilterActive = selectedCategory !== "all";
+    const categoryRef = useRef<HTMLDivElement>(null);
+    const sortRef = useRef<HTMLDivElement>(null);
+    const filtersRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (categoryRef.current && !categoryRef.current.contains(e.target as Node)) {
+                setIsCategoryDropdownOpen(false);
+            }
+            if (sortRef.current && !sortRef.current.contains(e.target as Node)) {
+                setIsSortDropdownOpen(false);
+            }
+            if (filtersRef.current && !filtersRef.current.contains(e.target as Node)) {
+                setIsFiltersOpen(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
     const isSortActive = sortBy !== (defaultSort ?? sortOptions[0]);
-    const desktopToolbarButtons = toolbarButtons.filter(({iconName}) => iconName !== HEADER_HOME_ICON_NAME);
-    const desktopToolbarNavItems = getHeaderNavItems(desktopToolbarButtons, 20, savedProductCounts);
-    const handleCategorySelect = (category: string) => {
-        setSelectedCategory(category);
-        setIsCategoryDropdownOpen(false);
-    };
-    const toggleCategoryDropdown = () => {
-        setIsCategoryDropdownOpen(currentValue => !currentValue);
-        setIsSortDropdownOpen(false);
-    };
     const handleSortSelect = (sortOption: CatalogSortOption) => {
         setSortBy(sortOption);
         setIsSortDropdownOpen(false);
     };
     const toggleSortDropdown = () => {
         setIsSortDropdownOpen(currentValue => !currentValue);
-        setIsCategoryDropdownOpen(false);
     };
-    const categoryButtons = (
-        <>
-            <button
-                type="button"
-                onClick={() => handleCategorySelect("all")}
-                className={getCategoryButtonClassName(selectedCategory === "all")}
-                aria-pressed={selectedCategory === "all"}
-            >
-                {selectedCategory === "all" && <CheckIcon />}
-                {PRODUCT_CATEGORY_LABELS.allOption}
-            </button>
-            {availableCategories.map(category => (
-                <button
-                    key={category}
-                    type="button"
-                    onClick={() => handleCategorySelect(category)}
-                    className={getCategoryButtonClassName(selectedCategory === category)}
-                    aria-pressed={selectedCategory === category}
-                >
-                    {selectedCategory === category && <CheckIcon />}
-                    {category}
-                </button>
-            ))}
-        </>
-    );
     const filterDropdown = (
-        <div className={PRODUCT_LIST_CLASS_NAMES.categoryDropdownWrapper}>
+        <div ref={filtersRef} className={PRODUCT_LIST_CLASS_NAMES.categoryDropdownWrapper}>
             <button
                 type="button"
-                onClick={toggleCategoryDropdown}
-                className={isCategoryDropdownOpen ? `${PRODUCT_LIST_CLASS_NAMES.filterButton} liquid-button-selected` : PRODUCT_LIST_CLASS_NAMES.filterButton}
-                aria-expanded={isCategoryDropdownOpen}
+                onClick={() => setIsFiltersOpen(v => !v)}
+                className={isFiltersOpen || activeFilterCount > 0 ? `${PRODUCT_LIST_CLASS_NAMES.filterButton} liquid-button-selected` : PRODUCT_LIST_CLASS_NAMES.filterButton}
+                aria-haspopup="dialog"
+                aria-expanded={isFiltersOpen}
             >
                 <FilterIcon />
                 {PRODUCT_CATEGORY_LABELS.filters}
-                {isFilterActive && (
+                {activeFilterCount > 0 && (
                     <span className="grid h-5 min-w-5 place-items-center rounded-full bg-[#1c1c1e] px-1.5 text-xs font-bold leading-5 text-white">
-                        1
+                        {activeFilterCount}
                     </span>
                 )}
             </button>
-
-            {isCategoryDropdownOpen && (
-                <div className={PRODUCT_LIST_CLASS_NAMES.categoryDropdownMenu}>
-                    {categoryButtons}
-                </div>
-            )}
+            <FiltersSheet
+                open={isFiltersOpen}
+                categories={availableCategories}
+                selectedCategories={selectedCategories}
+                onCategoriesChange={setSelectedCategories}
+                priceMin={priceMin}
+                priceMax={priceMax}
+                absoluteMin={absoluteMin}
+                absoluteMax={absoluteMax}
+                onPriceChange={(mn, mx) => { setPriceMin(mn); setPriceMax(mx); }}
+                activeFilterCount={activeFilterCount}
+                onClear={handleClear}
+                onClose={() => setIsFiltersOpen(false)}
+            />
         </div>
     );
     const sortDropdown = (
-        <div className={PRODUCT_LIST_CLASS_NAMES.sortDropdownWrapper}>
+        <div ref={sortRef} className={PRODUCT_LIST_CLASS_NAMES.sortDropdownWrapper}>
             <button
                 type="button"
                 onClick={toggleSortDropdown}
@@ -212,47 +250,43 @@ export const ProductList = ({
 
     return (
         <div className={rootClassName}>
-            <div className={toolbarClassName}>
-                <div className={PRODUCT_LIST_CLASS_NAMES.mainPageToolbarInner}>
-                    {shouldShowToolbarTitleGroup && (
-                        <div className={PRODUCT_LIST_CLASS_NAMES.mainPageToolbarTitleGroup}>
-                            {toolbarTitle && <h2 className={PRODUCT_LIST_CLASS_NAMES.mainPageToolbarTitle}>{toolbarTitle}</h2>}
-                        </div>
-                    )}
-
-                    <div className={searchWrapperClassName}>
-                        <SearchComponent
-                            value={query}
-                            onChange={setQuery}
-                            placeholder={searchPlaceholder}
-                        />
-                    </div>
-
-                    <div className={PRODUCT_LIST_CLASS_NAMES.mainPageActions}>
-                        {Boolean(desktopToolbarNavItems.length) && (
-                            <nav className={PRODUCT_LIST_CLASS_NAMES.mainPageToolbarNav}>
-                                {desktopToolbarNavItems}
-                            </nav>
-                        )}
-
-                        {showCreateProductButton && (
-                            <div className={productCreatorWrapperClassName}>
-                                <ProductCreator
-                                    categoryOptions={availableCategories}
-                                    onProductCreated={refreshProducts}
-                                />
+            {toolbarClassName && (
+                <div className="sticky top-0 z-20 flex flex-col">
+                    <PageHeader className="flex items-center justify-between gap-4">
+                        {shouldShowToolbarTitleGroup && (
+                            <div className={PRODUCT_LIST_CLASS_NAMES.mainPageToolbarTitleGroup}>
+                                {toolbarTitle && <Link href="/" className={PRODUCT_LIST_CLASS_NAMES.mainPageToolbarTitle}>{toolbarTitle}</Link>}
                             </div>
                         )}
-                    </div>
-                </div>
 
-                {(shouldShowToolbarCategories || shouldShowToolbarSort) && (
-                    <div className={PRODUCT_LIST_CLASS_NAMES.categoryInlineRow}>
-                        <div>{shouldShowToolbarCategories && filterDropdown}</div>
-                        <div>{shouldShowToolbarSort && sortDropdown}</div>
-                    </div>
-                )}
-            </div>
+                        <div className={searchWrapperClassName}>
+                            <SearchComponent
+                                value={query}
+                                onChange={setQuery}
+                                placeholder={searchPlaceholder}
+                            />
+                        </div>
+
+                        <div className={PRODUCT_LIST_CLASS_NAMES.mainPageActions}>
+                            {showCreateProductButton && (
+                                <div className={productCreatorWrapperClassName}>
+                                    <ProductCreator
+                                        categoryOptions={availableCategories}
+                                        onProductCreated={refreshProducts}
+                                    />
+                                </div>
+                            )}
+                        </div>
+                    </PageHeader>
+
+                    {(shouldShowToolbarCategories || shouldShowToolbarSort) && (
+                        <div className={PRODUCT_LIST_CLASS_NAMES.categoryInlineRow}>
+                            <div>{shouldShowToolbarCategories && filterDropdown}</div>
+                            <div>{shouldShowToolbarSort && sortDropdown}</div>
+                        </div>
+                    )}
+                </div>
+            )}
 
             {shouldShowInlineCategories && (
                 <div className={filterWrapperClassName}>
@@ -273,14 +307,16 @@ export const ProductList = ({
                 gridClassName={gridClassName}
                 hasMore={hasMore}
                 isLoading={isLoading}
-                items={items}
+                items={filteredItems}
                 loadMoreRef={loadMoreRef}
                 messageClassName={messageClassName}
                 onProductDeleted={refreshProducts}
                 showCategoryOnCard={showCategoryOnCard}
                 showAdminActions={showDeleteProductButton}
                 usdToUahRate={usdToUahRate}
+                pricingConfig={pricingConfig}
             />
+
         </div>
     );
 };

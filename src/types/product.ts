@@ -9,7 +9,7 @@ export type ProductOrder =
 
 export interface GetProductsParams {
     query?: string;
-    category?: string;
+    category?: string[];
     sortBy?: CatalogSortOption;
     skip?: number;
     limit?: number;

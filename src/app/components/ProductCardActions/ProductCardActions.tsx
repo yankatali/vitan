@@ -10,12 +10,6 @@ import type {ProductCardActionsProps} from "@/types/productCardActions";
 import {useState} from "react";
 import {ConfirmModal} from "@/app/components/ConfirmModal/ConfirmModal";
 
-const getCartButtonLabel = (isInCart: boolean) => {
-    if (isInCart) return PRODUCT_CARD_ACTION_LABELS.inCart;
-
-    return PRODUCT_CARD_ACTION_LABELS.addToCart;
-};
-
 const getCartButtonClassName = (isInCart: boolean) => {
     if (isInCart) return PRODUCT_CARD_ACTION_CLASS_NAMES.activeCartButton;
 
@@ -33,6 +27,7 @@ export const ProductCardActions = ({
     onProductChanged,
     product,
     showAdminActions = false,
+    showCartButton = true,
 }: ProductCardActionsProps) => {
     const {
         closeEdit,
@@ -57,16 +52,17 @@ export const ProductCardActions = ({
     };
 
     return (
-        <div className={PRODUCT_CARD_ACTION_CLASS_NAMES.wrapper}>
-            <button
-                type="button"
-                onClick={handleCartButtonClick}
-                className={getCartButtonClassName(isInCart)}
-                aria-pressed={isInCart}
-            >
-                <CartIcon size={18} />
-                {getCartButtonLabel(isInCart)}
-            </button>
+        <div className={showAdminActions ? PRODUCT_CARD_ACTION_CLASS_NAMES.wrapper : "grid gap-2"}>
+            {showCartButton && (
+                <button
+                    type="button"
+                    onClick={handleCartButtonClick}
+                    className={getCartButtonClassName(isInCart)}
+                    aria-pressed={isInCart}
+                >
+                    <CartIcon size={24} checked={isInCart} />
+                </button>
+            )}
 
             {showAdminActions && (
                 <div className={PRODUCT_CARD_ACTION_CLASS_NAMES.adminRow}>
@@ -76,7 +72,7 @@ export const ProductCardActions = ({
                         className={PRODUCT_CARD_ACTION_CLASS_NAMES.iconButton}
                         aria-label={PRODUCT_CARD_ACTION_LABELS.edit}
                     >
-                        <PencilIcon />
+                        <PencilIcon size={20} />
                     </button>
 
                     <button
@@ -86,7 +82,7 @@ export const ProductCardActions = ({
                         aria-label={getDeleteButtonLabel(isDeleting)}
                         disabled={isDeleting}
                     >
-                        <TrashIcon />
+                        <TrashIcon size={20} />
                     </button>
                 </div>
             )}
@@ -106,13 +102,13 @@ export const ProductCardActions = ({
                 <ConfirmModal
                     isOpen={isConfirmOpen}
                     text="Ви точно хочете видалити цей товар?"
+                    isLoading={isDeleting}
                     onCancel={() => setIsConfirmOpen(false)}
                     onConfirm={async () => {
                         if (isDeleting) return;
                         await handleDelete();
                         setIsConfirmOpen(false);
                     }}
-
                 />
             )}
             {isCartRemoveConfirmOpen && (

@@ -9,10 +9,16 @@ const getCardCategory = (showCategoryOnCard: boolean, category: string) => {
     return undefined;
 };
 
-const getPriceUah = (usdToUahRate: number | null, priceUsd: number) => {
+const getRetailPriceUah = (usdToUahRate: number | null, priceUsd: number, retailMarkup: number) => {
     if (!usdToUahRate) return null;
 
-    return Number((priceUsd * usdToUahRate).toFixed(2));
+    return Number((priceUsd * (1 + retailMarkup / 100) * usdToUahRate).toFixed(2));
+};
+
+const getWholesalePriceUah = (usdToUahRate: number | null, priceUsd: number, wholesaleMarkup: number) => {
+    if (!usdToUahRate) return null;
+
+    return Number((priceUsd * (1 + wholesaleMarkup / 100) * usdToUahRate).toFixed(2));
 };
 
 export const ProductListResults = ({
@@ -29,7 +35,13 @@ export const ProductListResults = ({
     showCategoryOnCard,
     showAdminActions,
     usdToUahRate,
+    pricingConfig,
 }: ProductListResultsProps) => {
+    const effectiveRate = pricingConfig?.usdToUahRate ?? usdToUahRate;
+    const retailMarkup = pricingConfig?.retailMarkup ?? 30;
+    const wholesaleMarkup = pricingConfig?.wholesaleMarkup ?? 15;
+    const wholesaleDescription = pricingConfig?.wholesaleDescription ?? "";
+
     if (error) {
         return <p className={messageClassName} role="alert">{error}</p>;
     }
@@ -56,7 +68,9 @@ export const ProductListResults = ({
                     category={getCardCategory(showCategoryOnCard, item.category)}
                     onProductDeleted={onProductDeleted}
                     priceUsd={item.priceUsd}
-                    priceUah={getPriceUah(usdToUahRate, item.priceUsd)}
+                    priceUah={getRetailPriceUah(effectiveRate, item.priceUsd, retailMarkup)}
+                    priceUahWholesale={getWholesalePriceUah(effectiveRate, item.priceUsd, wholesaleMarkup)}
+                    wholesaleDescription={wholesaleDescription}
                     showAdminActions={showAdminActions}
                 />
             ))}

@@ -11,6 +11,7 @@ export const getReactComponent = (
     const {type, config} = component;
     const headerConfig = options.headerConfig;
     const initialProducts = options.initialProducts ?? EMPTY_PRODUCTS_RESULT;
+    const pricingConfig = options.pricingConfig;
 
     switch (type) {
         case "Header":
@@ -25,6 +26,7 @@ export const getReactComponent = (
                     config={config}
                     headerConfig={headerConfig}
                     initialProducts={initialProducts}
+                    pricingConfig={pricingConfig}
                 />
             );
 

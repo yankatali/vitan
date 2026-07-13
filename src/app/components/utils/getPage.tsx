@@ -3,6 +3,7 @@ import {getReactComponent} from "@/app/components/utils/getReactComponent";
 import {CtfComponent, isRenderableCtfComponent, RenderableCtfComponent} from "@/types/ctfComponents";
 import {Fragment} from "react";
 import {getProducts} from "@/lib/products";
+import {getPricingConfig} from "@/lib/pricingConfig";
 import {getContentfulRevalidateSeconds} from "@/lib/cache";
 import {CatalogSortOption} from "@/types/catalog";
 import type {ProductsResult} from "@/types/product";
@@ -75,7 +76,9 @@ export async function renderPageByPath(path = "/") {
             });
         }
 
-        const renderedComponents = components.map(ref => getReactComponent(ref, {headerConfig, initialProducts}));
+        const pricingConfig = await getPricingConfig();
+
+        const renderedComponents = components.map(ref => getReactComponent(ref, {headerConfig, initialProducts, pricingConfig}));
 
         return renderedComponents.map((component, index) => (
             <Fragment key={components[index].sys.id}>

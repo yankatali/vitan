@@ -13,9 +13,10 @@ export default function WishlistIcon({
             width={size}
             height={size}
             viewBox="0 0 24 24"
-            fill={filled ? "currentColor" : "none"}
-            stroke="currentColor"
-            strokeWidth="1.5"
+            fill={filled ? "#ff2d55" : "none"}
+            stroke={filled ? "#ff2d55" : "currentColor"}
+            strokeWidth={filled ? "0.5" : "1.8"}
+            style={filled ? {filter: "drop-shadow(0 0 3px rgba(255,255,255,0.7))"} : undefined}
             strokeLinecap="round"
             strokeLinejoin="round"
             className={className}

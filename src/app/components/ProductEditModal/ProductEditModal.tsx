@@ -8,6 +8,7 @@ import {CloseIcon} from "@/app/components/icon/CloseIcon";
 import {PlusIcon} from "@/app/components/icon/PlusIcon";
 import {CategoryMultiSelect} from "@/app/components/CategoryMultiSelect/CategoryMultiSelect";
 import {useUpdateProductForm} from "@/app/components/ProductEditModal/useUpdateProductForm";
+import {useLockScroll} from "@/hooks/useLockScroll";
 import type {ProductEditModalProps} from "@/types/updateProduct";
 
 const getSubmitButtonLabel = (isSubmitting: boolean) => {
@@ -17,6 +18,7 @@ const getSubmitButtonLabel = (isSubmitting: boolean) => {
 };
 
 export const ProductEditModal = ({categoryOptions, isOpen, onClose, onProductUpdated, product}: ProductEditModalProps) => {
+    useLockScroll(isOpen);
     const {
         error,
         handleBackdropClose,

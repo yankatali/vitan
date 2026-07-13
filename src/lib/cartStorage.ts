@@ -107,3 +107,7 @@ export const removeProductFromCart = (productId: string) => {
 
     return nextItems;
 };
+
+export const clearCart = () => {
+    setCartItems([]);
+};

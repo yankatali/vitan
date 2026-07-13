@@ -14,7 +14,7 @@ export const useProductList = ({
     categories = [],
 }: UseProductListParams) => {
     const [query, setQuery] = useState("");
-    const [selectedCategory, setSelectedCategory] = useState("all");
+    const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
     const [sortBy, setSortBy] = useState<CatalogSortOption>(defaultSort);
     const [items, setItems] = useState<ItemConfig[]>(initialProducts.items);
     const [hasMore, setHasMore] = useState(initialProducts.hasMore);
@@ -44,7 +44,7 @@ export const useProductList = ({
         try {
             const data = await fetchProductList({
                 query,
-                category: selectedCategory,
+                categories: selectedCategories,
                 sortBy,
                 skip: nextSkip,
                 signal,
@@ -73,7 +73,7 @@ export const useProductList = ({
                 setIsLoading(false);
             }
         }
-    }, [query, selectedCategory, sortBy]);
+    }, [query, selectedCategories, sortBy]);
 
     useEffect(() => {
         if (skipInitialFetch.current) {
@@ -128,10 +128,12 @@ export const useProductList = ({
     }, [hasMore, isLoading, isLoadingMore, items.length, loadProducts]);
 
     const refreshProducts = useCallback(() => {
-        void loadProducts({
-            nextSkip: 0,
-            append: false,
-        });
+        setTimeout(() => {
+            void loadProducts({
+                nextSkip: 0,
+                append: false,
+            });
+        }, 1500);
     }, [loadProducts]);
 
     useEffect(() => {
@@ -161,9 +163,9 @@ export const useProductList = ({
         loadMoreRef,
         query,
         refreshProducts,
-        selectedCategory,
+        selectedCategories,
         setQuery,
-        setSelectedCategory,
+        setSelectedCategories,
         setSortBy,
         sortBy,
     };

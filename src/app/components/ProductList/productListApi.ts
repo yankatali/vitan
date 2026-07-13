@@ -4,7 +4,7 @@ import type {ProductListRequest} from "@/types/productList";
 
 const buildProductsUrl = ({
     query,
-    category,
+    categories,
     sortBy,
     skip,
 }: Omit<ProductListRequest, "signal">) => {
@@ -12,14 +12,15 @@ const buildProductsUrl = ({
         limit: String(PRODUCT_PAGE_SIZE),
         skip: String(skip),
         sortBy,
+        _t: String(Date.now()),
     });
 
     if (query.trim()) {
         params.set("query", query.trim());
     }
 
-    if (category !== "all") {
-        params.set("category", category);
+    if (categories.length > 0) {
+        params.set("categories", categories.join(","));
     }
 
     return `${PRODUCT_API_PATH}?${params.toString()}`;

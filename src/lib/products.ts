@@ -184,8 +184,6 @@ const getProductOrder = (sortBy?: CatalogSortOption): ProductOrder[] => {
 const buildWhere = ({query, category}: Pick<GetProductsParams, "query" | "category">) => {
     const filters: Record<string, unknown>[] = [];
     const normalizedQuery = query?.trim();
-    const normalizedCategory = category?.trim();
-
     if (normalizedQuery) {
         filters.push({
             OR: [
@@ -196,8 +194,8 @@ const buildWhere = ({query, category}: Pick<GetProductsParams, "query" | "catego
         });
     }
 
-    if (normalizedCategory && normalizedCategory !== "all") {
-        filters.push({category_contains_some: [normalizedCategory]});
+    if (category && category.length > 0) {
+        filters.push({category_contains_some: category});
     }
 
     if (filters.length === 0) return undefined;

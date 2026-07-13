@@ -1,16 +1,16 @@
-import {CartClient} from "@/app/cart/CartClient";
 import {getContentfulRevalidateSeconds} from "@/lib/cache";
 import {getPricingConfig} from "@/lib/pricingConfig";
 import {getProducts} from "@/lib/products";
+import {OrderClient} from "./OrderClient";
 
 export const dynamic = "force-dynamic";
 
-export default async function CartPage() {
+export default async function OrderPage() {
     const revalidateSeconds = getContentfulRevalidateSeconds();
     const [products, pricingConfig] = await Promise.all([
         getProducts({limit: 100, revalidateSeconds}),
         getPricingConfig(revalidateSeconds),
     ]);
 
-    return <CartClient products={products.items} pricingConfig={pricingConfig} />;
+    return <OrderClient products={products.items} pricingConfig={pricingConfig} />;
 }

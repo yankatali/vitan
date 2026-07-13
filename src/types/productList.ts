@@ -1,6 +1,7 @@
 import type {CatalogSortOption} from "@/types/catalog";
 import type {HeaderButton} from "@/types/header";
 import type {ItemConfig} from "@/types/item";
+import type {PricingConfig} from "@/types/pricingConfig";
 import type {ProductsResult} from "@/types/product";
 
 export interface ProductListProps {
@@ -15,6 +16,7 @@ export interface ProductListProps {
     showCreateProductButton?: boolean;
     showDeleteProductButton?: boolean;
     usdToUahRate?: number | null;
+    pricingConfig?: PricingConfig | null;
     rootClassName?: string;
     productCreatorWrapperClassName?: string;
     toolbarButtons?: HeaderButton[];
@@ -29,7 +31,7 @@ export interface ProductListProps {
 
 export interface ProductListRequest {
     query: string;
-    category: string;
+    categories: string[];
     sortBy: CatalogSortOption;
     skip: number;
     signal?: AbortSignal;
@@ -61,4 +63,5 @@ export interface ProductListResultsProps {
     showCategoryOnCard: boolean;
     showAdminActions: boolean;
     usdToUahRate: number | null;
+    pricingConfig?: PricingConfig | null;
 }

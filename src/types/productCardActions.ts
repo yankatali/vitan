@@ -3,6 +3,7 @@ import type {ItemConfig} from "@/types/item";
 export interface ProductCardActionsProps {
     categoryOptions: string[];
     showAdminActions?: boolean;
+    showCartButton?: boolean;
     product: ItemConfig;
     onProductChanged: () => void;
 }

@@ -1,3 +1,6 @@
+import {createPortal} from "react-dom";
+import {useLockScroll} from "@/hooks/useLockScroll";
+
 interface ConfirmModalProps {
     isOpen: boolean;
     text: string;
@@ -13,12 +16,18 @@ export const ConfirmModal = ({
                                  onConfirm,
                                  isLoading = false,
                              }: ConfirmModalProps) => {
-    if (!isOpen) return null;
+    useLockScroll(isOpen);
+    if (!isOpen || typeof document === "undefined") return null;
 
-    return (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/28 px-2 py-2 backdrop-blur-md min-[744px]:items-center min-[744px]:px-4">
-            <div className="vitan-sheet-panel flex w-full max-w-sm flex-col overflow-hidden rounded-[var(--radius-2xl)]">
-                <span className="mx-auto mt-2 h-1.5 w-10 shrink-0 rounded-full bg-[var(--label-quaternary)]" aria-hidden="true" />
+    return createPortal(
+        <div
+            className="fixed inset-0 z-[200] flex items-center justify-center bg-black/28 px-4 backdrop-blur-md"
+            onClick={onCancel}
+        >
+            <div
+                className="vitan-sheet-panel flex w-full max-w-sm flex-col overflow-hidden rounded-[var(--radius-2xl)]"
+                onClick={(e) => e.stopPropagation()}
+            >
                 <div className="grid gap-6 px-5 pb-5 pt-5">
                     <p className="text-[17px] font-medium leading-[22px] tracking-[-0.2px] text-[var(--text-primary)]">{text}</p>
 
@@ -33,15 +42,22 @@ export const ConfirmModal = ({
 
                         <button
                             type="button"
-                            className="rounded-[var(--radius-capsule)] bg-[rgba(255,59,48,0.12)] px-5 py-2.5 text-sm font-semibold text-[var(--destructive)] transition-transform hover:bg-[rgba(255,59,48,0.2)] active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-50"
+                            className="inline-flex items-center gap-2 rounded-[var(--radius-capsule)] bg-[rgba(255,59,48,0.12)] px-5 py-2.5 text-sm font-semibold text-[var(--destructive)] transition-transform hover:bg-[rgba(255,59,48,0.2)] active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-50"
                             onClick={onConfirm}
                             disabled={isLoading}
                         >
+                            {isLoading && (
+                                <svg className="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" opacity="0.25" />
+                                    <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+                                </svg>
+                            )}
                             Видалити
                         </button>
                     </div>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };

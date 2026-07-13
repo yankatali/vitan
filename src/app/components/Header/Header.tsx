@@ -23,9 +23,9 @@ const iconMap: Record<IconName, React.FC<{ size?: number; className?: string }>>
 };
 
 const getIconSize = (isLg: boolean) => {
-    if (isLg) return 20;
+    if (isLg) return 18;
 
-    return 26;
+    return 22;
 };
 
 const isNavItemActive = (url: string, pathname: string) => {
@@ -39,7 +39,7 @@ export const getHeaderNavItems = (
     iconSize: number,
     counts: SavedProductCounts = {cart: 0, wishlist: 0},
     pathname = "",
-    onSelect?: (index: number) => void,
+    onSelect?: (index: number | null) => void,
 ) => {
     return buttons.map(({ url, label, iconName }, index) => {
         const Icon = iconMap[iconName];
@@ -68,10 +68,9 @@ export const getHeaderNavItems = (
     });
 };
 
-const getActiveNavIndex = (buttons: HeaderConfig["headerButtons"] = [], pathname: string) => {
+const getActiveNavIndex = (buttons: HeaderConfig["headerButtons"] = [], pathname: string): number | null => {
     const activeIndex = buttons.findIndex(({url}) => isNavItemActive(url, pathname));
-
-    return activeIndex >= 0 ? activeIndex : 0;
+    return activeIndex >= 0 ? activeIndex : null;
 };
 
 const Header = ({ config }: Props) => {
@@ -93,18 +92,16 @@ const Header = ({ config }: Props) => {
     );
 
     return (
-        <>
-            {!isLg && (
-                <nav className={HEADER_NAV_CLASS_NAMES.mobileNav}>
-                    <span
-                        className={HEADER_NAV_CLASS_NAMES.mobileNavIndicator}
-                        style={{"--active-index": activeNavIndex} as CSSProperties}
-                        aria-hidden="true"
-                    />
-                    {mobileNavItems}
-                </nav>
+        <nav className={HEADER_NAV_CLASS_NAMES.mobileNav}>
+            {activeNavIndex !== null && (
+                <span
+                    className={HEADER_NAV_CLASS_NAMES.mobileNavIndicator}
+                    style={{"--active-index": activeNavIndex} as CSSProperties}
+                    aria-hidden="true"
+                />
             )}
-        </>
+            {mobileNavItems}
+        </nav>
     )
 }
 
