@@ -6,7 +6,7 @@ export interface ItemConfig {
     description: string;
     category: string;
     priceUsd?: number;
-    priceUah: number | null;
+    priceUah?: number | null;
     priceUahWholesale?: number | null;
     wholesaleDescription?: string;
     imageUrl: string;

@@ -9,14 +9,14 @@ const getCardCategory = (showCategoryOnCard: boolean, category: string) => {
     return undefined;
 };
 
-const getRetailPriceUah = (usdToUahRate: number | null, priceUsd: number, retailMarkup: number) => {
-    if (!usdToUahRate) return null;
+const getRetailPriceUah = (usdToUahRate: number | null | undefined, priceUsd: number | undefined, retailMarkup: number) => {
+    if (!usdToUahRate || !priceUsd) return null;
 
     return Number((priceUsd * (1 + retailMarkup / 100) * usdToUahRate).toFixed(2));
 };
 
-const getWholesalePriceUah = (usdToUahRate: number | null, priceUsd: number, wholesaleMarkup: number) => {
-    if (!usdToUahRate) return null;
+const getWholesalePriceUah = (usdToUahRate: number | null | undefined, priceUsd: number | undefined, wholesaleMarkup: number) => {
+    if (!usdToUahRate || !priceUsd) return null;
 
     return Number((priceUsd * (1 + wholesaleMarkup / 100) * usdToUahRate).toFixed(2));
 };

@@ -92,10 +92,10 @@ const sortItems = (items: ItemConfig[], sortBy?: CatalogSortOption) => {
 
     switch (sortBy) {
         case "priceAsc":
-            sorted.sort((a, b) => a.priceUsd - b.priceUsd);
+            sorted.sort((a, b) => (a.priceUsd ?? 0) - (b.priceUsd ?? 0));
             break;
         case "priceDesc":
-            sorted.sort((a, b) => b.priceUsd - a.priceUsd);
+            sorted.sort((a, b) => (b.priceUsd ?? 0) - (a.priceUsd ?? 0));
             break;
         case "titleAsc":
             sorted.sort((a, b) => a.title.localeCompare(b.title, "uk"));
@@ -145,7 +145,7 @@ export const getLocalFixtureProducts = ({
     skip = 0,
     limit = 100,
 }: GetProductsParams): ProductsResult => {
-    const normalizedCategory = category?.trim();
+    const activeCategories = category?.filter(c => c && c !== "all");
 
     const filtered = localFixture.pageComponents
         .filter(component => component.type[0] === "Item")
@@ -157,7 +157,7 @@ export const getLocalFixtureProducts = ({
         }))
         .filter(item => item.isActive !== false)
         .filter(item => matchesSearchQuery(item, query))
-        .filter(item => !normalizedCategory || normalizedCategory === "all" || item.category === normalizedCategory);
+        .filter(item => !activeCategories?.length || activeCategories.includes(item.category));
 
     const sorted = sortItems(filtered, sortBy);
     const start = Math.max(skip, 0);
