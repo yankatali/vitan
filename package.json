@@ -13,7 +13,7 @@
     "@contentful/rich-text-react-renderer": "^16.0.2",
     "contentful": "^11.7.2",
     "contentful-management": "^12.5.1",
-    "next": "15.3.3",
+    "next": "15.3.8",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-use": "^17.6.0"
