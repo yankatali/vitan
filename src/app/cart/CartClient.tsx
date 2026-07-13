@@ -11,7 +11,8 @@ import type {PricingConfig} from "@/types/pricingConfig";
 import {useBarBottom} from "@/hooks/useBarBottom";
 import {PageHeader} from "@/app/components/PageHeader/PageHeader";
 import {ConfirmModal} from "@/app/components/ConfirmModal/ConfirmModal";
-import {ProductCardSimple} from "@/app/components/ProductCardSimple/ProductCardSimple";
+import Image from "next/image";
+import {ImagePlaceholder} from "@/app/components/ImagePlaceholder/ImagePlaceholder";
 import {RelatedProductsRow, getCategoriesFromProducts, getRelatedProducts} from "@/app/components/RelatedProductsRow/RelatedProductsRow";
 import CartIcon from "@/app/components/icon/CartIcon";
 import {TrashIcon} from "@/app/components/icon/TrashIcon";
@@ -140,48 +141,60 @@ export const CartClient = ({products, pricingConfig}: CartClientProps) => {
                         <div className={CART_CLASS_NAMES.list}>
                             {cartProducts.map(({product, quantity}) => {
                                 const priceUah = getRetailPriceUah(usdToUahRate, product.priceUsd ?? 0, retailMarkup);
-                                const priceUahWholesale = getWholesalePriceUah(usdToUahRate, product.priceUsd ?? 0, wholesaleMarkup);
 
                                 return (
-                                    <ProductCardSimple
-                                        key={product.id}
-                                        className="vitan-product-card--cart"
-                                        item={product}
-                                        priceUah={priceUah}
-                                        priceUahWholesale={priceUahWholesale}
-                                        wholesaleDescription={wholesaleDescription}
-                                        bottomActions={
-                                            <div className="flex items-center justify-between gap-2 pt-1">
-                                                <div className={CART_CLASS_NAMES.quantityGroup}>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => handleQuantityChange(product.id, quantity - 1)}
-                                                        className={CART_CLASS_NAMES.quantityButton}
-                                                        aria-label={`Зменшити кількість ${product.title}`}
-                                                    >
-                                                        -
-                                                    </button>
-                                                    <span className={CART_CLASS_NAMES.quantityValue}>{quantity}</span>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => handleQuantityChange(product.id, quantity + 1)}
-                                                        className={CART_CLASS_NAMES.quantityButton}
-                                                        aria-label={`Збільшити кількість ${product.title}`}
-                                                    >
-                                                        +
-                                                    </button>
-                                                </div>
+                                    <article key={product.id} className={CART_CLASS_NAMES.item}>
+                                        {product.imageUrl ? (
+                                            <Image
+                                                src={product.imageUrl}
+                                                alt={product.imageAlt ?? product.title}
+                                                width={120}
+                                                height={120}
+                                                className={CART_CLASS_NAMES.image}
+                                            />
+                                        ) : (
+                                            <div className={CART_CLASS_NAMES.imagePlaceholder}>
+                                                <ImagePlaceholder iconSize={24} />
+                                            </div>
+                                        )}
+
+                                        <div className={CART_CLASS_NAMES.itemInfo}>
+                                            <h2 className={CART_CLASS_NAMES.name}>{product.title}</h2>
+                                            {priceUah !== null && (
+                                                <p className={CART_CLASS_NAMES.price}>{formatUah(priceUah)}</p>
+                                            )}
+                                        </div>
+
+                                        <div className={CART_CLASS_NAMES.controls}>
+                                            <div className={CART_CLASS_NAMES.quantityGroup}>
                                                 <button
                                                     type="button"
-                                                    onClick={() => setConfirmRemoveId(product.id)}
-                                                    className={CART_CLASS_NAMES.removeButton}
-                                                    aria-label={`Видалити ${product.title}`}
+                                                    onClick={() => handleQuantityChange(product.id, quantity - 1)}
+                                                    className={CART_CLASS_NAMES.quantityButton}
+                                                    aria-label={`Зменшити кількість ${product.title}`}
                                                 >
-                                                    <TrashIcon size={18} />
+                                                    −
+                                                </button>
+                                                <span className={CART_CLASS_NAMES.quantityValue}>{quantity}</span>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleQuantityChange(product.id, quantity + 1)}
+                                                    className={CART_CLASS_NAMES.quantityButton}
+                                                    aria-label={`Збільшити кількість ${product.title}`}
+                                                >
+                                                    +
                                                 </button>
                                             </div>
-                                        }
-                                    />
+                                            <button
+                                                type="button"
+                                                onClick={() => setConfirmRemoveId(product.id)}
+                                                className={CART_CLASS_NAMES.removeButton}
+                                                aria-label={`Видалити ${product.title}`}
+                                            >
+                                                <TrashIcon size={18} />
+                                            </button>
+                                        </div>
+                                    </article>
                                 );
                             })}
                         </div>
