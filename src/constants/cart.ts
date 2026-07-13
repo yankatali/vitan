@@ -1,7 +1,7 @@
 import {PAGE_CONTENT_PX, CARD_GRID_GAP} from "@/constants/pageLayout";
 
 export const CART_CLASS_NAMES = {
-    page: "flex min-h-screen flex-col gap-2 text-[var(--text-primary)]",
+    page: "flex min-h-screen flex-col gap-2 text-[var(--text-primary)] overflow-x-clip",
 
     homeLink: "whitespace-nowrap text-[22px] font-bold leading-7 tracking-[-0.4px] text-[var(--text-primary)] [font-family:var(--font-brand)]",
     title: "whitespace-nowrap text-[17px] font-bold leading-[22px] text-[var(--text-primary)]",

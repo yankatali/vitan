@@ -95,20 +95,20 @@ export const RelatedProductsRow = ({
     if (!products.length) return null;
 
     return (
-        <section>
+        <section className="min-w-0">
             <p className="mb-2 px-0.5 text-[13px] font-semibold text-[var(--text-primary)]">{title}</p>
-            <div className="relative overflow-hidden">
+            <div className="relative min-w-0">
                 <div
                     ref={scrollRef}
                     onScroll={updateArrows}
-                    className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                    className="flex gap-2 pb-1 [-ms-overflow-style:none] [overscroll-behavior-x:contain] [overflow-x:auto] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
                 >
                     {products.map(product => {
                         const prices = priceMap.get(product.id);
                         const active = isActive(product.id);
 
                         return (
-                            <div key={product.id} style={{width: "140px", flexShrink: 0}}>
+                            <div key={product.id} className="shrink-0" style={{width: "140px"}}>
                                 <ProductCardSimple
                                     item={product}
                                     priceUah={prices?.retail ?? null}
