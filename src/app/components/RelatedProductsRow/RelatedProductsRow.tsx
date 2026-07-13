@@ -1,6 +1,6 @@
 "use client";
 
-import {type ReactNode, useMemo} from "react";
+import {type ReactNode, useMemo, useRef, useState, useCallback} from "react";
 import {ProductCardSimple} from "@/app/components/ProductCardSimple/ProductCardSimple";
 import {PRODUCT_CARD_CLASS_NAMES} from "@/constants/productCard";
 import type {ItemConfig} from "@/types/item";
@@ -75,46 +75,87 @@ export const RelatedProductsRow = ({
         return new Map(entries);
     }, [products, usdToUahRate, retailMarkup, wholesaleMarkup]);
 
+    const scrollRef = useRef<HTMLDivElement>(null);
+    const [canScrollRight, setCanScrollRight] = useState(true);
+    const [canScrollLeft, setCanScrollLeft] = useState(false);
+
+    const updateArrows = useCallback(() => {
+        const el = scrollRef.current;
+        if (!el) return;
+        setCanScrollLeft(el.scrollLeft > 4);
+        setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
+    }, []);
+
+    const scroll = (dir: "left" | "right") => {
+        const el = scrollRef.current;
+        if (!el) return;
+        el.scrollBy({left: dir === "right" ? 300 : -300, behavior: "smooth"});
+    };
+
     if (!products.length) return null;
 
     return (
         <section>
             <p className="mb-2 px-0.5 text-[13px] font-semibold text-[var(--text-primary)]">{title}</p>
-            <div
-                className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-                style={{marginLeft: "-16px", marginRight: "-16px", paddingLeft: "16px", paddingRight: "16px"}}
-            >
-                {products.map(product => {
-                    const prices = priceMap.get(product.id);
-                    const active = isActive(product.id);
+            <div className="relative overflow-hidden">
+                <div
+                    ref={scrollRef}
+                    onScroll={updateArrows}
+                    className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                >
+                    {products.map(product => {
+                        const prices = priceMap.get(product.id);
+                        const active = isActive(product.id);
 
-                    return (
-                        <div key={product.id} style={{width: "140px", flexShrink: 0}}>
-                            <ProductCardSimple
-                                item={product}
-                                priceUah={prices?.retail ?? null}
-                                priceUahWholesale={prices?.wholesale ?? null}
-                                wholesaleDescription={wholesaleDescription}
-                                overlayButton={
-                                    <button
-                                        type="button"
-                                        onClick={e => {
-                                            e.stopPropagation();
-                                            onAction(product.id);
-                                        }}
-                                        className={active
-                                            ? PRODUCT_CARD_CLASS_NAMES.favoriteOverlayActive
-                                            : PRODUCT_CARD_CLASS_NAMES.favoriteOverlay}
-                                        aria-pressed={active}
-                                        aria-label={active ? "Вже додано" : "Додати"}
-                                    >
-                                        {active ? activeActionIcon : actionIcon}
-                                    </button>
-                                }
-                            />
-                        </div>
-                    );
-                })}
+                        return (
+                            <div key={product.id} style={{width: "140px", flexShrink: 0}}>
+                                <ProductCardSimple
+                                    item={product}
+                                    priceUah={prices?.retail ?? null}
+                                    priceUahWholesale={prices?.wholesale ?? null}
+                                    wholesaleDescription={wholesaleDescription}
+                                    overlayButton={
+                                        <button
+                                            type="button"
+                                            onClick={e => {
+                                                e.stopPropagation();
+                                                onAction(product.id);
+                                            }}
+                                            className={active
+                                                ? PRODUCT_CARD_CLASS_NAMES.favoriteOverlayActive
+                                                : PRODUCT_CARD_CLASS_NAMES.favoriteOverlay}
+                                            aria-pressed={active}
+                                            aria-label={active ? "Вже додано" : "Додати"}
+                                        >
+                                            {active ? activeActionIcon : actionIcon}
+                                        </button>
+                                    }
+                                />
+                            </div>
+                        );
+                    })}
+                </div>
+
+                {canScrollLeft && (
+                    <button
+                        type="button"
+                        onClick={() => scroll("left")}
+                        className="absolute left-0 top-1/2 z-10 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-white/70 shadow-[0_2px_8px_rgba(0,0,0,0.14)] backdrop-blur-md transition-opacity active:opacity-70"
+                        aria-label="Прокрутити вліво"
+                    >
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    </button>
+                )}
+                {canScrollRight && (
+                    <button
+                        type="button"
+                        onClick={() => scroll("right")}
+                        className="absolute right-0 top-1/2 z-10 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-white/70 shadow-[0_2px_8px_rgba(0,0,0,0.14)] backdrop-blur-md transition-opacity active:opacity-70"
+                        aria-label="Прокрутити вправо"
+                    >
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    </button>
+                )}
             </div>
         </section>
     );
