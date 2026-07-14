@@ -8,7 +8,7 @@ import {SAVED_PRODUCTS_CHANGE_EVENT} from "@/lib/savedProductsEvents";
 import type {CartProductItem, CartStorageItem} from "@/types/cart";
 import type {ItemConfig} from "@/types/item";
 import type {PricingConfig} from "@/types/pricingConfig";
-import {useBarBottom} from "@/hooks/useBarBottom";
+
 import {PageHeader} from "@/app/components/PageHeader/PageHeader";
 import {ConfirmModal} from "@/app/components/ConfirmModal/ConfirmModal";
 import Image from "next/image";
@@ -53,7 +53,6 @@ const getCartProducts = (cartItems: CartStorageItem[], products: ItemConfig[]): 
 export const CartClient = ({products, pricingConfig}: CartClientProps) => {
     const [cartItems, setCartItems] = useState<CartStorageItem[]>([]);
     const [confirmRemoveId, setConfirmRemoveId] = useState<string | null>(null);
-    const barBottom = useBarBottom();
 
     useEffect(() => {
         if (products.length > 0) {
@@ -214,7 +213,7 @@ export const CartClient = ({products, pricingConfig}: CartClientProps) => {
             </section>
 
             {cartProducts.length > 0 && (
-                <div className="fixed left-1/2 z-30 w-[min(calc(100vw-1.5rem),30rem)] -translate-x-1/2" style={{bottom: `${barBottom}px`}}>
+                <div className="fixed left-1/2 z-30 w-[min(calc(100vw-1.5rem),30rem)] -translate-x-1/2" style={{bottom: "calc(env(safe-area-inset-bottom) + 16px)"}}>
                     <div className="flex items-stretch justify-between gap-2 overflow-hidden rounded-full border-[0.5px] border-white/35 bg-white/50 pl-[27px] pr-[6px] py-[6px] shadow-[0_2px_12px_rgba(0,0,0,0.06)] backdrop-blur-2xl">
                         <div className="flex flex-col justify-center">
                             <p className="text-[10px] text-[var(--text-secondary)]">{totalQuantity} товарів</p>
