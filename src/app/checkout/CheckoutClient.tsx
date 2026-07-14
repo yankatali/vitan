@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import {useEffect, useMemo, useState} from "react";
-
+import {useBarBottom} from "@/hooks/useBarBottom";
 import {PageHeader} from "@/app/components/PageHeader/PageHeader";
 import {PAGE_CONTENT_PX} from "@/constants/pageLayout";
 import {CART_STORAGE_KEY, getCartItems, clearCart, updateCartQuantity, removeProductFromCart} from "@/lib/cartStorage";
@@ -40,6 +40,7 @@ export const CheckoutClient = ({products, pricingConfig}: CheckoutClientProps) =
     const [phone, setPhone] = useState("");
     const [comment, setComment] = useState("");
     const [submitted, setSubmitted] = useState(false);
+    const barBottom = useBarBottom();
 
     useEffect(() => {
         const sync = () => setCartItems(getCartItems());
@@ -273,7 +274,7 @@ export const CheckoutClient = ({products, pricingConfig}: CheckoutClientProps) =
             </div>
 
             {/* Mobile/tablet — fixed above nav + footer */}
-            <div className="fixed left-1/2 z-30 w-[min(calc(100vw-1.5rem),30rem)] -translate-x-1/2 lg:hidden" style={{bottom: "calc(env(safe-area-inset-bottom) + 16px)"}}>
+            <div className="fixed left-1/2 z-30 w-[min(calc(100vw-1.5rem),30rem)] -translate-x-1/2 lg:hidden" style={{bottom: `${barBottom}px`}}>
                 <button
                     type="submit"
                     form="checkout-form"
