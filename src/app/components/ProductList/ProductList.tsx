@@ -251,33 +251,36 @@ export const ProductList = ({
     return (
         <div className={rootClassName}>
             {toolbarClassName && (
-                <div className="sticky top-0 z-20 flex flex-col">
-                    <PageHeader className="flex items-center justify-between gap-4">
-                        {shouldShowToolbarTitleGroup && (
-                            <div className={PRODUCT_LIST_CLASS_NAMES.mainPageToolbarTitleGroup}>
-                                {toolbarTitle && <Link href="/" className={PRODUCT_LIST_CLASS_NAMES.mainPageToolbarTitle}>{toolbarTitle}</Link>}
-                            </div>
-                        )}
-
-                        <div className={searchWrapperClassName}>
-                            <SearchComponent
-                                value={query}
-                                onChange={setQuery}
-                                placeholder={searchPlaceholder}
-                            />
-                        </div>
-
-                        <div className={PRODUCT_LIST_CLASS_NAMES.mainPageActions}>
-                            {showCreateProductButton && (
-                                <div className={productCreatorWrapperClassName}>
-                                    <ProductCreator
-                                        categoryOptions={availableCategories}
-                                        onProductCreated={refreshProducts}
-                                    />
+                <div className="sticky top-0 z-20 flex flex-col gap-3 pt-3">
+                    <div className="px-3">
+                        <PageHeader className="flex items-center justify-between gap-4">
+                            {shouldShowToolbarTitleGroup && (
+                                <div className={PRODUCT_LIST_CLASS_NAMES.mainPageToolbarTitleGroup}>
+                                    {toolbarTitle && <Link href="/" className={PRODUCT_LIST_CLASS_NAMES.mainPageToolbarTitle}>{toolbarTitle}</Link>}
                                 </div>
                             )}
-                        </div>
-                    </PageHeader>
+
+                            <div className={searchWrapperClassName}>
+                                <SearchComponent
+                                    value={query}
+                                    onChange={setQuery}
+                                    placeholder={searchPlaceholder}
+                                />
+                            </div>
+
+                            <div className={PRODUCT_LIST_CLASS_NAMES.mainPageActions}>
+                                {showCreateProductButton && (
+                                    <div className={productCreatorWrapperClassName}>
+                                        <ProductCreator
+                                            categoryOptions={availableCategories}
+                                            onProductCreated={refreshProducts}
+                                            pricingConfig={pricingConfig}
+                                        />
+                                    </div>
+                                )}
+                            </div>
+                        </PageHeader>
+                    </div>
 
                     {(shouldShowToolbarCategories || shouldShowToolbarSort) && (
                         <div className={PRODUCT_LIST_CLASS_NAMES.categoryInlineRow}>

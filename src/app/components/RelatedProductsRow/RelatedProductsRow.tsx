@@ -3,6 +3,7 @@
 import {type ReactNode, useMemo, useRef, useState, useCallback} from "react";
 import {ProductCardSimple} from "@/app/components/ProductCardSimple/ProductCardSimple";
 import {PRODUCT_CARD_CLASS_NAMES} from "@/constants/productCard";
+import {PRODUCT_CARD_ACTION_CLASS_NAMES} from "@/constants/productCardActions";
 import type {ItemConfig} from "@/types/item";
 import type {PricingConfig} from "@/types/pricingConfig";
 
@@ -124,6 +125,22 @@ export const RelatedProductsRow = ({
                                             className={active
                                                 ? PRODUCT_CARD_CLASS_NAMES.favoriteOverlayActive
                                                 : PRODUCT_CARD_CLASS_NAMES.favoriteOverlay}
+                                            aria-pressed={active}
+                                            aria-label={active ? "Вже додано" : "Додати"}
+                                        >
+                                            {active ? activeActionIcon : actionIcon}
+                                        </button>
+                                    }
+                                    modalAction={
+                                        <button
+                                            type="button"
+                                            onClick={e => {
+                                                e.stopPropagation();
+                                                onAction(product.id);
+                                            }}
+                                            className={active
+                                                ? PRODUCT_CARD_ACTION_CLASS_NAMES.activeCartButton
+                                                : PRODUCT_CARD_ACTION_CLASS_NAMES.cartButton}
                                             aria-pressed={active}
                                             aria-label={active ? "Вже додано" : "Додати"}
                                         >

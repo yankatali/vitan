@@ -47,11 +47,19 @@ const getKeptImageUrls = (formData: FormData) => {
         .filter(Boolean);
 };
 
+const getPrice = (value: string) => {
+    const price = Number(value);
+
+    if (!Number.isFinite(price) || price < 0) return null;
+
+    return price;
+};
+
 const getUpdateProductInput = (formData: FormData, id: string): UpdateProductInput => {
     const name = getStringFormValue(formData, CREATE_PRODUCT_FIELD_NAMES.name);
     const description = getStringFormValue(formData, CREATE_PRODUCT_FIELD_NAMES.description);
     const priceValue = getStringFormValue(formData, CREATE_PRODUCT_FIELD_NAMES.price);
-    const price = Number(priceValue);
+    const price = getPrice(priceValue);
     const images = getImages(formData);
 
     if (!id) {
@@ -62,7 +70,7 @@ const getUpdateProductInput = (formData: FormData, id: string): UpdateProductInp
         throw new Error(UPDATE_PRODUCT_ERROR_MESSAGES.missingName);
     }
 
-    if (!Number.isFinite(price) || price < 0) {
+    if (price === null) {
         throw new Error(UPDATE_PRODUCT_ERROR_MESSAGES.invalidPrice);
     }
 

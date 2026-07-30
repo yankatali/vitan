@@ -119,18 +119,20 @@ export const WishlistClient = ({products, pricingConfig}: WishlistClientProps) =
 
     return (
         <main className={WISHLIST_CLASS_NAMES.page}>
-            <PageHeader className="sticky top-0 z-20">
-                <div className="flex items-center gap-3">
-                    <Link href="/" className="inline-flex h-[28px] w-full items-center justify-start rounded-full text-[var(--text-primary)] transition-opacity active:opacity-60" aria-label="Назад">
-                        <svg width="12" height="20" viewBox="0 0 12 20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10 2L2 10l8 8"/></svg>
-                    </Link>
-                    <Link href="/" className={WISHLIST_CLASS_NAMES.homeLink}>Вітан</Link>
-                </div>
-                <div className="flex items-center gap-1.5">
-                    <WishlistIcon size={20} filled />
-                    <h1 className={WISHLIST_CLASS_NAMES.title}>Вибране</h1>
-                </div>
-            </PageHeader>
+            <div className="sticky top-0 z-20 px-3 pt-3">
+                <PageHeader>
+                    <div className="flex items-center gap-3">
+                        <Link href="/" className="inline-flex h-[28px] w-full items-center justify-start rounded-full text-[var(--text-primary)] transition-opacity active:opacity-60" aria-label="Назад">
+                            <svg width="12" height="20" viewBox="0 0 12 20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10 2L2 10l8 8"/></svg>
+                        </Link>
+                        <Link href="/" className={WISHLIST_CLASS_NAMES.homeLink}>Вітан</Link>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                        <WishlistIcon size={20} filled />
+                        <h1 className={WISHLIST_CLASS_NAMES.title}>Вибране</h1>
+                    </div>
+                </PageHeader>
+            </div>
 
             <section className={WISHLIST_CLASS_NAMES.content}>
                 {!wishlistIds.length ? (
@@ -191,7 +193,7 @@ export const WishlistClient = ({products, pricingConfig}: WishlistClientProps) =
             </section>
 
             {wishlistProducts.length > 0 && (
-                <div className="fixed left-1/2 z-30 w-[min(calc(100vw-1.5rem),30rem)] -translate-x-1/2" style={{bottom: `${barBottom}px`}}>
+                <div className="fixed left-1/2 z-30 w-[min(calc(100vw-1.5rem),30rem)] -translate-x-1/2 transition-[bottom] duration-200 ease-out" style={{bottom: `${barBottom}px`}}>
                     <div className="flex items-stretch justify-between gap-2 overflow-hidden rounded-full border-[0.5px] border-white/35 bg-white/50 pl-[27px] pr-[6px] py-[6px] shadow-[0_2px_12px_rgba(0,0,0,0.06)] backdrop-blur-2xl">
                         <div className="flex flex-col justify-center">
                             <p className="text-[10px] text-[var(--text-secondary)]">{wishlistIds.length} товарів</p>

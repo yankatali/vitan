@@ -2,6 +2,7 @@
 
 import {ChangeEvent, FormEvent, useEffect, useMemo, useState} from "react";
 import {splitProductCategories} from "@/lib/productCategories";
+import {getUahPriceInputFromUsd, getUsdPriceInputFromUah} from "@/lib/priceInputSync";
 import {updateProduct} from "@/app/components/ProductEditModal/updateProductApi";
 import type {UpdateProductFormValues, UpdateProductTextField, UseUpdateProductFormParams} from "@/types/updateProduct";
 
@@ -24,38 +25,66 @@ const hasFormDraft = (values: UpdateProductFormValues, initialValues: UpdateProd
     return values.name !== initialValues.name
         || values.description !== initialValues.description
         || values.price !== initialValues.price
+        || values.priceUah !== initialValues.priceUah
         || !areStringArraysEqual(values.categories, initialValues.categories)
         || !areStringArraysEqual(values.keptImageUrls, initialValues.keptImageUrls)
         || values.image.length > 0;
 };
 
-const getInitialValues = ({category, description, imageUrl, imageUrls, priceUsd, title}: UseUpdateProductFormParams["product"]): UpdateProductFormValues => {
+const getInitialValues = (
+    {category, description, imageUrl, imageUrls, priceUsd, title}: UseUpdateProductFormParams["product"],
+    usdToUahRate: number | null,
+): UpdateProductFormValues => {
+    const price = typeof priceUsd === "number" ? String(priceUsd) : "";
+
     return {
         name: title,
         description,
-        price: String(priceUsd),
+        price,
+        priceUah: getUahPriceInputFromUsd(price, usdToUahRate),
         categories: splitProductCategories(category),
         image: [],
         keptImageUrls: imageUrls?.length ? imageUrls : imageUrl ? [imageUrl] : [],
     };
 };
 
-export const useUpdateProductForm = ({onClose, onProductUpdated, product}: UseUpdateProductFormParams) => {
-    const initialValues = useMemo(() => getInitialValues(product), [product]);
+export const useUpdateProductForm = ({onClose, onProductUpdated, pricingConfig, product}: UseUpdateProductFormParams) => {
+    const usdToUahRate = pricingConfig?.usdToUahRate ?? null;
+    const initialValues = useMemo(() => getInitialValues(product, usdToUahRate), [product, usdToUahRate]);
     const [values, setValues] = useState<UpdateProductFormValues>(initialValues);
     const [error, setError] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState<number | null>(null);
 
     useEffect(() => {
         setValues(initialValues);
         setError(null);
+        setUploadProgress(null);
     }, [initialValues]);
 
     const setFieldValue = (field: UpdateProductTextField, value: string) => {
-        setValues(currentValues => ({
-            ...currentValues,
-            [field]: value,
-        }));
+        setValues(currentValues => {
+            if (field === "price") {
+                return {
+                    ...currentValues,
+                    price: value,
+                    priceUah: getUahPriceInputFromUsd(value, usdToUahRate),
+                };
+            }
+
+            if (field === "priceUah") {
+                return {
+                    ...currentValues,
+                    price: getUsdPriceInputFromUah(value, usdToUahRate),
+                    priceUah: value,
+                };
+            }
+
+            return {
+                ...currentValues,
+                [field]: value,
+            };
+        });
     };
 
     const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -66,6 +95,13 @@ export const useUpdateProductForm = ({onClose, onProductUpdated, product}: UseUp
             image: appendUniqueImages(currentValues.image, images),
         }));
         event.target.value = "";
+    };
+
+    const removeSelectedImage = (imageToRemove: File) => {
+        setValues(currentValues => ({
+            ...currentValues,
+            image: currentValues.image.filter(image => image !== imageToRemove),
+        }));
     };
 
     const toggleCategory = (category: string) => {
@@ -97,6 +133,7 @@ export const useUpdateProductForm = ({onClose, onProductUpdated, product}: UseUp
 
         setValues(initialValues);
         setError(null);
+        setUploadProgress(null);
         onClose();
     };
 
@@ -115,10 +152,11 @@ export const useUpdateProductForm = ({onClose, onProductUpdated, product}: UseUp
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setError(null);
+        setUploadProgress(values.image.length > 0 ? 0 : null);
         setIsSubmitting(true);
 
         try {
-            await updateProduct(product.id, values);
+            await updateProduct(product.id, values, values.image.length > 0 ? setUploadProgress : undefined);
             setValues(currentValues => ({
                 ...currentValues,
                 image: [],
@@ -133,6 +171,7 @@ export const useUpdateProductForm = ({onClose, onProductUpdated, product}: UseUp
             }
         } finally {
             setIsSubmitting(false);
+            setUploadProgress(null);
         }
     };
 
@@ -146,6 +185,8 @@ export const useUpdateProductForm = ({onClose, onProductUpdated, product}: UseUp
         setFieldValue,
         toggleCategory,
         removeExistingImage,
+        removeSelectedImage,
+        uploadProgress,
         values,
     };
 };

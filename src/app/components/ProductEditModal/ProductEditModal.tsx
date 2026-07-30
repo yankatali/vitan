@@ -7,6 +7,8 @@ import {UPDATE_PRODUCT_BUTTON_LABELS} from "@/constants/updateProduct";
 import {CloseIcon} from "@/app/components/icon/CloseIcon";
 import {PlusIcon} from "@/app/components/icon/PlusIcon";
 import {CategoryMultiSelect} from "@/app/components/CategoryMultiSelect/CategoryMultiSelect";
+import {ProductImagePreviews, ProductImageUploadProgress} from "@/app/components/ProductImagePreviews/ProductImagePreviews";
+import {OriginalProductPriceField, ProductPricingPreview} from "@/app/components/ProductPricingPreview/ProductPricingPreview";
 import {useUpdateProductForm} from "@/app/components/ProductEditModal/useUpdateProductForm";
 import {useLockScroll} from "@/hooks/useLockScroll";
 import type {ProductEditModalProps} from "@/types/updateProduct";
@@ -17,8 +19,9 @@ const getSubmitButtonLabel = (isSubmitting: boolean) => {
     return UPDATE_PRODUCT_BUTTON_LABELS.idle;
 };
 
-export const ProductEditModal = ({categoryOptions, isOpen, onClose, onProductUpdated, product}: ProductEditModalProps) => {
+export const ProductEditModal = ({categoryOptions, isOpen, onClose, onProductUpdated, pricingConfig, product}: ProductEditModalProps) => {
     useLockScroll(isOpen);
+    const hasUsdToUahRate = Boolean(pricingConfig?.usdToUahRate);
     const {
         error,
         handleBackdropClose,
@@ -27,10 +30,12 @@ export const ProductEditModal = ({categoryOptions, isOpen, onClose, onProductUpd
         handleSubmit,
         isSubmitting,
         removeExistingImage,
+        removeSelectedImage,
         setFieldValue,
         toggleCategory,
+        uploadProgress,
         values,
-    } = useUpdateProductForm({onClose, onProductUpdated, product});
+    } = useUpdateProductForm({onClose, onProductUpdated, pricingConfig, product});
 
     if (!isOpen || typeof document === "undefined") return null;
 
@@ -67,8 +72,10 @@ export const ProductEditModal = ({categoryOptions, isOpen, onClose, onProductUpd
                         />
                     </label>
 
+                    <OriginalProductPriceField priceUsd={product.priceUsd} pricingConfig={pricingConfig} />
+
                     <label className={CREATE_PRODUCT_MODAL_CLASS_NAMES.label}>
-                        Ціна USD
+                        Закупочна ціна USD
                         <input
                             name={CREATE_PRODUCT_FIELD_NAMES.price}
                             value={values.price}
@@ -80,6 +87,23 @@ export const ProductEditModal = ({categoryOptions, isOpen, onClose, onProductUpd
                             required
                         />
                     </label>
+
+                    <label className={CREATE_PRODUCT_MODAL_CLASS_NAMES.label}>
+                        Закупочна ціна UAH
+                        <input
+                            name={CREATE_PRODUCT_FIELD_NAMES.priceUah}
+                            value={values.priceUah}
+                            onChange={(event) => setFieldValue(CREATE_PRODUCT_FIELD_NAMES.priceUah, event.target.value)}
+                            className={CREATE_PRODUCT_MODAL_CLASS_NAMES.input}
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            disabled={!hasUsdToUahRate}
+                            placeholder={hasUsdToUahRate ? undefined : "Немає курсу USD"}
+                        />
+                    </label>
+
+                    <ProductPricingPreview priceUsd={values.price} pricingConfig={pricingConfig} />
 
                     <CategoryMultiSelect
                         options={categoryOptions}
@@ -125,19 +149,25 @@ export const ProductEditModal = ({categoryOptions, isOpen, onClose, onProductUpd
                                         className={CREATE_PRODUCT_MODAL_CLASS_NAMES.existingImageRemoveButton}
                                         onClick={() => removeExistingImage(imageUrl)}
                                         aria-label={`Видалити фото ${index + 1}`}
+                                        disabled={isSubmitting}
                                     >
                                         <CloseIcon />
                                     </button>
                                 </div>
                             ))}
+                            <ProductImagePreviews
+                                images={values.image}
+                                isDisabled={isSubmitting}
+                                onRemove={removeSelectedImage}
+                            />
                         </div>
                         <span className={CREATE_PRODUCT_MODAL_CLASS_NAMES.hint}>Нові фото додадуться до поточних.</span>
                         {values.image.length > 0 && (
                             <span className={CREATE_PRODUCT_MODAL_CLASS_NAMES.selectedImages}>
-                                <span>Вибрано нових фото: {values.image.length}</span>
-                                <span>{values.image.map(image => image.name).join(", ")}</span>
+                                Вибрано нових фото: {values.image.length}
                             </span>
                         )}
+                        {uploadProgress !== null && <ProductImageUploadProgress progress={uploadProgress} />}
                     </div>
 
                     {error && <p className={CREATE_PRODUCT_MODAL_CLASS_NAMES.error}>{error}</p>}

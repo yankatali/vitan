@@ -26,6 +26,7 @@ interface ProductCardSimpleProps {
     overlayButton?: ReactNode;
     cartAction?: ReactNode;
     bottomActions?: ReactNode;
+    modalAction?: ReactNode;
     className?: string;
 }
 
@@ -37,6 +38,7 @@ export const ProductCardSimple = ({
     overlayButton,
     cartAction,
     bottomActions,
+    modalAction,
     className,
 }: ProductCardSimpleProps) => {
     const router = useRouter();
@@ -251,6 +253,13 @@ export const ProductCardSimple = ({
                                                 )}</span>
                                             </p>
                                         )}
+                                    </div>
+                                )}
+
+                                {(cartAction || bottomActions || modalAction) && (
+                                    <div className="mt-2 flex flex-col gap-2">
+                                        {modalAction ?? cartAction}
+                                        {bottomActions}
                                     </div>
                                 )}
                             </div>

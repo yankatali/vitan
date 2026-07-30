@@ -3,7 +3,9 @@
 import {ChangeEvent, FormEvent, useState} from "react";
 import {EMPTY_CREATE_PRODUCT_FORM} from "@/constants/createProduct";
 import {createProduct} from "@/app/components/ProductCreator/createProductApi";
+import {getUahPriceInputFromUsd, getUsdPriceInputFromUah} from "@/lib/priceInputSync";
 import type {CreateProductFormValues, CreateProductTextField} from "@/types/createProduct";
+import type {PricingConfig} from "@/types/pricingConfig";
 
 const getFileKey = (file: File) => `${file.name}-${file.size}-${file.lastModified}`;
 
@@ -19,21 +21,42 @@ const hasFormDraft = (values: CreateProductFormValues) => {
         values.name.trim()
         || values.description.trim()
         || values.price.trim()
+        || values.priceUah.trim()
         || values.categories.length
         || values.image.length,
     );
 };
 
-export const useCreateProductForm = (onProductCreated: () => void, onClose: () => void) => {
+export const useCreateProductForm = (onProductCreated: () => void, onClose: () => void, pricingConfig?: PricingConfig | null) => {
     const [values, setValues] = useState<CreateProductFormValues>(EMPTY_CREATE_PRODUCT_FORM);
     const [error, setError] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+    const usdToUahRate = pricingConfig?.usdToUahRate ?? null;
 
     const setFieldValue = (field: CreateProductTextField, value: string) => {
-        setValues(currentValues => ({
-            ...currentValues,
-            [field]: value,
-        }));
+        setValues(currentValues => {
+            if (field === "price") {
+                return {
+                    ...currentValues,
+                    price: value,
+                    priceUah: getUahPriceInputFromUsd(value, usdToUahRate),
+                };
+            }
+
+            if (field === "priceUah") {
+                return {
+                    ...currentValues,
+                    price: getUsdPriceInputFromUah(value, usdToUahRate),
+                    priceUah: value,
+                };
+            }
+
+            return {
+                ...currentValues,
+                [field]: value,
+            };
+        });
     };
 
     const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -44,6 +67,13 @@ export const useCreateProductForm = (onProductCreated: () => void, onClose: () =
             image: appendUniqueImages(currentValues.image, images),
         }));
         event.target.value = "";
+    };
+
+    const removeSelectedImage = (imageToRemove: File) => {
+        setValues(currentValues => ({
+            ...currentValues,
+            image: currentValues.image.filter(image => image !== imageToRemove),
+        }));
     };
 
     const toggleCategory = (category: string) => {
@@ -66,6 +96,7 @@ export const useCreateProductForm = (onProductCreated: () => void, onClose: () =
     const resetForm = () => {
         setValues(EMPTY_CREATE_PRODUCT_FORM);
         setError(null);
+        setUploadProgress(null);
     };
 
     const handleClose = () => {
@@ -90,10 +121,11 @@ export const useCreateProductForm = (onProductCreated: () => void, onClose: () =
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setError(null);
+        setUploadProgress(values.image.length > 0 ? 0 : null);
         setIsSubmitting(true);
 
         try {
-            await createProduct(values);
+            await createProduct(values, values.image.length > 0 ? setUploadProgress : undefined);
             resetForm();
             onProductCreated();
             onClose();
@@ -105,6 +137,7 @@ export const useCreateProductForm = (onProductCreated: () => void, onClose: () =
             }
         } finally {
             setIsSubmitting(false);
+            setUploadProgress(null);
         }
     };
 
@@ -115,8 +148,10 @@ export const useCreateProductForm = (onProductCreated: () => void, onClose: () =
         handleImageChange,
         handleSubmit,
         isSubmitting,
+        removeSelectedImage,
         setFieldValue,
         toggleCategory,
+        uploadProgress,
         values,
     };
 };

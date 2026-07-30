@@ -60,19 +60,21 @@ export const OrderClient = ({products, pricingConfig}: OrderClientProps) => {
     }
 
     return (
-        <main className="flex min-h-screen flex-col gap-2 pb-10 text-[var(--text-primary)]">
+        <main className="flex min-h-screen flex-col pb-10 text-[var(--text-primary)]">
             {/* Header */}
-            <div className="sticky top-0 z-20 flex items-center gap-2 rounded-b-[var(--radius-xl)] bg-white/30 px-6 pb-3 pt-3 shadow-[inset_0_1px_1px_rgba(255,255,255,0.8),inset_0_-1px_1px_rgba(0,0,0,0.05),0_2px_8px_rgba(0,0,0,0.06)] backdrop-blur-2xl backdrop-saturate-[180%]">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
-                    <rect x="9" y="3" width="6" height="4" rx="2"/>
-                    <line x1="9" y1="12" x2="15" y2="12"/>
-                    <line x1="9" y1="16" x2="12" y2="16"/>
-                </svg>
-                <h1 className="text-[17px] font-semibold leading-[22px]">Замовлення</h1>
+            <div className="sticky top-0 z-20 px-3 pt-3">
+                <div className="flex items-center gap-2 rounded-[var(--radius-xl)] bg-white/30 pl-6 pr-3 pb-3 pt-3 lg:pr-6 shadow-[inset_0_1px_1px_rgba(255,255,255,0.8),inset_0_-1px_1px_rgba(0,0,0,0.05),0_2px_8px_rgba(0,0,0,0.06)] backdrop-blur-2xl backdrop-saturate-[180%]">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
+                        <rect x="9" y="3" width="6" height="4" rx="2"/>
+                        <line x1="9" y1="12" x2="15" y2="12"/>
+                        <line x1="9" y1="16" x2="12" y2="16"/>
+                    </svg>
+                    <h1 className="text-[17px] font-semibold leading-[22px]">Замовлення</h1>
+                </div>
             </div>
 
-            <div className="grid gap-3 px-4 pt-2 md:px-6">
+            <div className="grid gap-3 px-4 pt-3 md:px-6">
 
                 {/* Customer info */}
                 <div className="vitan-glass-block rounded-3xl p-4">

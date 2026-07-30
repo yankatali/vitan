@@ -1,4 +1,5 @@
 import {CREATE_PRODUCT_API_PATH, CREATE_PRODUCT_FIELD_NAMES} from "@/constants/createProduct";
+import {sendFormDataRequest, type UploadProgressHandler} from "@/lib/formDataUpload";
 import type {CreateProductApiResponse, CreateProductFormValues} from "@/types/createProduct";
 
 const appendTextField = (formData: FormData, name: string, value: string) => {
@@ -34,31 +35,14 @@ const isCreateProductApiResponse = (value: unknown): value is CreateProductApiRe
     return Boolean(product && typeof product === "object" && "id" in product && typeof product.id === "string");
 };
 
-const getResponseErrorMessage = async (response: Response) => {
-    const payload: unknown = await response.json();
-
-    if (payload && typeof payload === "object" && "message" in payload && typeof payload.message === "string") {
-        return payload.message;
-    }
-
-    return "Не вдалося створити товар.";
-};
-
-export const createProduct = async (values: CreateProductFormValues) => {
-    const response = await fetch(CREATE_PRODUCT_API_PATH, {
-        method: "POST",
+export const createProduct = async (values: CreateProductFormValues, onUploadProgress?: UploadProgressHandler) => {
+    return sendFormDataRequest<CreateProductApiResponse>({
         body: buildCreateProductFormData(values),
+        fallbackErrorMessage: "Не вдалося створити товар.",
+        isResponse: isCreateProductApiResponse,
+        method: "POST",
+        onUploadProgress,
+        unexpectedResponseMessage: "Contentful повернув неочікувану відповідь.",
+        url: CREATE_PRODUCT_API_PATH,
     });
-
-    if (!response.ok) {
-        throw new Error(await getResponseErrorMessage(response));
-    }
-
-    const payload: unknown = await response.json();
-
-    if (!isCreateProductApiResponse(payload)) {
-        throw new Error("Contentful повернув неочікувану відповідь.");
-    }
-
-    return payload;
 };

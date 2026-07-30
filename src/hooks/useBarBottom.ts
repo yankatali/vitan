@@ -3,7 +3,7 @@ import {useEffect, useState} from "react";
 const NAV_BOTTOM = 85;
 
 export const useBarBottom = () => {
-    const [bottom, setBottom] = useState(NAV_BOTTOM);
+    const [bottom, setBottom] = useState(NAV_BOTTOM + 5);
 
     useEffect(() => {
         const getFooterVisible = () => {
@@ -14,10 +14,10 @@ export const useBarBottom = () => {
         };
 
         const update = () => {
-            setBottom(NAV_BOTTOM + getFooterVisible());
+            const footerVisible = getFooterVisible();
+            setBottom(Math.max(NAV_BOTTOM + 5, footerVisible + 10));
         };
 
-        // IntersectionObserver — fires when footer enters/leaves viewport
         const footer = document.getElementById("site-footer");
         let observer: IntersectionObserver | null = null;
 

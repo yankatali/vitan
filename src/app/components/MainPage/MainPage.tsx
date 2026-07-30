@@ -42,3 +42,4 @@ export const MainPage = ({config, headerConfig, initialProducts, pricingConfig}:
         </div>
     );
 };
+

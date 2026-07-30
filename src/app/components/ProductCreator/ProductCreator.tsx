@@ -6,7 +6,7 @@ import {ProductCreateModal} from "@/app/components/ProductCreator/ProductCreateM
 import {useProductCreatorDisclosure} from "@/app/components/ProductCreator/useProductCreatorDisclosure";
 import type {ProductCreatorProps} from "@/types/createProduct";
 
-export const ProductCreator = ({categoryOptions, onProductCreated}: ProductCreatorProps) => {
+export const ProductCreator = ({categoryOptions, onProductCreated, pricingConfig}: ProductCreatorProps) => {
     const {close, isOpen, open} = useProductCreatorDisclosure();
 
     return (
@@ -19,6 +19,7 @@ export const ProductCreator = ({categoryOptions, onProductCreated}: ProductCreat
                 isOpen={isOpen}
                 onClose={close}
                 onProductCreated={onProductCreated}
+                pricingConfig={pricingConfig}
             />
         </>
     );

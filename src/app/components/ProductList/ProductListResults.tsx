@@ -70,6 +70,7 @@ export const ProductListResults = ({
                     priceUsd={item.priceUsd}
                     priceUah={getRetailPriceUah(effectiveRate, item.priceUsd, retailMarkup)}
                     priceUahWholesale={getWholesalePriceUah(effectiveRate, item.priceUsd, wholesaleMarkup)}
+                    pricingConfig={pricingConfig}
                     wholesaleDescription={wholesaleDescription}
                     showAdminActions={showAdminActions}
                 />

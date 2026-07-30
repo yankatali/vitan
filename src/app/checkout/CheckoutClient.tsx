@@ -92,13 +92,15 @@ export const CheckoutClient = ({products, pricingConfig}: CheckoutClientProps) =
 
     if (submitted) {
         return (
-            <main className="flex min-h-screen flex-col gap-2 text-[var(--text-primary)]">
-                <PageHeader className="sticky top-0 z-20">
-                    <Link href="/" className="inline-flex h-9 items-center gap-1.5 text-[var(--text-primary)] transition-opacity active:opacity-60">
-                        <svg width="12" height="20" viewBox="0 0 12 20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10 2L2 10l8 8"/></svg>
-                        <span className="text-[22px] font-bold leading-7 tracking-[-0.4px]">Vitan</span>
-                    </Link>
-                </PageHeader>
+            <main className="flex min-h-screen flex-col text-[var(--text-primary)]">
+                <div className="sticky top-0 z-20 px-3 pt-3">
+                    <PageHeader>
+                        <Link href="/" className="inline-flex h-9 items-center gap-1.5 text-[var(--text-primary)] transition-opacity active:opacity-60">
+                            <svg width="12" height="20" viewBox="0 0 12 20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10 2L2 10l8 8"/></svg>
+                            <span className="text-[22px] font-bold leading-7 tracking-[-0.4px]">Vitan</span>
+                        </Link>
+                    </PageHeader>
+                </div>
                 <div className="flex flex-1 flex-col items-center justify-center gap-6 px-6 py-16 text-center">
                     <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[var(--accent)]/15">
                         <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -118,26 +120,28 @@ export const CheckoutClient = ({products, pricingConfig}: CheckoutClientProps) =
     }
 
     return (
-        <main className="flex min-h-screen flex-col gap-2 text-[var(--text-primary)]">
-            <PageHeader className="sticky top-0 z-20">
-                <div className="flex items-center gap-3">
-                    <Link href="/cart" className="inline-flex h-[28px] w-full items-center justify-start rounded-full text-[var(--text-primary)] transition-opacity active:opacity-60" aria-label="Назад">
-                        <svg width="12" height="20" viewBox="0 0 12 20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10 2L2 10l8 8"/></svg>
-                    </Link>
-                    <Link href="/" className="whitespace-nowrap text-[22px] font-bold leading-7 tracking-[-0.4px] text-[var(--text-primary)]">Вітан</Link>
-                </div>
-                <div className="flex items-center gap-2">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
-                        <rect x="9" y="3" width="6" height="4" rx="2"/>
-                        <line x1="9" y1="12" x2="15" y2="12"/>
-                        <line x1="9" y1="16" x2="12" y2="16"/>
-                    </svg>
-                    <h1 className="whitespace-nowrap text-[17px] font-semibold leading-[22px]">Оформлення</h1>
-                </div>
-            </PageHeader>
+        <main className="flex min-h-screen flex-col text-[var(--text-primary)]">
+            <div className="sticky top-0 z-20 px-3 pt-3">
+                <PageHeader>
+                    <div className="flex items-center gap-3">
+                        <Link href="/cart" className="inline-flex h-[28px] w-full items-center justify-start rounded-full text-[var(--text-primary)] transition-opacity active:opacity-60" aria-label="Назад">
+                            <svg width="12" height="20" viewBox="0 0 12 20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10 2L2 10l8 8"/></svg>
+                        </Link>
+                        <Link href="/" className="whitespace-nowrap text-[22px] font-bold leading-7 tracking-[-0.4px] text-[var(--text-primary)]">Вітан</Link>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
+                            <rect x="9" y="3" width="6" height="4" rx="2"/>
+                            <line x1="9" y1="12" x2="15" y2="12"/>
+                            <line x1="9" y1="16" x2="12" y2="16"/>
+                        </svg>
+                        <h1 className="whitespace-nowrap text-[17px] font-semibold leading-[22px]">Оформлення</h1>
+                    </div>
+                </PageHeader>
+            </div>
 
-            <div className={`grid gap-4 pt-2 ${PAGE_CONTENT_PX}`} style={{paddingBottom: '160px'}}>
+            <div className={`grid gap-4 pt-3 ${PAGE_CONTENT_PX}`} style={{paddingBottom: '160px'}}>
 
                 {/* Order summary */}
                 {cartProducts.length > 0 && (
@@ -274,7 +278,7 @@ export const CheckoutClient = ({products, pricingConfig}: CheckoutClientProps) =
             </div>
 
             {/* Mobile/tablet — fixed above nav + footer */}
-            <div className="fixed left-1/2 z-30 w-[min(calc(100vw-1.5rem),30rem)] -translate-x-1/2 lg:hidden" style={{bottom: `${barBottom}px`}}>
+            <div className="fixed left-1/2 z-30 w-[min(calc(100vw-1.5rem),30rem)] -translate-x-1/2 lg:hidden transition-[bottom] duration-200 ease-out" style={{bottom: `${barBottom}px`}}>
                 <button
                     type="submit"
                     form="checkout-form"

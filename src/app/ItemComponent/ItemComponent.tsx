@@ -27,6 +27,12 @@ const formatUah = (value: number) => {
     return `${formatted} ₴`;
 };
 
+const getPurchasePriceUah = (priceUsd: number | undefined, usdToUahRate: number | null | undefined) => {
+    if (typeof priceUsd !== "number" || !usdToUahRate) return null;
+
+    return priceUsd * usdToUahRate;
+};
+
 export const ItemComponent = ({
     category,
     categoryOptions = [],
@@ -35,6 +41,7 @@ export const ItemComponent = ({
     images,
     item,
     onProductDeleted,
+    pricingConfig,
     priceUah,
     priceUahWholesale,
     priceUsd,
@@ -50,6 +57,7 @@ export const ItemComponent = ({
     const productImages = images?.length ? images : image ? [image] : [];
     const handleProductChanged = onProductDeleted ?? (() => undefined);
     const productId = item?.id;
+    const purchasePriceUah = getPurchasePriceUah(priceUsd, pricingConfig?.usdToUahRate);
 
     useLockScroll(isDetailOpen);
 
@@ -186,6 +194,7 @@ export const ItemComponent = ({
                                 <ProductCardActions
                                     categoryOptions={categoryOptions}
                                     product={item}
+                                    pricingConfig={pricingConfig}
                                     showAdminActions={false}
                                     onProductChanged={handleProductChanged}
                                 />
@@ -306,25 +315,30 @@ export const ItemComponent = ({
                                                 <ProductCardActions
                                                     categoryOptions={categoryOptions}
                                                     product={item}
+                                                    pricingConfig={pricingConfig}
                                                     showAdminActions={false}
                                                     onProductChanged={handleProductChanged}
                                                 />
                                             </div>
                                         )}
                                     </div>
-                                    <div className="flex justify-between gap-2">
-                                        <div className="min-w-0">
-                                            {typeof priceUsd === "number" && (
-                                                <p className="text-[13px] font-medium text-[var(--text-secondary)]">
-                                                    {usdFormatter.format(priceUsd)}
-                                                </p>
-                                            )}</div>
+	                                    <div className="flex justify-between gap-2">
+	                                        <div className="min-w-0">
+	                                            {typeof priceUsd === "number" && (
+	                                                <div className="grid gap-0.5 text-[13px] font-medium text-[var(--text-secondary)]">
+	                                                    <p>Закупка USD: {usdFormatter.format(priceUsd)}</p>
+	                                                    {purchasePriceUah !== null && (
+	                                                        <p>Закупка UAH: {formatUah(purchasePriceUah)}</p>
+	                                                    )}
+	                                                </div>
+	                                            )}</div>
 
                                         {showAdminActions && showProductActions && item && (
                                             <div onClick={(e) => e.stopPropagation()}>
                                                 <ProductCardActions
                                                     categoryOptions={categoryOptions}
                                                     product={item}
+                                                    pricingConfig={pricingConfig}
                                                     showAdminActions
                                                     showCartButton={false}
                                                     onProductChanged={handleProductChanged}

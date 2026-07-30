@@ -34,18 +34,26 @@ const getImages = (formData: FormData) => {
         .filter((value): value is File => value instanceof File && value.size > 0);
 };
 
+const getPrice = (value: string) => {
+    const price = Number(value);
+
+    if (!Number.isFinite(price) || price < 0) return null;
+
+    return price;
+};
+
 const getCreateProductInput = (formData: FormData): CreateProductInput => {
     const name = getStringFormValue(formData, CREATE_PRODUCT_FIELD_NAMES.name);
     const description = getStringFormValue(formData, CREATE_PRODUCT_FIELD_NAMES.description);
     const priceValue = getStringFormValue(formData, CREATE_PRODUCT_FIELD_NAMES.price);
-    const price = Number(priceValue);
+    const price = getPrice(priceValue);
     const images = getImages(formData);
 
     if (!name) {
         throw new Error(CREATE_PRODUCT_ERROR_MESSAGES.missingName);
     }
 
-    if (!Number.isFinite(price) || price < 0) {
+    if (price === null) {
         throw new Error(CREATE_PRODUCT_ERROR_MESSAGES.invalidPrice);
     }
 

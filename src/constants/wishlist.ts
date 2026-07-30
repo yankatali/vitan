@@ -1,11 +1,11 @@
 import {PAGE_CONTENT_PX, CARD_GRID_GAP} from "@/constants/pageLayout";
 
 export const WISHLIST_CLASS_NAMES = {
-    page: "flex min-h-screen flex-col gap-2 text-[var(--text-primary)] overflow-x-clip",
+    page: "flex min-h-screen flex-col text-[var(--text-primary)] overflow-x-clip",
 
     homeLink: "whitespace-nowrap text-[22px] font-bold leading-7 tracking-[-0.4px] text-[var(--text-primary)] [font-family:var(--font-brand)]",
     title: "whitespace-nowrap text-[17px] font-bold leading-[22px] text-[var(--text-primary)]",
-    content: `grid gap-4 pt-2 pb-[160px] lg:pb-4 ${PAGE_CONTENT_PX}`,
+    content: `grid gap-4 pt-3 pb-[160px] lg:pb-4 ${PAGE_CONTENT_PX}`,
     emptyState: "liquid-surface rounded-3xl p-6 text-sm text-[#6b615b]",
     list: `grid grid-cols-2 content-start items-stretch ${CARD_GRID_GAP} md:grid-cols-3 xl:grid-cols-4`,
     item: "liquid-surface grid grid-cols-[80px_1fr] gap-3 rounded-3xl p-2 md:grid-cols-[120px_1fr_auto] md:items-center",

@@ -1,9 +1,11 @@
 import type {ItemConfig} from "@/types/item";
+import type {PricingConfig} from "@/types/pricingConfig";
 
 export interface UpdateProductFormValues {
     name: string;
     description: string;
     price: string;
+    priceUah: string;
     categories: string[];
     image: File[];
     keptImageUrls: string[];
@@ -33,13 +35,15 @@ export interface ProductEditModalProps {
     isOpen: boolean;
     onClose: () => void;
     onProductUpdated: () => void;
+    pricingConfig?: PricingConfig | null;
     product: ItemConfig;
 }
 
 export interface UseUpdateProductFormParams {
     onClose: () => void;
     onProductUpdated: () => void;
+    pricingConfig?: PricingConfig | null;
     product: ItemConfig;
 }
 
-export type UpdateProductTextField = Exclude<keyof UpdateProductFormValues, "categories" | "image">;
+export type UpdateProductTextField = Exclude<keyof UpdateProductFormValues, "categories" | "image" | "keptImageUrls">;

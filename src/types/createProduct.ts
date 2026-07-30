@@ -1,7 +1,10 @@
+import type {PricingConfig} from "@/types/pricingConfig";
+
 export interface CreateProductFormValues {
     name: string;
     description: string;
     price: string;
+    priceUah: string;
     categories: string[];
     image: File[];
 }
@@ -26,6 +29,7 @@ export interface CreateProductApiResponse {
 export interface ProductCreatorProps {
     categoryOptions: string[];
     onProductCreated: () => void;
+    pricingConfig?: PricingConfig | null;
 }
 
 export interface ProductCreateModalProps extends ProductCreatorProps {

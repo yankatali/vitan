@@ -1,3 +1,5 @@
+import type {PricingConfig} from "@/types/pricingConfig";
+
 export interface ItemConfig {
     id: string;
     sku?: string;
@@ -30,5 +32,6 @@ export interface ItemComponentProps {
     category?: string;
     showProductActions?: boolean;
     showAdminActions?: boolean;
+    pricingConfig?: PricingConfig | null;
     onProductDeleted?: () => void;
 }

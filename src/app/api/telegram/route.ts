@@ -26,16 +26,23 @@ export async function POST(req: NextRequest) {
     const itemsParam = body.items.map(i => `${i.id}:${i.quantity}`).join(",");
     const orderUrl = `${siteUrl}/order?items=${encodeURIComponent(itemsParam)}&name=${encodeURIComponent(body.name)}&phone=${encodeURIComponent(body.phone)}${body.comment ? `&comment=${encodeURIComponent(body.comment)}` : ""}`;
 
+    const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
     const itemLines = body.items
-        .map(item => `• ${item.title} × ${item.quantity} = ${item.price}`)
+        .map(item => {
+            const title = item.imageUrl
+                ? `<a href="${item.imageUrl}">${esc(item.title)}</a>`
+                : esc(item.title);
+            return `• ${title} × ${item.quantity} = ${item.price}`;
+        })
         .join("\n");
 
     const text = [
         "🛍 Нове замовлення!",
         "",
-        `👤 ${body.name}`,
-        `📞 ${body.phone}`,
-        body.comment ? `💬 ${body.comment}` : null,
+        `👤 ${esc(body.name)}`,
+        `📞 ${esc(body.phone)}`,
+        body.comment ? `💬 ${esc(body.comment)}` : null,
         "",
         "📦 Товари:",
         itemLines,
@@ -50,7 +57,7 @@ export async function POST(req: NextRequest) {
     const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
         method: "POST",
         headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({chat_id: chatId, text}),
+        body: JSON.stringify({chat_id: chatId, text, parse_mode: "HTML"}),
     });
 
     const result = await response.text();

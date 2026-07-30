@@ -25,6 +25,7 @@ const getDeleteButtonLabel = (isDeleting: boolean) => {
 export const ProductCardActions = ({
     categoryOptions,
     onProductChanged,
+    pricingConfig,
     product,
     showAdminActions = false,
     showCartButton = true,
@@ -95,6 +96,7 @@ export const ProductCardActions = ({
                     isOpen={isEditOpen}
                     onClose={closeEdit}
                     onProductUpdated={onProductChanged}
+                    pricingConfig={pricingConfig}
                     product={product}
                 />
             )}

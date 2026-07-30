@@ -1,6 +1,7 @@
 import {CREATE_PRODUCT_FIELD_NAMES} from "@/constants/createProduct";
 import {DELETE_PRODUCT_API_PATH} from "@/constants/deleteProduct";
 import {UPDATE_PRODUCT_ERROR_MESSAGES} from "@/constants/updateProduct";
+import {sendFormDataRequest, type UploadProgressHandler} from "@/lib/formDataUpload";
 import type {UpdateProductApiResponse, UpdateProductFormValues} from "@/types/updateProduct";
 
 const getUpdateProductUrl = (productId: string) => {
@@ -47,31 +48,14 @@ const isUpdateProductApiResponse = (value: unknown): value is UpdateProductApiRe
     return Boolean(product && typeof product === "object" && "id" in product && typeof product.id === "string");
 };
 
-const getResponseErrorMessage = async (response: Response) => {
-    const payload: unknown = await response.json();
-
-    if (payload && typeof payload === "object" && "message" in payload && typeof payload.message === "string") {
-        return payload.message;
-    }
-
-    return UPDATE_PRODUCT_ERROR_MESSAGES.unableToUpdate;
-};
-
-export const updateProduct = async (productId: string, values: UpdateProductFormValues) => {
-    const response = await fetch(getUpdateProductUrl(productId), {
-        method: "PUT",
+export const updateProduct = async (productId: string, values: UpdateProductFormValues, onUploadProgress?: UploadProgressHandler) => {
+    return sendFormDataRequest<UpdateProductApiResponse>({
         body: buildUpdateProductFormData(values),
+        fallbackErrorMessage: UPDATE_PRODUCT_ERROR_MESSAGES.unableToUpdate,
+        isResponse: isUpdateProductApiResponse,
+        method: "PUT",
+        onUploadProgress,
+        unexpectedResponseMessage: UPDATE_PRODUCT_ERROR_MESSAGES.unexpectedResponse,
+        url: getUpdateProductUrl(productId),
     });
-
-    if (!response.ok) {
-        throw new Error(await getResponseErrorMessage(response));
-    }
-
-    const payload: unknown = await response.json();
-
-    if (!isUpdateProductApiResponse(payload)) {
-        throw new Error(UPDATE_PRODUCT_ERROR_MESSAGES.unexpectedResponse);
-    }
-
-    return payload;
 };
