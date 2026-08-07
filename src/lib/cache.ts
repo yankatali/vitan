@@ -31,7 +31,7 @@ export const getContentfulFetchCacheOptions = (
     revalidateSeconds = getContentfulRevalidateSeconds(),
     tags: string[] = [],
 ): ContentfulFetchCacheOptions => {
-    if (!isContentfulCacheEnabled()) {
+    if (!isContentfulCacheEnabled() || revalidateSeconds <= 0) {
         return {cache: NO_STORE_CACHE_CONTROL};
     }
 

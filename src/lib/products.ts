@@ -207,6 +207,7 @@ const buildWhere = ({query, category}: Pick<GetProductsParams, "query" | "catego
 const mapProduct = (product: ContentfulProduct): ItemConfig => {
     const images = product.imagesCollection?.items?.filter(image => Boolean(image?.url)) ?? [];
     const primaryImage = images[0];
+    const purchasePriceUah = Number(product.price ?? 0);
 
     return {
         id: product.sys.id,
@@ -215,7 +216,7 @@ const mapProduct = (product: ContentfulProduct): ItemConfig => {
         title: product.name ?? "",
         description: product.description ?? "",
         category: product.category?.join(", ") ?? "",
-        priceUsd: Number(product.price ?? 0),
+        purchasePriceUah,
         imageUrl: primaryImage?.url ?? "",
         imageUrls: images.map(image => image.url).filter((url): url is string => Boolean(url)),
         imageAlt: primaryImage?.description ?? primaryImage?.title ?? product.name ?? "",

@@ -6,6 +6,7 @@ import {useRef, useState, useEffect, type ReactNode} from "react";
 import {useRouter, usePathname, useSearchParams} from "next/navigation";
 import {ImagePlaceholder} from "@/app/components/ImagePlaceholder/ImagePlaceholder";
 import {CloseIcon} from "@/app/components/icon/CloseIcon";
+import {PriceTooltip} from "@/app/components/PriceTooltip/PriceTooltip";
 import {PRODUCT_CARD_CLASS_NAMES} from "@/constants/productCard";
 import {useLockScroll} from "@/hooks/useLockScroll";
 import type {ItemConfig} from "@/types/item";
@@ -23,6 +24,8 @@ interface ProductCardSimpleProps {
     priceUah: number | null;
     priceUahWholesale: number | null;
     wholesaleDescription?: string;
+    wholesaleActiveDescription?: string;
+    wholesaleAsPrimary?: boolean;
     overlayButton?: ReactNode;
     cartAction?: ReactNode;
     bottomActions?: ReactNode;
@@ -35,6 +38,8 @@ export const ProductCardSimple = ({
     priceUah,
     priceUahWholesale,
     wholesaleDescription,
+    wholesaleActiveDescription,
+    wholesaleAsPrimary = false,
     overlayButton,
     cartAction,
     bottomActions,
@@ -67,6 +72,12 @@ export const ProductCardSimple = ({
     };
 
     const productImages = item.imageUrls?.length ? item.imageUrls : item.imageUrl ? [item.imageUrl] : [];
+    const shouldShowWholesaleAsPrimary = wholesaleAsPrimary && typeof priceUahWholesale === "number";
+    const primaryPriceUah = shouldShowWholesaleAsPrimary ? priceUahWholesale : priceUah;
+    const wholesaleTooltipText = shouldShowWholesaleAsPrimary
+        ? wholesaleActiveDescription ?? wholesaleDescription
+        : wholesaleDescription;
+    const showCartActionInDetailPrice = Boolean(cartAction && !modalAction && typeof primaryPriceUah === "number");
 
     const handleImageScroll = () => {
         const node = imageScrollerRef.current;
@@ -148,17 +159,41 @@ export const ProductCardSimple = ({
                     <div className="flex flex-col gap-1 mt-1">
                         <div className="flex items-end justify-between gap-2">
                             <div className="min-w-0">
-                                {typeof priceUah === "number" && (
+                                {typeof primaryPriceUah === "number" && (
                                     <>
-                                        <p className={PRODUCT_CARD_CLASS_NAMES.priceUsd}>
-                                            {formatUah(priceUah)}
-                                        </p>
-                                        {typeof priceUahWholesale === "number" && (
-                                            <p className="flex flex-wrap items-center gap-x-1 text-[12px] font-medium leading-4 text-[#0ba862]">
-                                                <span className="whitespace-nowrap">{formatUah(priceUahWholesale)}</span>
-                                                <span className="flex items-center gap-1 whitespace-nowrap">Опт{wholesaleDescription && (
-                                                    <span className="inline-flex h-3.5 w-3.5 cursor-help items-center justify-center rounded-full bg-[#0ba862]/15 text-[9px] font-bold text-[#0ba862]" title={wholesaleDescription}>?</span>
-                                                )}</span>
+                                        {shouldShowWholesaleAsPrimary ? (
+                                            <>
+                                                <div className="flex flex-wrap items-center gap-x-1 text-[#0ba862]">
+                                                    <p className={`${PRODUCT_CARD_CLASS_NAMES.priceUsd} !text-[#0ba862]`}>
+                                                        {formatUah(primaryPriceUah)}
+                                                    </p>
+                                                    <span className="flex items-center gap-1 whitespace-nowrap text-[12px] font-medium leading-4">
+                                                        Опт
+                                                        <PriceTooltip text={wholesaleTooltipText} />
+                                                    </span>
+                                                </div>
+                                                {typeof priceUah === "number" && (
+                                                    <p className="text-[12px] font-semibold leading-4 text-[var(--destructive)] line-through">
+                                                        {formatUah(priceUah)}
+                                                    </p>
+                                                )}
+                                            </>
+                                        ) : typeof priceUahWholesale === "number" ? (
+                                            <>
+                                                <p className={PRODUCT_CARD_CLASS_NAMES.priceUsd}>
+                                                    {formatUah(primaryPriceUah)}
+                                                </p>
+                                                <p className="flex flex-wrap items-center gap-x-1 text-[12px] font-medium leading-4 text-[#0ba862]">
+                                                    <span className="whitespace-nowrap">{formatUah(priceUahWholesale)}</span>
+                                                    <span className="flex items-center gap-1 whitespace-nowrap">
+                                                        Опт
+                                                        <PriceTooltip text={wholesaleTooltipText} />
+                                                    </span>
+                                                </p>
+                                            </>
+                                        ) : (
+                                            <p className={PRODUCT_CARD_CLASS_NAMES.priceUsd}>
+                                                {formatUah(primaryPriceUah)}
                                             </p>
                                         )}
                                     </>
@@ -240,25 +275,56 @@ export const ProductCardSimple = ({
                                     </p>
                                 )}
 
-                                {typeof priceUah === "number" && (
-                                    <div className="mt-px">
-                                        <p className={PRODUCT_CARD_CLASS_NAMES.priceUsd}>
-                                            {formatUah(priceUah)}
-                                        </p>
-                                        {typeof priceUahWholesale === "number" && (
-                                            <p className="flex flex-wrap items-center gap-x-1 text-[13px] font-medium text-[#0ba862]">
-                                                <span className="whitespace-nowrap">{formatUah(priceUahWholesale)}</span>
-                                                <span className="flex items-center gap-1 whitespace-nowrap">Опт{wholesaleDescription && (
-                                                    <span className="inline-flex h-3.5 w-3.5 cursor-help items-center justify-center rounded-full bg-[#0ba862]/15 text-[9px] font-bold text-[#0ba862]" title={wholesaleDescription}>?</span>
-                                                )}</span>
-                                            </p>
+                                {typeof primaryPriceUah === "number" && (
+                                    <div className="mt-px flex items-end justify-between gap-3">
+                                        <div className="min-w-0">
+                                            {shouldShowWholesaleAsPrimary ? (
+                                                <>
+                                                    <div className="flex flex-wrap items-center gap-x-1 text-[#0ba862]">
+                                                        <p className={`${PRODUCT_CARD_CLASS_NAMES.priceUsd} !text-[#0ba862]`}>
+                                                            {formatUah(primaryPriceUah)}
+                                                        </p>
+                                                        <span className="flex items-center gap-1 whitespace-nowrap text-[13px] font-medium">
+                                                            Опт
+                                                            <PriceTooltip text={wholesaleTooltipText} />
+                                                        </span>
+                                                    </div>
+                                                    {typeof priceUah === "number" && (
+                                                        <p className="text-[12px] font-semibold leading-4 text-[var(--destructive)] line-through">
+                                                            {formatUah(priceUah)}
+                                                        </p>
+                                                    )}
+                                                </>
+                                        ) : typeof priceUahWholesale === "number" ? (
+                                                <>
+                                                    <p className={PRODUCT_CARD_CLASS_NAMES.priceUsd}>
+                                                        {formatUah(primaryPriceUah)}
+                                                    </p>
+                                                    <p className="flex flex-wrap items-center gap-x-1 text-[13px] font-medium text-[#0ba862]">
+                                                        <span className="whitespace-nowrap">{formatUah(priceUahWholesale)}</span>
+                                                        <span className="flex items-center gap-1 whitespace-nowrap">
+                                                            Опт
+                                                            <PriceTooltip text={wholesaleTooltipText} />
+                                                        </span>
+                                                    </p>
+                                                </>
+                                            ) : (
+                                                <p className={PRODUCT_CARD_CLASS_NAMES.priceUsd}>
+                                                    {formatUah(primaryPriceUah)}
+                                                </p>
+                                            )}
+                                        </div>
+                                        {showCartActionInDetailPrice && (
+                                            <div className="shrink-0" onClick={(e) => e.stopPropagation()}>
+                                                {cartAction}
+                                            </div>
                                         )}
                                     </div>
                                 )}
 
-                                {(cartAction || bottomActions || modalAction) && (
+                                {(modalAction || bottomActions || (cartAction && !showCartActionInDetailPrice)) && (
                                     <div className="mt-2 flex flex-col gap-2">
-                                        {modalAction ?? cartAction}
+                                        {modalAction ?? (!showCartActionInDetailPrice ? cartAction : null)}
                                         {bottomActions}
                                     </div>
                                 )}

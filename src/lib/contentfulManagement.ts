@@ -5,12 +5,15 @@ import {
     CONTENTFUL_ENVIRONMENT_ENV,
     CONTENTFUL_MANAGEMENT_TOKEN_ENV,
     CONTENTFUL_MISSING_ENV_MESSAGES,
+    CONTENTFUL_PRICING_CONFIG_CONTENT_TYPE,
+    CONTENTFUL_PRICING_CONFIG_FIELD_IDS,
     CONTENTFUL_PRODUCT_CONTENT_TYPE,
     CONTENTFUL_PRODUCT_FIELD_IDS,
     CONTENTFUL_SPACE_ID_ENV,
 } from "@/constants/contentful";
 import type {CreateProductInput, CreateProductResult} from "@/types/createProduct";
 import type {DeleteProductResult} from "@/types/deleteProduct";
+import type {UpdatePricingConfigInput} from "@/types/pricingConfig";
 import type {UpdateProductInput, UpdateProductResult} from "@/types/updateProduct";
 
 const getRequiredEnv = (name: string) => {
@@ -36,6 +39,19 @@ const getContentfulManagementEnvironment = async () => {
 
 type ContentfulManagementEnvironment = Awaited<ReturnType<typeof getContentfulManagementEnvironment>>;
 
+const getSafeAssetFileName = (file: File, index: number) => {
+    const extension = file.name.match(/\.[a-z0-9]+$/i)?.[0]?.toLowerCase() ?? "";
+    const baseName = file.name
+        .replace(/\.[a-z0-9]+$/i, "")
+        .normalize("NFKD")
+        .replace(/[^\w.-]+/g, "-")
+        .replace(/-+/g, "-")
+        .replace(/^-|-$/g, "")
+        .slice(0, 48);
+
+    return `${baseName || "product-image"}-${index + 1}${extension}`;
+};
+
 const getLocalizedField = (value: unknown) => {
     return {
         [CONTENTFUL_DEFAULT_LOCALE]: value,
@@ -52,6 +68,7 @@ const createProductAsset = async (
     environment: ContentfulManagementEnvironment,
     input: CreateProductInput | UpdateProductInput,
     image: File,
+    index: number,
 ) => {
     const asset = await environment.createAssetFromFiles({
         fields: {
@@ -60,7 +77,7 @@ const createProductAsset = async (
             file: {
                 [CONTENTFUL_DEFAULT_LOCALE]: {
                     contentType: image.type,
-                    fileName: image.name,
+                    fileName: getSafeAssetFileName(image, index),
                     file: await image.arrayBuffer(),
                 },
             },
@@ -77,7 +94,7 @@ const createProductAssets = async (
 ) => {
     const images = input.images ?? [];
 
-    return Promise.all(images.map(image => createProductAsset(environment, input, image)));
+    return Promise.all(images.map((image, index) => createProductAsset(environment, input, image, index)));
 };
 
 const getAssetLinksField = (assets: Awaited<ReturnType<typeof createProductAssets>>) => {
@@ -88,6 +105,15 @@ const getAssetLinksField = (assets: Awaited<ReturnType<typeof createProductAsset
             id: asset.sys.id,
         },
     })));
+};
+
+const setOptionalCategoryField = (
+    fields: Record<string, Record<string, unknown>>,
+    categories: string[],
+) => {
+    if (!categories.length) return;
+
+    fields[CONTENTFUL_PRODUCT_FIELD_IDS.category] = getLocalizedField(categories);
 };
 
 const getAssetLinks = (assets: Awaited<ReturnType<typeof createProductAssets>>) => {
@@ -202,8 +228,9 @@ export const createContentfulProduct = async (input: CreateProductInput): Promis
         [CONTENTFUL_PRODUCT_FIELD_IDS.name]: getLocalizedField(input.name),
         [CONTENTFUL_PRODUCT_FIELD_IDS.description]: getLocalizedField(input.description),
         [CONTENTFUL_PRODUCT_FIELD_IDS.price]: getLocalizedField(input.price),
-        [CONTENTFUL_PRODUCT_FIELD_IDS.category]: getLocalizedField(input.categories),
     };
+
+    setOptionalCategoryField(fields, input.categories);
 
     if (assets.length) {
         fields[CONTENTFUL_PRODUCT_FIELD_IDS.images] = getAssetLinksField(assets);
@@ -237,7 +264,11 @@ export const updateContentfulProduct = async (input: UpdateProductInput): Promis
     entry.fields[CONTENTFUL_PRODUCT_FIELD_IDS.name] = getLocalizedField(input.name);
     entry.fields[CONTENTFUL_PRODUCT_FIELD_IDS.description] = getLocalizedField(input.description);
     entry.fields[CONTENTFUL_PRODUCT_FIELD_IDS.price] = getLocalizedField(input.price);
-    entry.fields[CONTENTFUL_PRODUCT_FIELD_IDS.category] = getLocalizedField(input.categories);
+    if (input.categories.length) {
+        entry.fields[CONTENTFUL_PRODUCT_FIELD_IDS.category] = getLocalizedField(input.categories);
+    } else {
+        delete entry.fields[CONTENTFUL_PRODUCT_FIELD_IDS.category];
+    }
 
     if (assets.length) {
         entry.fields[CONTENTFUL_PRODUCT_FIELD_IDS.images] = getLocalizedField(
@@ -257,4 +288,29 @@ export const updateContentfulProduct = async (input: UpdateProductInput): Promis
         id: publishedEntry.sys.id,
         assetIds: assets.map(asset => asset.sys.id),
     };
+};
+
+export const updateContentfulPricingConfig = async (input: UpdatePricingConfigInput): Promise<UpdatePricingConfigInput> => {
+    const environment = await getContentfulManagementEnvironment();
+    const entries = await environment.getEntries({
+        content_type: CONTENTFUL_PRICING_CONFIG_CONTENT_TYPE,
+        limit: 1,
+    });
+    const entry = entries.items[0];
+
+    if (!entry) {
+        throw new Error("Pricing config entry not found.");
+    }
+
+    entry.fields[CONTENTFUL_PRICING_CONFIG_FIELD_IDS.usdToUahRate] = getLocalizedField(input.usdToUahRate);
+    entry.fields[CONTENTFUL_PRICING_CONFIG_FIELD_IDS.retailMarkup] = getLocalizedField(input.retailMarkup);
+    entry.fields[CONTENTFUL_PRICING_CONFIG_FIELD_IDS.wholesaleMarkup] = getLocalizedField(input.wholesaleMarkup);
+    entry.fields[CONTENTFUL_PRICING_CONFIG_FIELD_IDS.wholesaleDescription] = getLocalizedField(input.wholesaleDescription);
+    entry.fields[CONTENTFUL_PRICING_CONFIG_FIELD_IDS.optPrice] = getLocalizedField(input.optPrice);
+    entry.fields[CONTENTFUL_PRICING_CONFIG_FIELD_IDS.descriptionAfterOptValid] = getLocalizedField(input.descriptionAfterOptValid);
+
+    const updatedEntry = await entry.update();
+    await updatedEntry.publish();
+
+    return input;
 };

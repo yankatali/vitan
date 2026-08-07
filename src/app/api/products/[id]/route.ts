@@ -1,5 +1,6 @@
 import {NextResponse} from "next/server";
 import {revalidatePath, revalidateTag} from "next/cache";
+import {ADMIN_UNAUTHORIZED_MESSAGE} from "@/constants/admin";
 import {CONTENTFUL_PRODUCTS_CACHE_TAG} from "@/constants/cache";
 import {
     CREATE_PRODUCT_ALLOWED_IMAGE_TYPES,
@@ -8,6 +9,8 @@ import {
 } from "@/constants/createProduct";
 import {DELETE_PRODUCT_ERROR_MESSAGES} from "@/constants/deleteProduct";
 import {UPDATE_PRODUCT_ERROR_MESSAGES} from "@/constants/updateProduct";
+import {getApiErrorMessage} from "@/lib/apiErrorMessage";
+import {isAdminSession} from "@/lib/adminAuth";
 import {deleteContentfulProduct, updateContentfulProduct} from "@/lib/contentfulManagement";
 import type {UpdateProductInput} from "@/types/updateProduct";
 
@@ -48,9 +51,9 @@ const getKeptImageUrls = (formData: FormData) => {
 };
 
 const getPrice = (value: string) => {
-    const price = Number(value);
+    const price = Number(value.replace(",", "."));
 
-    if (!Number.isFinite(price) || price < 0) return null;
+    if (!Number.isFinite(price) || price < 0 || !Number.isInteger(price)) return null;
 
     return price;
 };
@@ -60,6 +63,7 @@ const getUpdateProductInput = (formData: FormData, id: string): UpdateProductInp
     const description = getStringFormValue(formData, CREATE_PRODUCT_FIELD_NAMES.description);
     const priceValue = getStringFormValue(formData, CREATE_PRODUCT_FIELD_NAMES.price);
     const price = getPrice(priceValue);
+    const categories = getCategories(formData);
     const images = getImages(formData);
 
     if (!id) {
@@ -87,7 +91,7 @@ const getUpdateProductInput = (formData: FormData, id: string): UpdateProductInp
         name,
         description,
         price,
-        categories: getCategories(formData),
+        categories,
         images,
         keptImageUrls: getKeptImageUrls(formData),
     };
@@ -100,6 +104,10 @@ const revalidateProducts = () => {
 
 export async function DELETE(_request: Request, context: DeleteProductRouteContext) {
     try {
+        if (!await isAdminSession()) {
+            return NextResponse.json({message: ADMIN_UNAUTHORIZED_MESSAGE}, {status: 401});
+        }
+
         const {id} = await context.params;
 
         if (!id) {
@@ -112,18 +120,17 @@ export async function DELETE(_request: Request, context: DeleteProductRouteConte
 
         return NextResponse.json({product});
     } catch (error) {
-        let message = DELETE_PRODUCT_ERROR_MESSAGES.unableToDelete;
-
-        if (error instanceof Error) {
-            message = error.message;
-        }
-
+        const message = getApiErrorMessage(error, DELETE_PRODUCT_ERROR_MESSAGES.unableToDelete);
         return NextResponse.json({message}, {status: 400});
     }
 }
 
 export async function PUT(request: Request, context: DeleteProductRouteContext) {
     try {
+        if (!await isAdminSession()) {
+            return NextResponse.json({message: ADMIN_UNAUTHORIZED_MESSAGE}, {status: 401});
+        }
+
         const {id} = await context.params;
         const formData = await request.formData();
         const product = await updateContentfulProduct(getUpdateProductInput(formData, id));
@@ -132,12 +139,7 @@ export async function PUT(request: Request, context: DeleteProductRouteContext) 
 
         return NextResponse.json({product});
     } catch (error) {
-        let message = UPDATE_PRODUCT_ERROR_MESSAGES.unableToUpdate;
-
-        if (error instanceof Error) {
-            message = error.message;
-        }
-
+        const message = getApiErrorMessage(error, UPDATE_PRODUCT_ERROR_MESSAGES.unableToUpdate);
         return NextResponse.json({message}, {status: 400});
     }
 }

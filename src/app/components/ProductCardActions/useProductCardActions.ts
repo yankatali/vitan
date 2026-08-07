@@ -2,7 +2,7 @@
 
 import {useEffect, useState} from "react";
 import {useDeleteProduct} from "@/app/components/ProductDeleteButton/useDeleteProduct";
-import {addProductToCart, CART_STORAGE_KEY, getCartQuantity, removeProductFromCart} from "@/lib/cartStorage";
+import {addProductToCart, CART_STORAGE_KEY, getCartPriceSnapshot, getCartQuantity, removeProductFromCart} from "@/lib/cartStorage";
 import {isProductInWishlist, toggleWishlistProduct, WISHLIST_STORAGE_KEY} from "@/lib/wishlistStorage";
 import {SAVED_PRODUCTS_CHANGE_EVENT} from "@/lib/savedProductsEvents";
 import type {UseProductCardActionsParams} from "@/types/productCardActions";
@@ -41,7 +41,7 @@ export const useProductCardActions = ({onProductChanged, product}: UseProductCar
     }, [product.id]);
 
     const handleCartAdd = () => {
-        addProductToCart(product.id);
+        addProductToCart(product.id, 1, getCartPriceSnapshot(product));
         setIsInCart(true);
     };
 

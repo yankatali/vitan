@@ -57,6 +57,7 @@ export interface ProductListResultsProps {
     hasMore: boolean;
     isLoading: boolean;
     items: ItemConfig[];
+    cartPricingProducts: ItemConfig[];
     loadMoreRef: React.RefObject<HTMLDivElement | null>;
     messageClassName: string;
     onProductDeleted: () => void;

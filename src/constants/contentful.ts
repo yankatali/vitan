@@ -4,6 +4,7 @@ export const CONTENTFUL_ENVIRONMENT_ENV = "CONTENTFUL_ENVIRONMENT";
 export const CONTENTFUL_DEFAULT_ENVIRONMENT = "master";
 export const CONTENTFUL_DEFAULT_LOCALE = "en-US";
 export const CONTENTFUL_PRODUCT_CONTENT_TYPE = "product";
+export const CONTENTFUL_PRICING_CONFIG_CONTENT_TYPE = "pricingConfig";
 
 export const CONTENTFUL_PRODUCT_FIELD_IDS = {
     name: "name",
@@ -11,6 +12,15 @@ export const CONTENTFUL_PRODUCT_FIELD_IDS = {
     price: "price",
     category: "category",
     images: "images",
+};
+
+export const CONTENTFUL_PRICING_CONFIG_FIELD_IDS = {
+    usdToUahRate: "usdToUahRate",
+    retailMarkup: "retailMarkup",
+    wholesaleMarkup: "wholesaleMarkup",
+    wholesaleDescription: "wholesaleDescription",
+    optPrice: "optPrice",
+    descriptionAfterOptValid: "descriptionAfterOptValid",
 };
 
 export const CONTENTFUL_MISSING_ENV_MESSAGES: Record<string, string> = {

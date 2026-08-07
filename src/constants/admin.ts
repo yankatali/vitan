@@ -1,0 +1,10 @@
+export const ADMIN_COOKIE_NAME = "vitan_admin_session";
+export const ADMIN_SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 400;
+export const DEFAULT_ADMIN_PASSWORD_FIELD = "adminPassword";
+export const DEFAULT_ADMIN_PASSWORD_HASH_FIELD = "adminPasswordHash";
+export const ADMIN_UNAUTHORIZED_MESSAGE = "Недостатньо прав для цієї дії.";
+export const ADMIN_LOGIN_ERROR_MESSAGE = "Невірний адмін пароль.";
+export const ADMIN_LOGIN_CONFIG_ERROR_MESSAGE = "Адмін пароль не налаштований.";
+export const ADMIN_SETTINGS_NOT_FOUND_MESSAGE = "Налаштування не знайдені в Contentful.";
+export const ADMIN_SETTINGS_INVALID_MESSAGE = "Перевірте значення налаштувань.";
+export const ADMIN_SETTINGS_UPDATE_ERROR_MESSAGE = "Не вдалося оновити налаштування.";

@@ -1,4 +1,4 @@
-import {PAGE_CONTENT_PX, CARD_GRID_GAP} from "@/constants/pageLayout";
+import {PAGE_CONTENT_PX} from "@/constants/pageLayout";
 
 export const CART_CLASS_NAMES = {
     page: "flex min-h-screen flex-col text-[var(--text-primary)] overflow-x-clip",
@@ -12,7 +12,6 @@ export const CART_CLASS_NAMES = {
     image: "aspect-square w-full rounded-3xl object-cover",
     imagePlaceholder: "flex aspect-square w-full items-center justify-center rounded-3xl bg-[rgba(255,255,255,0.15)] text-[var(--text-tertiary)] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.06)]",
     itemInfo: "grid gap-1 min-w-0",
-    category: "text-xs uppercase tracking-wide text-[#98887e]",
     name: "text-base font-semibold",
     price: "text-sm font-semibold text-[#336651]",
     controls: "col-span-2 flex items-center justify-between gap-3 md:col-span-1 md:justify-end",

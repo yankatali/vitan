@@ -7,6 +7,7 @@ import WishlistIcon from "@/app/components/icon/WishlistIcon";
 import {CloseIcon} from "@/app/components/icon/CloseIcon";
 import {ProductCardActions} from "@/app/components/ProductCardActions/ProductCardActions";
 import {ImagePlaceholder} from "@/app/components/ImagePlaceholder/ImagePlaceholder";
+import {PriceTooltip} from "@/app/components/PriceTooltip/PriceTooltip";
 import {PRODUCT_CARD_CLASS_NAMES} from "@/constants/productCard";
 import {PRODUCT_CARD_ACTION_LABELS} from "@/constants/productCardActions";
 import {isProductInWishlist, toggleWishlistProduct, WISHLIST_STORAGE_KEY} from "@/lib/wishlistStorage";
@@ -19,18 +20,83 @@ const usdFormatter = new Intl.NumberFormat("en-US", {
     currency: "USD",
 });
 
-const formatUah = (value: number) => {
-    const formatted = new Intl.NumberFormat("uk-UA", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-    }).format(value);
-    return `${formatted} ₴`;
-};
+const uahFormatter = new Intl.NumberFormat("uk-UA", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+});
 
-const getPurchasePriceUah = (priceUsd: number | undefined, usdToUahRate: number | null | undefined) => {
-    if (typeof priceUsd !== "number" || !usdToUahRate) return null;
+const formatUah = (value: number) => `${uahFormatter.format(value)} ₴`;
 
-    return priceUsd * usdToUahRate;
+interface ProductPriceBlockProps {
+    priceUah?: number | null;
+    priceUahWholesale?: number | null;
+    priceUsd?: number;
+    wholesaleActiveDescription?: string;
+    wholesaleAsPrimary?: boolean;
+    wholesaleDescription?: string;
+}
+
+const ProductPriceBlock = ({
+    priceUah,
+    priceUahWholesale,
+    priceUsd,
+    wholesaleActiveDescription,
+    wholesaleAsPrimary = false,
+    wholesaleDescription,
+}: ProductPriceBlockProps) => {
+    const shouldShowWholesaleAsPrimary = wholesaleAsPrimary && typeof priceUahWholesale === "number";
+    const primaryPriceUah = shouldShowWholesaleAsPrimary ? priceUahWholesale : priceUah;
+    const wholesaleTooltipText = shouldShowWholesaleAsPrimary
+        ? wholesaleActiveDescription ?? wholesaleDescription
+        : wholesaleDescription;
+
+    if (typeof primaryPriceUah === "number") {
+        return (
+            <>
+                {shouldShowWholesaleAsPrimary ? (
+                    <div className="flex flex-wrap items-center gap-x-1 text-[#0ba862]">
+                        <p className={`${PRODUCT_CARD_CLASS_NAMES.priceUsd} !text-[#0ba862]`}>
+                            {formatUah(primaryPriceUah)}
+                        </p>
+                        <span className="flex items-center gap-1 whitespace-nowrap text-[12px] font-medium leading-4">
+                            Опт
+                            <PriceTooltip text={wholesaleTooltipText} />
+                        </span>
+                    </div>
+                ) : (
+                    <p className={PRODUCT_CARD_CLASS_NAMES.priceUsd}>
+                        {formatUah(primaryPriceUah)}
+                    </p>
+                )}
+
+                {shouldShowWholesaleAsPrimary && typeof priceUah === "number" && (
+                    <p className="text-[12px] font-semibold leading-4 text-[var(--destructive)] line-through">
+                        {formatUah(priceUah)}
+                    </p>
+                )}
+
+                {!shouldShowWholesaleAsPrimary && typeof priceUahWholesale === "number" && (
+                    <p className="flex flex-wrap items-center gap-x-1 text-[12px] font-medium leading-4 text-[#0ba862]">
+                        <span className="whitespace-nowrap">{formatUah(priceUahWholesale)}</span>
+                        <span className="flex items-center gap-1 whitespace-nowrap">
+                            Опт
+                            <PriceTooltip text={wholesaleTooltipText} />
+                        </span>
+                    </p>
+                )}
+            </>
+        );
+    }
+
+    if (typeof priceUsd === "number") {
+        return (
+            <p className={PRODUCT_CARD_CLASS_NAMES.priceUsd}>
+                {usdFormatter.format(priceUsd)}
+            </p>
+        );
+    }
+
+    return null;
 };
 
 export const ItemComponent = ({
@@ -42,12 +108,15 @@ export const ItemComponent = ({
     item,
     onProductDeleted,
     pricingConfig,
+    purchasePriceUah,
     priceUah,
     priceUahWholesale,
     priceUsd,
     showAdminActions = false,
     showProductActions = true,
     title,
+    wholesaleActiveDescription,
+    wholesaleAsPrimary = false,
     wholesaleDescription,
 }: ItemComponentProps) => {
     const imageScrollerRef = useRef<HTMLDivElement | null>(null);
@@ -57,7 +126,6 @@ export const ItemComponent = ({
     const productImages = images?.length ? images : image ? [image] : [];
     const handleProductChanged = onProductDeleted ?? (() => undefined);
     const productId = item?.id;
-    const purchasePriceUah = getPurchasePriceUah(priceUsd, pricingConfig?.usdToUahRate);
 
     useLockScroll(isDetailOpen);
 
@@ -79,19 +147,18 @@ export const ItemComponent = ({
         };
     }, [productId]);
 
-
-
-
     const handleFavoriteToggle = () => {
         if (!productId) return;
         setIsFavorite(toggleWishlistProduct(productId));
     };
+
     const handleImageScroll = () => {
         const node = imageScrollerRef.current;
         if (!node || node.clientWidth === 0) return;
 
         setActiveImageIndex(Math.round(node.scrollLeft / node.clientWidth));
     };
+
     const handleDotClick = (index: number) => {
         const node = imageScrollerRef.current;
         if (!node) return;
@@ -102,6 +169,17 @@ export const ItemComponent = ({
         });
         setActiveImageIndex(index);
     };
+
+    const priceBlock = (
+        <ProductPriceBlock
+            priceUah={priceUah}
+            priceUahWholesale={priceUahWholesale}
+            priceUsd={priceUsd}
+            wholesaleActiveDescription={wholesaleActiveDescription}
+            wholesaleAsPrimary={wholesaleAsPrimary}
+            wholesaleDescription={wholesaleDescription}
+        />
+    );
 
     return (
         <article className={PRODUCT_CARD_CLASS_NAMES.article} onClick={() => setIsDetailOpen(true)} role="button" tabIndex={0}>
@@ -164,31 +242,10 @@ export const ItemComponent = ({
                     <h3 className={PRODUCT_CARD_CLASS_NAMES.title} title={title}>
                         {title}
                     </h3>
-
                 </div>
                 <div className={PRODUCT_CARD_CLASS_NAMES.footer}>
                     <div className="flex items-end justify-between gap-2">
-                        <div className="min-w-0">
-                            {typeof priceUah === "number" ? (
-                                <>
-                                    <p className={PRODUCT_CARD_CLASS_NAMES.priceUsd}>
-                                        {formatUah(priceUah)}
-                                    </p>
-                                    {typeof priceUahWholesale === "number" && (
-                                        <p className="flex flex-wrap items-center gap-x-1 text-[12px] font-medium leading-4 text-[#0ba862]">
-                                            <span className="whitespace-nowrap">{formatUah(priceUahWholesale)}</span>
-                                            <span className="flex items-center gap-1 whitespace-nowrap">Опт{wholesaleDescription && (
-                                                <span className="inline-flex h-3.5 w-3.5 cursor-help items-center justify-center rounded-full bg-[#0ba862]/15 text-[9px] font-bold text-[#0ba862]" title={wholesaleDescription}>?</span>
-                                            )}</span>
-                                        </p>
-                                    )}
-                                </>
-                            ) : typeof priceUsd === "number" ? (
-                                <p className={PRODUCT_CARD_CLASS_NAMES.priceUsd}>
-                                    {usdFormatter.format(priceUsd)}
-                                </p>
-                            ) : null}
-                        </div>
+                        <div className="min-w-0">{priceBlock}</div>
                         {showProductActions && item && (
                             <div className="shrink-0" onClick={(e) => e.stopPropagation()}>
                                 <ProductCardActions
@@ -289,27 +346,7 @@ export const ItemComponent = ({
 
                                 <div className="mt-px flex flex-col gap-2">
                                     <div className="flex items-end justify-between gap-2">
-                                        <div className="min-w-0">
-                                            {typeof priceUah === "number" ? (
-                                                <>
-                                                    <p className={PRODUCT_CARD_CLASS_NAMES.priceUsd}>
-                                                        {formatUah(priceUah)}
-                                                    </p>
-                                                    {typeof priceUahWholesale === "number" && (
-                                                        <p className="flex flex-wrap items-center gap-x-1 text-[12px] font-medium leading-4 text-[#0ba862]">
-                                                            <span className="whitespace-nowrap">{formatUah(priceUahWholesale)}</span>
-                                                            <span className="flex items-center gap-1 whitespace-nowrap">Опт{wholesaleDescription && (
-                                                                <span className="inline-flex h-3.5 w-3.5 cursor-help items-center justify-center rounded-full bg-[#0ba862]/15 text-[9px] font-bold text-[#0ba862]" title={wholesaleDescription}>?</span>
-                                                            )}</span>
-                                                        </p>
-                                                    )}
-                                                </>
-                                            ) : typeof priceUsd === "number" ? (
-                                                <p className={PRODUCT_CARD_CLASS_NAMES.priceUsd}>
-                                                    {usdFormatter.format(priceUsd)}
-                                                </p>
-                                            ) : null}
-                                        </div>
+                                        <div className="min-w-0">{priceBlock}</div>
                                         {showProductActions && item && (
                                             <div className="shrink-0" onClick={(e) => e.stopPropagation()}>
                                                 <ProductCardActions
@@ -322,16 +359,19 @@ export const ItemComponent = ({
                                             </div>
                                         )}
                                     </div>
-	                                    <div className="flex justify-between gap-2">
-	                                        <div className="min-w-0">
-	                                            {typeof priceUsd === "number" && (
-	                                                <div className="grid gap-0.5 text-[13px] font-medium text-[var(--text-secondary)]">
-	                                                    <p>Закупка USD: {usdFormatter.format(priceUsd)}</p>
-	                                                    {purchasePriceUah !== null && (
-	                                                        <p>Закупка UAH: {formatUah(purchasePriceUah)}</p>
-	                                                    )}
-	                                                </div>
-	                                            )}</div>
+                                    <div className="flex justify-between gap-2">
+                                        <div className="min-w-0">
+                                            {showAdminActions && (typeof purchasePriceUah === "number" || typeof priceUsd === "number") && (
+                                                <div className="grid gap-0.5 text-[13px] font-medium text-[var(--text-secondary)]">
+                                                    {typeof purchasePriceUah === "number" && (
+                                                        <p>Закупка грн: {formatUah(purchasePriceUah)}</p>
+                                                    )}
+                                                    {typeof priceUsd === "number" && (
+                                                        <p>Закупка USD: {usdFormatter.format(priceUsd)}</p>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
 
                                         {showAdminActions && showProductActions && item && (
                                             <div onClick={(e) => e.stopPropagation()}>
@@ -349,7 +389,6 @@ export const ItemComponent = ({
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 </div>,
                 document.body

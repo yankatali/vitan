@@ -7,6 +7,7 @@ import {
     CREATE_PRODUCT_MODAL_CLASS_NAMES,
 } from "@/constants/createProduct";
 import {CloseIcon} from "@/app/components/icon/CloseIcon";
+import {LoadingSpinnerIcon} from "@/app/components/icon/LoadingSpinnerIcon";
 import {PlusIcon} from "@/app/components/icon/PlusIcon";
 import {CategoryMultiSelect} from "@/app/components/CategoryMultiSelect/CategoryMultiSelect";
 import {ProductImagePreviews, ProductImageUploadProgress} from "@/app/components/ProductImagePreviews/ProductImagePreviews";
@@ -62,13 +63,28 @@ export const ProductCreateModal = ({categoryOptions, isOpen, onClose, onProductC
                 </div>
 
                 <form onSubmit={handleSubmit} className={CREATE_PRODUCT_MODAL_CLASS_NAMES.form}>
+                    <div className={CREATE_PRODUCT_MODAL_CLASS_NAMES.fields}>
+                        <label className={CREATE_PRODUCT_MODAL_CLASS_NAMES.label}>
+                            Назва
+                            <input
+                                name={CREATE_PRODUCT_FIELD_NAMES.name}
+                                value={values.name}
+                                onChange={(event) => setFieldValue(CREATE_PRODUCT_FIELD_NAMES.name, event.target.value)}
+                                className={CREATE_PRODUCT_MODAL_CLASS_NAMES.input}
+                                required
+                            />
+                        </label>
+
                     <label className={CREATE_PRODUCT_MODAL_CLASS_NAMES.label}>
-                        Назва
+                        Закупочна ціна грн
                         <input
-                            name={CREATE_PRODUCT_FIELD_NAMES.name}
-                            value={values.name}
-                            onChange={(event) => setFieldValue(CREATE_PRODUCT_FIELD_NAMES.name, event.target.value)}
+                            name={CREATE_PRODUCT_FIELD_NAMES.priceUah}
+                            value={values.priceUah}
+                            onChange={(event) => setFieldValue(CREATE_PRODUCT_FIELD_NAMES.priceUah, event.target.value)}
                             className={CREATE_PRODUCT_MODAL_CLASS_NAMES.input}
+                            type="number"
+                            min="0"
+                            step="1"
                             required
                         />
                     </label>
@@ -83,26 +99,12 @@ export const ProductCreateModal = ({categoryOptions, isOpen, onClose, onProductC
                             type="number"
                             min="0"
                             step="0.01"
-                            required
-                        />
-                    </label>
-
-                    <label className={CREATE_PRODUCT_MODAL_CLASS_NAMES.label}>
-                        Закупочна ціна UAH
-                        <input
-                            name={CREATE_PRODUCT_FIELD_NAMES.priceUah}
-                            value={values.priceUah}
-                            onChange={(event) => setFieldValue(CREATE_PRODUCT_FIELD_NAMES.priceUah, event.target.value)}
-                            className={CREATE_PRODUCT_MODAL_CLASS_NAMES.input}
-                            type="number"
-                            min="0"
-                            step="0.01"
                             disabled={!hasUsdToUahRate}
                             placeholder={hasUsdToUahRate ? undefined : "Немає курсу USD"}
                         />
                     </label>
 
-                    <ProductPricingPreview priceUsd={values.price} pricingConfig={pricingConfig} />
+                    <ProductPricingPreview priceUah={values.priceUah} pricingConfig={pricingConfig} />
 
                     <label className={CREATE_PRODUCT_MODAL_CLASS_NAMES.label}>
                         Опис
@@ -148,13 +150,15 @@ export const ProductCreateModal = ({categoryOptions, isOpen, onClose, onProductC
                         {uploadProgress !== null && <ProductImageUploadProgress progress={uploadProgress} />}
                     </div>
 
-                    {error && <p className={CREATE_PRODUCT_MODAL_CLASS_NAMES.error}>{error}</p>}
+                        {error && <p className={CREATE_PRODUCT_MODAL_CLASS_NAMES.error}>{error}</p>}
+                    </div>
 
                     <div className={CREATE_PRODUCT_MODAL_CLASS_NAMES.actions}>
                         <button type="button" onClick={handleClose} className={CREATE_PRODUCT_MODAL_CLASS_NAMES.secondaryButton} disabled={isSubmitting}>
                             Скасувати
                         </button>
                         <button type="submit" className={CREATE_PRODUCT_MODAL_CLASS_NAMES.primaryButton} disabled={isSubmitting}>
+                            {isSubmitting && <LoadingSpinnerIcon />}
                             {getSubmitButtonLabel(isSubmitting)}
                         </button>
                     </div>

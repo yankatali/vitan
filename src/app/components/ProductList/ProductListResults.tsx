@@ -1,6 +1,9 @@
 "use client";
 
 import {ItemComponent} from "@/app/ItemComponent/ItemComponent";
+import {useCartWholesaleStatus} from "@/hooks/useCartWholesaleStatus";
+import {getMarkedUpUahPrice, getUsdPriceFromUah} from "@/lib/productPricing";
+import {getWholesaleDescriptionText, getWholesaleTooltipText} from "@/lib/wholesalePricing";
 import type {ProductListResultsProps} from "@/types/productList";
 
 const getCardCategory = (showCategoryOnCard: boolean, category: string) => {
@@ -9,20 +12,9 @@ const getCardCategory = (showCategoryOnCard: boolean, category: string) => {
     return undefined;
 };
 
-const getRetailPriceUah = (usdToUahRate: number | null | undefined, priceUsd: number | undefined, retailMarkup: number) => {
-    if (!usdToUahRate || !priceUsd) return null;
-
-    return Number((priceUsd * (1 + retailMarkup / 100) * usdToUahRate).toFixed(2));
-};
-
-const getWholesalePriceUah = (usdToUahRate: number | null | undefined, priceUsd: number | undefined, wholesaleMarkup: number) => {
-    if (!usdToUahRate || !priceUsd) return null;
-
-    return Number((priceUsd * (1 + wholesaleMarkup / 100) * usdToUahRate).toFixed(2));
-};
-
 export const ProductListResults = ({
     categoryOptions,
+    cartPricingProducts,
     error,
     gridRef,
     gridClassName,
@@ -37,10 +29,14 @@ export const ProductListResults = ({
     usdToUahRate,
     pricingConfig,
 }: ProductListResultsProps) => {
-    const effectiveRate = pricingConfig?.usdToUahRate ?? usdToUahRate;
-    const retailMarkup = pricingConfig?.retailMarkup ?? 30;
-    const wholesaleMarkup = pricingConfig?.wholesaleMarkup ?? 15;
-    const wholesaleDescription = pricingConfig?.wholesaleDescription ?? "";
+    const effectiveRate = showAdminActions ? pricingConfig?.usdToUahRate ?? usdToUahRate : null;
+    const retailMarkup = showAdminActions ? pricingConfig?.retailMarkup ?? 30 : 0;
+    const wholesaleMarkup = showAdminActions ? pricingConfig?.wholesaleMarkup ?? 15 : 0;
+    const wholesaleDescription = showAdminActions ? getWholesaleDescriptionText(pricingConfig) : "";
+    const {
+        isWholesaleActive,
+    } = useCartWholesaleStatus(cartPricingProducts, pricingConfig);
+    const wholesaleActiveDescription = getWholesaleTooltipText(pricingConfig, wholesaleDescription);
 
     if (error) {
         return <p className={messageClassName} role="alert">{error}</p>;
@@ -67,11 +63,14 @@ export const ProductListResults = ({
                     description={item.description}
                     category={getCardCategory(showCategoryOnCard, item.category)}
                     onProductDeleted={onProductDeleted}
-                    priceUsd={item.priceUsd}
-                    priceUah={getRetailPriceUah(effectiveRate, item.priceUsd, retailMarkup)}
-                    priceUahWholesale={getWholesalePriceUah(effectiveRate, item.priceUsd, wholesaleMarkup)}
-                    pricingConfig={pricingConfig}
-                    wholesaleDescription={wholesaleDescription}
+                    purchasePriceUah={showAdminActions ? item.purchasePriceUah : undefined}
+                    priceUsd={showAdminActions ? getUsdPriceFromUah(item.purchasePriceUah, effectiveRate) ?? item.priceUsd : undefined}
+                    priceUah={item.priceUah ?? getMarkedUpUahPrice(item.purchasePriceUah, retailMarkup)}
+                    priceUahWholesale={item.priceUahWholesale ?? getMarkedUpUahPrice(item.purchasePriceUah, wholesaleMarkup)}
+                    pricingConfig={showAdminActions ? pricingConfig : null}
+                    wholesaleDescription={showAdminActions ? wholesaleDescription : item.wholesaleDescription ?? ""}
+                    wholesaleActiveDescription={wholesaleActiveDescription}
+                    wholesaleAsPrimary={isWholesaleActive}
                     showAdminActions={showAdminActions}
                 />
             ))}

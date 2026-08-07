@@ -1,49 +1,50 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import {useEffect, useMemo, useState} from "react";
 import {CART_CLASS_NAMES} from "@/constants/cart";
-import {addProductToCart, CART_STORAGE_KEY, getCartItems, removeProductFromCart, updateCartQuantity} from "@/lib/cartStorage";
+import {
+    addProductToCart,
+    CART_STORAGE_KEY,
+    getCartItems,
+    getCartPriceSnapshot,
+    removeProductFromCart,
+    setCartItems as saveCartItems,
+    updateCartQuantity,
+} from "@/lib/cartStorage";
 import {SAVED_PRODUCTS_CHANGE_EVENT} from "@/lib/savedProductsEvents";
 import type {CartProductItem, CartStorageItem} from "@/types/cart";
 import type {ItemConfig} from "@/types/item";
-import type {PricingConfig} from "@/types/pricingConfig";
 import {useBarBottom} from "@/hooks/useBarBottom";
 import {PageHeader} from "@/app/components/PageHeader/PageHeader";
 import {ConfirmModal} from "@/app/components/ConfirmModal/ConfirmModal";
-import Image from "next/image";
 import {ImagePlaceholder} from "@/app/components/ImagePlaceholder/ImagePlaceholder";
+import {PriceTooltip} from "@/app/components/PriceTooltip/PriceTooltip";
 import {RelatedProductsRow, getCategoriesFromProducts, getRelatedProducts} from "@/app/components/RelatedProductsRow/RelatedProductsRow";
 import CartIcon from "@/app/components/icon/CartIcon";
 import {TrashIcon} from "@/app/components/icon/TrashIcon";
+import {getCartRetailTotal, getOptPrice, getProductPriceUah, getRetailPriceUah, getWholesaleTooltipText, isWholesaleEligible} from "@/lib/wholesalePricing";
+import type {PricingConfig} from "@/types/pricingConfig";
 
 interface CartClientProps {
     products: ItemConfig[];
     pricingConfig?: PricingConfig | null;
 }
 
+const uahFormatter = new Intl.NumberFormat("uk-UA", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+});
+
 const formatUah = (value: number) => {
-    const formatted = new Intl.NumberFormat("uk-UA", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-    }).format(value);
-    return `${formatted} ₴`;
+    return `${uahFormatter.format(value)} ₴`;
 };
 
-const getRetailPriceUah = (usdToUahRate: number | null, priceUsd: number, retailMarkup: number) => {
-    if (!usdToUahRate) return null;
-    return Number((priceUsd * (1 + retailMarkup / 100) * usdToUahRate).toFixed(2));
-};
-
-const getWholesalePriceUah = (usdToUahRate: number | null, priceUsd: number, wholesaleMarkup: number) => {
-    if (!usdToUahRate) return null;
-    return Number((priceUsd * (1 + wholesaleMarkup / 100) * usdToUahRate).toFixed(2));
-};
-
-const getCartProducts = (cartItems: CartStorageItem[], products: ItemConfig[]): CartProductItem[] => {
+const getCartProducts = (cartItems: CartStorageItem[], productsById: Map<string, ItemConfig>): CartProductItem[] => {
     return cartItems
         .map(cartItem => {
-            const product = products.find(item => item.id === cartItem.productId);
+            const product = productsById.get(cartItem.productId);
             if (!product) return null;
             return {product, quantity: cartItem.quantity};
         })
@@ -54,15 +55,28 @@ export const CartClient = ({products, pricingConfig}: CartClientProps) => {
     const [cartItems, setCartItems] = useState<CartStorageItem[]>([]);
     const [confirmRemoveId, setConfirmRemoveId] = useState<string | null>(null);
     const barBottom = useBarBottom();
+    const productsById = useMemo(() => new Map(products.map(product => [product.id, product])), [products]);
 
     useEffect(() => {
-        if (products.length > 0) {
-            const validIds = new Set(products.map(p => p.id));
+        if (productsById.size > 0) {
             const raw = getCartItems();
-            const clean = raw.filter(item => validIds.has(item.productId));
-            if (clean.length !== raw.length) {
-                localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(clean));
-                window.dispatchEvent(new CustomEvent(SAVED_PRODUCTS_CHANGE_EVENT));
+            const clean = raw.flatMap(item => {
+                const product = productsById.get(item.productId);
+                if (!product) return [];
+
+                return [{
+                    ...item,
+                    ...getCartPriceSnapshot(product),
+                }];
+            });
+            const shouldSaveCleanCart = clean.length !== raw.length
+                || clean.some((item, index) => (
+                    item.priceUah !== raw[index]?.priceUah
+                    || item.priceUahWholesale !== raw[index]?.priceUahWholesale
+                ));
+
+            if (shouldSaveCleanCart) {
+                saveCartItems(clean);
             }
         }
 
@@ -81,12 +95,11 @@ export const CartClient = ({products, pricingConfig}: CartClientProps) => {
             window.removeEventListener("storage", handleStorage);
             window.removeEventListener("pageshow", syncCartItems);
         };
-    }, []);
+    }, [productsById]);
 
-    const cartProducts = useMemo(() => getCartProducts(cartItems, products), [cartItems, products]);
-    const totalQuantity = cartProducts.reduce((sum, item) => sum + item.quantity, 0);
+    const cartProducts = useMemo(() => getCartProducts(cartItems, productsById), [cartItems, productsById]);
 
-    const cartProductIds = useMemo(() => new Set(cartItems.map(i => i.productId)), [cartItems]);
+    const cartProductIds = useMemo(() => new Set(cartProducts.map(item => item.product.id)), [cartProducts]);
 
     const relatedProducts = useMemo(() => {
         const cartItemConfigs = cartProducts.map(cp => cp.product);
@@ -94,15 +107,18 @@ export const CartClient = ({products, pricingConfig}: CartClientProps) => {
         return getRelatedProducts(cartProductIds, categories, products);
     }, [cartProducts, cartProductIds, products]);
 
-    const usdToUahRate = pricingConfig?.usdToUahRate ?? null;
-    const retailMarkup = pricingConfig?.retailMarkup ?? 30;
-    const wholesaleMarkup = pricingConfig?.wholesaleMarkup ?? 15;
-    const wholesaleDescription = pricingConfig?.wholesaleDescription ?? "";
+    const retailTotalPrice = useMemo(() => getCartRetailTotal(cartProducts, pricingConfig), [cartProducts, pricingConfig]);
+    const isWholesaleActive = isWholesaleEligible(retailTotalPrice, pricingConfig);
+    const optPrice = getOptPrice(pricingConfig);
+    const remainingToWholesale = Math.max(0, optPrice - retailTotalPrice);
+    const shouldShowWholesaleHint = cartProducts.length > 0 && !isWholesaleActive && remainingToWholesale > 0;
+    const wholesaleTooltipText = getWholesaleTooltipText(pricingConfig);
 
-    const totalPrice = cartProducts.reduce((sum, item) => {
-        const price = getRetailPriceUah(usdToUahRate, item.product.priceUsd ?? 0, retailMarkup);
-        return sum + (price ?? 0) * item.quantity;
-    }, 0);
+    const {totalPrice, totalQuantity} = useMemo(() => cartProducts.reduce((totals, item) => {
+        totals.totalQuantity += item.quantity;
+        totals.totalPrice += (getProductPriceUah(item.product, isWholesaleActive, pricingConfig) ?? 0) * item.quantity;
+        return totals;
+    }, {totalPrice: 0, totalQuantity: 0}), [cartProducts, isWholesaleActive, pricingConfig]);
 
     const handleQuantityChange = (productId: string, quantity: number) => {
         if (quantity < 1) {
@@ -142,7 +158,12 @@ export const CartClient = ({products, pricingConfig}: CartClientProps) => {
                     <>
                         <div className={CART_CLASS_NAMES.list}>
                             {cartProducts.map(({product, quantity}) => {
-                                const priceUah = getRetailPriceUah(usdToUahRate, product.priceUsd ?? 0, retailMarkup);
+                                const retailPriceUah = getRetailPriceUah(product, pricingConfig);
+                                const priceUah = getProductPriceUah(product, isWholesaleActive, pricingConfig);
+                                const usesWholesalePrice = isWholesaleActive
+                                    && typeof priceUah === "number"
+                                    && typeof retailPriceUah === "number"
+                                    && priceUah !== retailPriceUah;
 
                                 return (
                                     <article key={product.id} className={CART_CLASS_NAMES.item}>
@@ -162,8 +183,23 @@ export const CartClient = ({products, pricingConfig}: CartClientProps) => {
 
                                         <div className={CART_CLASS_NAMES.itemInfo}>
                                             <h2 className={CART_CLASS_NAMES.name}>{product.title}</h2>
-                                            {priceUah !== null && (
-                                                <p className={CART_CLASS_NAMES.price}>{formatUah(priceUah)}</p>
+                                            {typeof priceUah === "number" && (
+                                                <div className="grid gap-0.5">
+                                                    <p className={usesWholesalePrice ? "text-[15px] font-bold leading-5 text-[#0ba862]" : CART_CLASS_NAMES.price}>
+                                                        {formatUah(priceUah)}
+                                                    </p>
+                                                    {usesWholesalePrice && typeof retailPriceUah === "number" && (
+                                                        <p className="text-[12px] font-semibold leading-4 text-[var(--destructive)] line-through">
+                                                            {formatUah(retailPriceUah)}
+                                                        </p>
+                                                    )}
+                                                    {usesWholesalePrice && (
+                                                        <p className="flex items-center gap-1 text-[12px] font-medium leading-4 text-[#0ba862]">
+                                                            Опт
+                                                            <PriceTooltip text={wholesaleTooltipText} />
+                                                        </p>
+                                                    )}
+                                                </div>
                                             )}
                                         </div>
 
@@ -201,11 +237,17 @@ export const CartClient = ({products, pricingConfig}: CartClientProps) => {
                             })}
                         </div>
 
+                        {shouldShowWholesaleHint && (
+                            <div className="liquid-surface rounded-2xl px-4 py-3 text-[13px] font-semibold leading-5 text-[var(--text-primary)]">
+                                Додайте ще {formatUah(remainingToWholesale)}, щоб сума була мінімум {formatUah(optPrice)} і відкрилась оптова ціна.
+                            </div>
+                        )}
+
                         <RelatedProductsRow
                             products={relatedProducts}
-                            pricingConfig={pricingConfig}
                             onAction={(id) => {
-                                addProductToCart(id);
+                                const product = productsById.get(id);
+                                addProductToCart(id, 1, product ? getCartPriceSnapshot(product) : undefined);
                             }}
                             isActive={(id) => cartProductIds.has(id)}
                             actionIcon={<CartIcon size={16} />}

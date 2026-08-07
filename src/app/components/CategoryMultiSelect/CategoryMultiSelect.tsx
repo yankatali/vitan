@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useMemo, useRef, useState} from "react";
 import {CREATE_PRODUCT_FIELD_NAMES, CREATE_PRODUCT_MODAL_CLASS_NAMES} from "@/constants/createProduct";
 
 interface CategoryMultiSelectProps {
@@ -14,6 +14,24 @@ const getSelectionLabel = (selectedCategories: string[]) => {
     return `Вибрано: ${selectedCategories.length}`;
 };
 
+const getCategoryKey = (category: string) => category.trim().toLowerCase();
+
+const getOptionsWithSelectedCategories = (options: string[], selectedCategories: string[]) => {
+    const seenCategories = new Set<string>();
+
+    return [...options, ...selectedCategories]
+        .map(category => category.trim())
+        .filter(category => {
+            if (!category) return false;
+
+            const key = getCategoryKey(category);
+            if (seenCategories.has(key)) return false;
+
+            seenCategories.add(key);
+            return true;
+        });
+};
+
 export const CategoryMultiSelect = ({
     onToggle,
     options,
@@ -21,6 +39,10 @@ export const CategoryMultiSelect = ({
 }: CategoryMultiSelectProps) => {
     const [isOpen, setIsOpen] = useState(false);
     const rootRef = useRef<HTMLDivElement | null>(null);
+    const categoryOptions = useMemo(
+        () => getOptionsWithSelectedCategories(options, selectedCategories),
+        [options, selectedCategories],
+    );
 
     useEffect(() => {
         if (!isOpen) return;
@@ -69,7 +91,7 @@ export const CategoryMultiSelect = ({
                 </summary>
 
                 <div className={CREATE_PRODUCT_MODAL_CLASS_NAMES.categorySelectMenu}>
-                    {options.map(category => (
+                    {categoryOptions.map(category => (
                         <label key={category} className={CREATE_PRODUCT_MODAL_CLASS_NAMES.checkboxLabel}>
                             <input
                                 name={CREATE_PRODUCT_FIELD_NAMES.categories}
@@ -83,9 +105,9 @@ export const CategoryMultiSelect = ({
                         </label>
                     ))}
 
-                    {!options.length && (
+                    {!categoryOptions.length && (
                         <span className={CREATE_PRODUCT_MODAL_CLASS_NAMES.categorySelectEmpty}>
-                            Категорії не знайдені в поточних товарах.
+                            Категорій немає. Можна зберегти товар без категорії.
                         </span>
                     )}
                 </div>

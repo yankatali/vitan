@@ -5,6 +5,8 @@ import {Fragment} from "react";
 import {getProducts} from "@/lib/products";
 import {getPricingConfig} from "@/lib/pricingConfig";
 import {getContentfulRevalidateSeconds} from "@/lib/cache";
+import {isAdminSession} from "@/lib/adminAuth";
+import {getAdminProductsResult, getPublicProductsResult} from "@/lib/publicProducts";
 import {CatalogSortOption} from "@/types/catalog";
 import type {ProductsResult} from "@/types/product";
 import type {HeaderConfig} from "@/types/header";
@@ -64,6 +66,7 @@ export async function renderPageByPath(path = "/") {
 
         const initialProductSort = getInitialProductSort(components);
         const headerConfig = getHeaderConfig(components);
+        const isAdmin = await isAdminSession();
         let initialProducts: ProductsResult | undefined;
 
         if (initialProductSort) {
@@ -77,8 +80,17 @@ export async function renderPageByPath(path = "/") {
         }
 
         const pricingConfig = await getPricingConfig();
+        const clientInitialProducts = initialProducts
+            ? isAdmin ? getAdminProductsResult(initialProducts) : getPublicProductsResult(initialProducts, pricingConfig)
+            : undefined;
+        const componentOptions = {
+            headerConfig,
+            initialProducts: clientInitialProducts,
+            isAdmin,
+            ...(isAdmin ? {pricingConfig} : {}),
+        };
 
-        const renderedComponents = components.map(ref => getReactComponent(ref, {headerConfig, initialProducts, pricingConfig}));
+        const renderedComponents = components.map(ref => getReactComponent(ref, componentOptions));
 
         return renderedComponents.map((component, index) => (
             <Fragment key={components[index].sys.id}>

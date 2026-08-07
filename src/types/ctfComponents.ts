@@ -53,5 +53,6 @@ export const isRenderableCtfComponent = (component: CtfComponent): component is 
 export interface GetReactComponentOptions {
     headerConfig?: HeaderConfig;
     initialProducts?: ProductsResult;
+    isAdmin?: boolean;
     pricingConfig?: PricingConfig | null;
 }

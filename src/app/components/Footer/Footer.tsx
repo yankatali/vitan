@@ -1,65 +1,102 @@
-export const Footer = () => {
+import {AdminAccess} from "@/app/components/AdminAccess/AdminAccess";
+
+interface FooterProps {
+    isAdmin?: boolean;
+}
+
+const footerLinkClassName = "group flex w-fit max-w-full items-center gap-1 rounded-[var(--radius-sm)] py-1 text-[var(--text-primary)] transition-opacity active:opacity-65";
+const footerIconClassName = "flex h-[18px] w-[18px] shrink-0 items-center justify-center";
+
+export const Footer = ({isAdmin = false}: FooterProps) => {
+    const phoneNumber = "+380 506 725 136";
+    const normalizedPhoneNumber = "380506725136";
+
     return (
-        <footer className="mt-4" id="site-footer">
-            <div className="liquid-surface rounded-t-3xl px-4 pt-4 md:px-6 lg:pb-6" style={{paddingBottom: '100px'}}>
-                <div className="flex flex-col gap-3">
+        <footer className="mt-5" id="site-footer">
+            <div className="liquid-surface rounded-t-3xl px-4 pt-5 md:px-6 lg:pb-6" style={{paddingBottom: '100px'}}>
+                <div className="flex flex-col gap-4">
 
                     {/* Brand */}
-                    <div className="flex items-baseline gap-2">
-                        <p className="text-[17px] font-bold tracking-[-0.3px] text-[var(--text-primary)]">Vitan</p>
-                        <p className="text-[12px] leading-4 text-[var(--text-secondary)]">Канцелярія та товари для творчості</p>
+                    <div className="flex flex-col">
+                        <p className="text-[18px] font-bold tracking-normal text-[var(--text-primary)]">Вітан</p>
+                        <p className="max-w-[34rem] text-[12px] leading-5 text-[var(--text-secondary)]">
+                            Універсальний магазин, у якому можна знайти майже все.
+                        </p>
                     </div>
 
                     <div className="h-px bg-black/8" />
 
                     {/* Two columns */}
-                    <div className="flex gap-4">
-                        {/* Addresses — left */}
-                        <div className="flex flex-1 flex-col gap-1.5">
-                            <p className="text-[11px] font-semibold uppercase tracking-wide text-[var(--text-secondary)]">Де знайти</p>
-                            <div className="flex items-start gap-1.5">
-                                <svg className="mt-[3px] shrink-0 text-[var(--text-secondary)]" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>
-                                </svg>
-                                <div>
-                                    <p className="text-[12px] font-semibold text-[var(--text-primary)]">Центральний ринок</p>
-                                    <p className="text-[11px] text-[var(--text-secondary)]">вул. Ринкова, 1 — ряд 3, місце 12</p>
-                                </div>
-                            </div>
-                            <div className="flex items-start gap-1.5">
-                                <svg className="mt-[3px] shrink-0 text-[var(--text-secondary)]" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>
-                                </svg>
-                                <div>
-                                    <p className="text-[12px] font-semibold text-[var(--text-primary)]">Магазин у центрі</p>
-                                    <p className="text-[11px] text-[var(--text-secondary)]">вул. Центральна, 5 — пн–сб 9–18</p>
-                                </div>
-                            </div>
+                    <div className="grid gap-4 sm:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+
+                        {/* Contacts — left */}
+                        <div className="flex min-w-0 flex-col gap-2">
+                            <p className="text-[11px] font-semibold uppercase tracking-wide text-[var(--text-secondary)]">
+                                Контакти
+                            </p>
+                            <a
+                                href={`tel:+${normalizedPhoneNumber}`}
+                                className={footerLinkClassName}
+                                aria-label={`Подзвонити ${phoneNumber}`}
+                            >
+                                <span className={`${footerIconClassName} text-[var(--text-primary)]`} aria-hidden="true">
+                                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.15" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M22 16.92v2.55a2.2 2.2 0 0 1-2.4 2.19 19.15 19.15 0 0 1-8.34-2.96 18.86 18.86 0 0 1-5.82-5.82 19.15 19.15 0 0 1-2.96-8.38A2.2 2.2 0 0 1 4.66 2.1h2.56a2.2 2.2 0 0 1 2.18 1.89c.14 1 .37 1.97.7 2.9a2.2 2.2 0 0 1-.49 2.25l-1.08 1.08a15.08 15.08 0 0 0 5.25 5.25l1.08-1.08a2.2 2.2 0 0 1 2.25-.49c.93.33 1.9.56 2.9.7A2.2 2.2 0 0 1 22 16.92Z"/>
+                                    </svg>
+                                </span>
+                                <span className="min-w-0 text-[13px] font-semibold leading-5 text-[var(--text-primary)]">{phoneNumber}</span>
+                            </a>
+                            <a
+                                href={`tg://resolve?phone=${normalizedPhoneNumber}`}
+                                className={footerLinkClassName}
+                                aria-label={`Написати в Telegram ${phoneNumber}`}
+                            >
+                                <span className={footerIconClassName} aria-hidden="true">
+                                    <svg width="17" height="17" viewBox="0 0 24 24" fill="#229ED9">
+                                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2Zm4.64 6.87-1.56 7.35c-.12.52-.43.65-.88.4l-2.42-1.78-1.17 1.13c-.13.13-.24.24-.49.24l.17-2.47 4.5-4.06c.2-.17-.04-.27-.3-.1l-5.56 3.5-2.39-.75c-.52-.16-.53-.52.11-.77l9.33-3.6c.43-.16.82.1.66.9Z"/>
+                                    </svg>
+                                </span>
+                                <span className="min-w-0 text-[13px] font-semibold leading-5 text-[var(--text-primary)]">Telegram</span>
+                            </a>
+                            <a
+                                href={`viber://chat/?number=%2B${normalizedPhoneNumber}`}
+                                className={footerLinkClassName}
+                                aria-label={`Написати у Viber ${phoneNumber}`}
+                            >
+                                <span className={footerIconClassName} aria-hidden="true">
+                                    <svg width="17" height="17" viewBox="0 0 24 24" fill="#7360f2">
+                                        <path d="M12 2C6.1 2 3 5.1 3 11v1.75c0 3.75 1.2 6.24 3.6 7.7v1.68c0 .56.67.86 1.1.5l1.98-1.56c.72.08 1.5.12 2.32.12 5.9 0 9-3.1 9-9V11c0-5.9-3.1-9-9-9Zm4.4 13.75c-.24.68-1.17 1.28-1.78 1.36-.52.07-1.18.11-3.3-.78-2.78-1.16-4.57-4.02-4.72-4.2-.14-.19-1.12-1.55-1.12-2.95 0-1.4.7-2.08.95-2.36.25-.27.55-.34.73-.34h.58c.2 0 .44.02.62.45.23.54.78 1.9.85 2.04.07.14.12.32.02.52-.1.2-.16.32-.32.5-.16.18-.33.4-.47.53-.15.15-.31.31-.13.6.18.28.78 1.3 1.67 2.1 1.15 1.02 2.1 1.33 2.4 1.49.3.15.48.13.66-.08.2-.23.78-.9.98-1.22.2-.32.42-.27.7-.16.28.1 1.78.84 2.08.99.3.15.5.23.57.36.08.13.08.78-.16 1.45Z"/>
+                                    </svg>
+                                </span>
+                                <span className="min-w-0 text-[13px] font-semibold leading-5 text-[var(--text-primary)]">Viber</span>
+                            </a>
                         </div>
-
-                        <div className="w-px bg-black/8" />
-
-                        {/* Contacts — right */}
-                        <div className="flex flex-1 flex-col gap-1.5">
-                            <p className="text-[11px] font-semibold uppercase tracking-wide text-[var(--text-secondary)]">Контакти</p>
-                            <div className="flex items-center gap-1.5">
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="#229ED9" className="shrink-0">
-                                    <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248l-2.012 9.484c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L6.26 14.4l-2.95-.924c-.642-.2-.655-.642.136-.953l11.526-4.443c.535-.194 1.003.13.59.168z"/>
-                                </svg>
-                                <p className="text-[12px] text-[var(--text-primary)]">@vitan_shop</p>
-                            </div>
-                            <div className="flex items-center gap-1.5">
-                                <svg className="shrink-0 text-[var(--text-secondary)]" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.89 10.8a19.79 19.79 0 01-3.07-8.63A2 2 0 012.81 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.29 6.29l1.28-1.28a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
-                                </svg>
-                                <p className="text-[12px] font-semibold text-[var(--text-primary)]">+38 (000) 000-00-00</p>
-                            </div>
+                        {/* Addresses — right */}
+                        <div className="flex min-w-0 flex-col gap-2">
+                            <p className="text-[11px] font-semibold uppercase tracking-wide text-[var(--text-secondary)]">
+                                Де знайти
+                            </p>
+                            <a
+                                href="https://maps.app.goo.gl/tBJFPrhTpUefVp5x6"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={footerLinkClassName}
+                                aria-label="Відкрити Вітан на карті"
+                            >
+                                <span className={`${footerIconClassName} text-[var(--text-primary)]`} aria-hidden="true">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.05" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M20 10c0 5-5.54 10.19-7.4 11.8a.94.94 0 0 1-1.2 0C9.54 20.19 4 15 4 10a8 8 0 0 1 16 0Z" />
+                                        <circle cx="12" cy="10" r="3" />
+                                    </svg>
+                                </span>
+                                <span className="min-w-0 text-[13px] font-semibold leading-5 text-[var(--text-primary)]">Вітан</span>
+                            </a>
                         </div>
                     </div>
 
                     <div className="h-px bg-black/8" />
 
-                    <p className="text-[10px] text-[var(--text-secondary)]">© {new Date().getFullYear()} Vitan</p>
+                    <AdminAccess initialIsAdmin={isAdmin} />
                 </div>
             </div>
         </footer>

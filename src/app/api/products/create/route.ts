@@ -6,7 +6,10 @@ import {
     CREATE_PRODUCT_FIELD_NAMES,
     CREATE_PRODUCT_MAX_IMAGE_SIZE,
 } from "@/constants/createProduct";
+import {ADMIN_UNAUTHORIZED_MESSAGE} from "@/constants/admin";
 import {CONTENTFUL_PRODUCTS_CACHE_TAG} from "@/constants/cache";
+import {getApiErrorMessage} from "@/lib/apiErrorMessage";
+import {isAdminSession} from "@/lib/adminAuth";
 import {createContentfulProduct} from "@/lib/contentfulManagement";
 import type {CreateProductInput} from "@/types/createProduct";
 
@@ -35,9 +38,9 @@ const getImages = (formData: FormData) => {
 };
 
 const getPrice = (value: string) => {
-    const price = Number(value);
+    const price = Number(value.replace(",", "."));
 
-    if (!Number.isFinite(price) || price < 0) return null;
+    if (!Number.isFinite(price) || price < 0 || !Number.isInteger(price)) return null;
 
     return price;
 };
@@ -47,6 +50,7 @@ const getCreateProductInput = (formData: FormData): CreateProductInput => {
     const description = getStringFormValue(formData, CREATE_PRODUCT_FIELD_NAMES.description);
     const priceValue = getStringFormValue(formData, CREATE_PRODUCT_FIELD_NAMES.price);
     const price = getPrice(priceValue);
+    const categories = getCategories(formData);
     const images = getImages(formData);
 
     if (!name) {
@@ -69,13 +73,17 @@ const getCreateProductInput = (formData: FormData): CreateProductInput => {
         name,
         description,
         price,
-        categories: getCategories(formData),
+        categories,
         images,
     };
 };
 
 export async function POST(request: NextRequest) {
     try {
+        if (!await isAdminSession()) {
+            return NextResponse.json({message: ADMIN_UNAUTHORIZED_MESSAGE}, {status: 401});
+        }
+
         const formData = await request.formData();
         const product = await createContentfulProduct(getCreateProductInput(formData));
 
@@ -84,12 +92,7 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json({product}, {status: 201});
     } catch (error) {
-        let message = CREATE_PRODUCT_ERROR_MESSAGES.unableToCreate;
-
-        if (error instanceof Error) {
-            message = error.message;
-        }
-
+        const message = getApiErrorMessage(error, CREATE_PRODUCT_ERROR_MESSAGES.unableToCreate);
         return NextResponse.json({message}, {status: 400});
     }
 }

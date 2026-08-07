@@ -2,11 +2,14 @@
 
 import {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {DEFAULT_PRODUCT_SORT} from "@/constants/products";
+import {DEFAULT_PRODUCT_CATEGORY_OPTIONS} from "@/constants/productCategories";
 import {fetchProductList} from "@/app/components/ProductList/productListApi";
 import {getProductCategories} from "@/lib/productCategories";
 import type {CatalogSortOption} from "@/types/catalog";
 import type {ItemConfig} from "@/types/item";
 import type {LoadProductsParams, UseProductListParams} from "@/types/productList";
+
+const PRODUCT_REFRESH_DELAYS_MS = [0, 1500, 3500, 6500];
 
 export const useProductList = ({
     initialProducts,
@@ -24,10 +27,14 @@ export const useProductList = ({
     const skipInitialFetch = useRef(true);
     const gridRef = useRef<HTMLDivElement | null>(null);
     const loadMoreRef = useRef<HTMLDivElement | null>(null);
+    const refreshTimeoutsRef = useRef<number[]>([]);
 
     const availableCategories = useMemo(() => {
-        return getProductCategories(initialProducts.items, categories);
-    }, [categories, initialProducts.items]);
+        return getProductCategories(
+            [...initialProducts.items, ...items],
+            [...DEFAULT_PRODUCT_CATEGORY_OPTIONS, ...categories],
+        );
+    }, [categories, initialProducts.items, items]);
 
     const loadProducts = useCallback(async ({
         nextSkip,
@@ -127,13 +134,28 @@ export const useProductList = ({
         });
     }, [hasMore, isLoading, isLoadingMore, items.length, loadProducts]);
 
+    const clearRefreshTimeouts = useCallback(() => {
+        refreshTimeoutsRef.current.forEach(timeout => window.clearTimeout(timeout));
+        refreshTimeoutsRef.current = [];
+    }, []);
+
     const refreshProducts = useCallback(() => {
-        setTimeout(() => {
+        clearRefreshTimeouts();
+
+        refreshTimeoutsRef.current = PRODUCT_REFRESH_DELAYS_MS.map(delay => window.setTimeout(() => {
             void loadProducts({
                 nextSkip: 0,
                 append: false,
             });
-        }, 1500);
+        }, delay));
+    }, [clearRefreshTimeouts, loadProducts]);
+
+    useEffect(() => {
+        return () => clearRefreshTimeouts();
+    }, [clearRefreshTimeouts]);
+
+    useEffect(() => {
+        clearRefreshTimeouts();
     }, [loadProducts]);
 
     useEffect(() => {

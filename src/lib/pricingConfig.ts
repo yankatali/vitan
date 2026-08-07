@@ -12,6 +12,8 @@ query PricingConfig {
       retailMarkup
       wholesaleMarkup
       wholesaleDescription
+      optPrice
+      descriptionAfterOptValid
     }
   }
 }
@@ -24,6 +26,8 @@ interface PricingConfigGraphqlResponse {
             retailMarkup?: number | null;
             wholesaleMarkup?: number | null;
             wholesaleDescription?: string | null;
+            optPrice?: number | null;
+            descriptionAfterOptValid?: string | null;
         }> | null;
     } | null;
 }
@@ -54,6 +58,8 @@ export const getPricingConfig = async (revalidateSeconds?: number): Promise<Pric
             retailMarkup: item.retailMarkup ?? 30,
             wholesaleMarkup: item.wholesaleMarkup ?? 15,
             wholesaleDescription: item.wholesaleDescription ?? "",
+            optPrice: item.optPrice ?? 200,
+            descriptionAfterOptValid: item.descriptionAfterOptValid ?? "",
         };
     } catch {
         return null;

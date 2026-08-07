@@ -5,7 +5,6 @@ import {ProductCardSimple} from "@/app/components/ProductCardSimple/ProductCardS
 import {PRODUCT_CARD_CLASS_NAMES} from "@/constants/productCard";
 import {PRODUCT_CARD_ACTION_CLASS_NAMES} from "@/constants/productCardActions";
 import type {ItemConfig} from "@/types/item";
-import type {PricingConfig} from "@/types/pricingConfig";
 
 export const getCategoriesFromProducts = (products: ItemConfig[]): Set<string> => {
     const cats = new Set<string>();
@@ -42,7 +41,6 @@ export const getRelatedProducts = (
 interface RelatedProductsRowProps {
     title?: string;
     products: ItemConfig[];
-    pricingConfig?: PricingConfig | null;
     onAction: (productId: string) => void;
     isActive: (productId: string) => boolean;
     actionIcon: ReactNode;
@@ -52,29 +50,20 @@ interface RelatedProductsRowProps {
 export const RelatedProductsRow = ({
     title = "Схожі товари",
     products,
-    pricingConfig,
     onAction,
     isActive,
     actionIcon,
     activeActionIcon,
 }: RelatedProductsRowProps) => {
-    const usdToUahRate = pricingConfig?.usdToUahRate ?? null;
-    const retailMarkup = pricingConfig?.retailMarkup ?? 30;
-    const wholesaleMarkup = pricingConfig?.wholesaleMarkup ?? 15;
-    const wholesaleDescription = pricingConfig?.wholesaleDescription ?? "";
-
     const priceMap = useMemo(() => {
         const entries: [string, {retail: number | null; wholesale: number | null}][] = products.map(p => {
-            if (!usdToUahRate || typeof p.priceUsd !== "number") {
-                return [p.id, {retail: null, wholesale: null}];
-            }
             return [p.id, {
-                retail: Number((p.priceUsd * (1 + retailMarkup / 100) * usdToUahRate).toFixed(2)),
-                wholesale: Number((p.priceUsd * (1 + wholesaleMarkup / 100) * usdToUahRate).toFixed(2)),
+                retail: p.priceUah ?? null,
+                wholesale: p.priceUahWholesale ?? null,
             }];
         });
         return new Map(entries);
-    }, [products, usdToUahRate, retailMarkup, wholesaleMarkup]);
+    }, [products]);
 
     const scrollRef = useRef<HTMLDivElement>(null);
     const [canScrollRight, setCanScrollRight] = useState(true);
@@ -114,7 +103,7 @@ export const RelatedProductsRow = ({
                                     item={product}
                                     priceUah={prices?.retail ?? null}
                                     priceUahWholesale={prices?.wholesale ?? null}
-                                    wholesaleDescription={wholesaleDescription}
+                                    wholesaleDescription={product.wholesaleDescription ?? ""}
                                     overlayButton={
                                         <button
                                             type="button"

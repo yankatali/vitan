@@ -1,9 +1,12 @@
 import type {CartStorageItem} from "@/types/cart";
+import type {ItemConfig} from "@/types/item";
 import {notifySavedProductsChanged} from "@/lib/savedProductsEvents";
 
 export const CART_STORAGE_KEY = "vitan-cart-product-ids";
 
 const MIN_CART_QUANTITY = 1;
+
+export type CartPriceSnapshot = Pick<CartStorageItem, "priceUah" | "priceUahWholesale">;
 
 const isCartStorageItem = (value: unknown): value is CartStorageItem => {
     if (!value || typeof value !== "object") return false;
@@ -11,23 +14,33 @@ const isCartStorageItem = (value: unknown): value is CartStorageItem => {
     const item = value as Partial<CartStorageItem>;
     const quantity = item.quantity;
 
+    const hasValidRetailPrice = item.priceUah === undefined || item.priceUah === null || typeof item.priceUah === "number";
+    const hasValidWholesalePrice = item.priceUahWholesale === undefined || item.priceUahWholesale === null || typeof item.priceUahWholesale === "number";
+
     return typeof item.productId === "string"
         && typeof quantity === "number"
         && Number.isInteger(quantity)
-        && quantity >= MIN_CART_QUANTITY;
+        && quantity >= MIN_CART_QUANTITY
+        && hasValidRetailPrice
+        && hasValidWholesalePrice;
 };
 
 const normalizeCartItems = (items: CartStorageItem[]) => {
-    const quantitiesByProductId = new Map<string, number>();
+    const itemsByProductId = new Map<string, CartStorageItem>();
 
-    items.forEach(({productId, quantity}) => {
-        quantitiesByProductId.set(productId, (quantitiesByProductId.get(productId) ?? 0) + quantity);
+    items.forEach(item => {
+        const existingItem = itemsByProductId.get(item.productId);
+        const nextItem = {
+            productId: item.productId,
+            quantity: (existingItem?.quantity ?? 0) + item.quantity,
+            priceUah: item.priceUah ?? existingItem?.priceUah,
+            priceUahWholesale: item.priceUahWholesale ?? existingItem?.priceUahWholesale,
+        };
+
+        itemsByProductId.set(item.productId, nextItem);
     });
 
-    return Array.from(quantitiesByProductId.entries()).map(([productId, quantity]) => ({
-        productId,
-        quantity,
-    }));
+    return Array.from(itemsByProductId.values());
 };
 
 const parseCartItems = (value: string | null): CartStorageItem[] => {
@@ -59,22 +72,37 @@ export const setCartItems = (items: CartStorageItem[]) => {
     notifySavedProductsChanged();
 };
 
+export const getCartPriceSnapshot = (product: ItemConfig): CartPriceSnapshot => ({
+    priceUah: product.priceUah ?? null,
+    priceUahWholesale: product.priceUahWholesale ?? null,
+});
+
 export const getCartQuantity = (productId: string) => {
     return getCartItems().find(item => item.productId === productId)?.quantity ?? 0;
 };
 
-export const addProductToCart = (productId: string, quantity = MIN_CART_QUANTITY) => {
+export const addProductToCart = (
+    productId: string,
+    quantity = MIN_CART_QUANTITY,
+    priceSnapshot?: CartPriceSnapshot,
+) => {
     const currentItems = getCartItems();
     const existingItem = currentItems.find(item => item.productId === productId);
 
     if (existingItem) {
         existingItem.quantity += Math.max(quantity, MIN_CART_QUANTITY);
+        existingItem.priceUah = priceSnapshot?.priceUah ?? existingItem.priceUah;
+        existingItem.priceUahWholesale = priceSnapshot?.priceUahWholesale ?? existingItem.priceUahWholesale;
         setCartItems(currentItems);
 
         return existingItem.quantity;
     }
 
-    setCartItems([...currentItems, {productId, quantity: Math.max(quantity, MIN_CART_QUANTITY)}]);
+    setCartItems([...currentItems, {
+        productId,
+        quantity: Math.max(quantity, MIN_CART_QUANTITY),
+        ...priceSnapshot,
+    }]);
 
     return Math.max(quantity, MIN_CART_QUANTITY);
 };

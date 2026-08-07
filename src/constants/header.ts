@@ -7,7 +7,7 @@ export const HEADER_NAV_CLASS_NAMES = {
     activeLink: "relative z-10 flex h-[49px] min-w-0 flex-1 flex-col items-center justify-center rounded-[1.25rem] px-2 text-[11px] font-semibold text-[#1c1c1e] transition-colors duration-300 [&_svg]:[shape-rendering:geometricPrecision]",
     iconWrapper: "relative",
     badge: "absolute -right-1 -top-1 flex min-h-[14px] min-w-[14px] items-center justify-center rounded-full bg-[#d92d20] px-0.5 text-[8px] font-bold leading-none text-white [text-shadow:none] [&_svg]:![filter:none]",
-    mobileNav: "fixed bottom-3 left-1/2 z-40 grid h-16 w-[min(calc(100vw-1.5rem),30rem)] -translate-x-1/2 grid-cols-3 items-center gap-0.5 overflow-hidden rounded-[1.75rem] border-[0.5px] border-white/35 bg-white/50 p-1.5 shadow-[0_2px_12px_rgba(0,0,0,0.06)] backdrop-blur-2xl",
+    mobileNav: "fixed bottom-3 left-1/2 z-40 grid h-16 w-[min(calc(100vw-1.5rem),30rem)] -translate-x-1/2 grid-cols-3 items-center gap-0.5 overflow-hidden rounded-full border-[0.5px] border-white/35 bg-white/50 p-1.5 shadow-[0_2px_12px_rgba(0,0,0,0.06)] backdrop-blur-2xl",
     mobileNavIndicator: "liquid-nav-indicator",
     desktopNav: "liquid-surface hidden items-center gap-6 rounded-full px-5 py-1 lg:flex",
     title: "hover:underline font-bold text-xl text-[#11100d] [font-family:var(--font-brand)]",

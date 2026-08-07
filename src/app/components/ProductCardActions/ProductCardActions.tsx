@@ -1,14 +1,19 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import CartIcon from "@/app/components/icon/CartIcon";
 import {PencilIcon} from "@/app/components/icon/PencilIcon";
 import {TrashIcon} from "@/app/components/icon/TrashIcon";
-import {ProductEditModal} from "@/app/components/ProductEditModal/ProductEditModal";
 import {PRODUCT_CARD_ACTION_CLASS_NAMES, PRODUCT_CARD_ACTION_LABELS} from "@/constants/productCardActions";
 import {useProductCardActions} from "@/app/components/ProductCardActions/useProductCardActions";
 import type {ProductCardActionsProps} from "@/types/productCardActions";
 import {useState} from "react";
 import {ConfirmModal} from "@/app/components/ConfirmModal/ConfirmModal";
+
+const ProductEditModal = dynamic(
+    () => import("@/app/components/ProductEditModal/ProductEditModal").then(module => module.ProductEditModal),
+    {ssr: false},
+);
 
 const getCartButtonClassName = (isInCart: boolean) => {
     if (isInCart) return PRODUCT_CARD_ACTION_CLASS_NAMES.activeCartButton;

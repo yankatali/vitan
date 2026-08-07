@@ -121,6 +121,7 @@ export const useCreateProductForm = (onProductCreated: () => void, onClose: () =
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setError(null);
+
         setUploadProgress(values.image.length > 0 ? 0 : null);
         setIsSubmitting(true);
 

@@ -1,30 +1,37 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import {useEffect, useMemo, useRef, useState} from "react";
 import {SearchComponent} from "@/app/components/Search/SearchComponent";
 import {PRODUCT_CREATOR_WRAPPER_CLASS_NAME, PRODUCT_SORT_LABELS, PRODUCT_SORT_OPTIONS} from "@/constants/products";
 import {PRODUCT_CATEGORY_LABELS, PRODUCT_LIST_CLASS_NAMES} from "@/constants/productListLayout";
 import {useProductList} from "@/app/components/ProductList/useProductList";
 import {ProductListResults} from "@/app/components/ProductList/ProductListResults";
-import {ProductCreator} from "@/app/components/ProductCreator/ProductCreator";
 import {FiltersSheet} from "@/app/components/FiltersSheet/FiltersSheet";
 import {PageHeader} from "@/app/components/PageHeader/PageHeader";
+import {getMarkedUpUahPrice} from "@/lib/productPricing";
 import type {CatalogSortOption} from "@/types/catalog";
 import type {ProductListProps} from "@/types/productList";
 import type {PricingConfig} from "@/types/pricingConfig";
 
-const getUahPrice = (priceUsd: number | undefined, config: PricingConfig | null | undefined): number | null => {
-    if (!priceUsd || !config?.usdToUahRate) return null;
-    const markup = config.retailMarkup ?? 30;
-    return Math.round(priceUsd * (1 + markup / 100) * config.usdToUahRate);
-};
+const ProductCreator = dynamic(
+    () => import("@/app/components/ProductCreator/ProductCreator").then(module => module.ProductCreator),
+    {ssr: false},
+);
 
-const getCategoryButtonClassName = (isSelected: boolean) => {
-    const baseClassName = "inline-flex min-h-10 items-center gap-2 rounded-[var(--radius-lg)] px-4 text-[15px] font-semibold leading-none tracking-[-0.1px] transition-all duration-200 active:scale-[0.94]";
-    if (isSelected) return `${baseClassName} vitan-accent-button text-white`;
+const AdminSettingsButton = dynamic(
+    () => import("@/app/components/AdminSettings/AdminSettingsButton").then(module => module.AdminSettingsButton),
+    {ssr: false},
+);
 
-    return `${baseClassName} bg-[var(--fill)] text-[var(--text-primary)] hover:bg-[var(--fill-secondary)]`;
+const getUahPrice = (item: {purchasePriceUah?: number; priceUah?: number | null}, config: PricingConfig | null | undefined): number | null => {
+    if (typeof item.priceUah === "number") return Math.round(item.priceUah);
+
+    const markup = config?.retailMarkup ?? 30;
+    const price = getMarkedUpUahPrice(item.purchasePriceUah, markup);
+
+    return price === null ? null : Math.round(price);
 };
 
 const getSortOptionButtonClassName = (isSelected: boolean) => {
@@ -86,11 +93,11 @@ export const ProductList = ({
     gridClassName,
     messageClassName,
 }: ProductListProps) => {
-    const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
     const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
     const [isFiltersOpen, setIsFiltersOpen] = useState(false);
     const [priceMin, setPriceMin] = useState(0);
     const [priceMax, setPriceMax] = useState(0);
+    const [isPriceFilterDirty, setIsPriceFilterDirty] = useState(false);
     const priceInitialized = useRef(false);
     const {
         availableCategories,
@@ -115,27 +122,41 @@ export const ProductList = ({
     // Price range
     const {absoluteMin, absoluteMax} = useMemo(() => {
         const prices = items
-            .map(i => getUahPrice(i.priceUsd, pricingConfig))
+            .map(i => getUahPrice(i, pricingConfig))
             .filter((p): p is number => p !== null);
         if (!prices.length) return {absoluteMin: 0, absoluteMax: 0};
         return {absoluteMin: Math.floor(Math.min(...prices)), absoluteMax: Math.ceil(Math.max(...prices))};
     }, [items, pricingConfig]);
 
     useEffect(() => {
-        if (absoluteMax > absoluteMin && !priceInitialized.current) {
+        if (absoluteMax <= absoluteMin) {
+            setPriceMin(0);
+            setPriceMax(0);
+            setIsPriceFilterDirty(false);
+            priceInitialized.current = false;
+            return;
+        }
+
+        if (!priceInitialized.current || !isPriceFilterDirty) {
             setPriceMin(absoluteMin);
             setPriceMax(absoluteMax);
             priceInitialized.current = true;
+            return;
         }
-    }, [absoluteMin, absoluteMax]);
 
-    const isPriceFilterActive = absoluteMax > absoluteMin && (priceMin > absoluteMin || priceMax < absoluteMax);
+        setPriceMin(currentValue => Math.max(absoluteMin, Math.min(currentValue, absoluteMax)));
+        setPriceMax(currentValue => Math.max(absoluteMin, Math.min(currentValue, absoluteMax)));
+    }, [absoluteMin, absoluteMax, isPriceFilterDirty]);
+
+    const isPriceFilterActive = isPriceFilterDirty
+        && absoluteMax > absoluteMin
+        && (priceMin > absoluteMin || priceMax < absoluteMax);
     const activeFilterCount = selectedCategories.length + (isPriceFilterActive ? 1 : 0);
 
     const filteredItems = useMemo(() => {
         if (!isPriceFilterActive) return items;
         return items.filter(item => {
-            const price = getUahPrice(item.priceUsd, pricingConfig);
+            const price = getUahPrice(item, pricingConfig);
             if (price === null) return true;
             return price >= priceMin && price <= priceMax;
         });
@@ -143,8 +164,15 @@ export const ProductList = ({
 
     const handleClear = () => {
         setSelectedCategories([]);
+        setIsPriceFilterDirty(false);
         setPriceMin(absoluteMin);
         setPriceMax(absoluteMax);
+    };
+
+    const handlePriceChange = (min: number, max: number) => {
+        setIsPriceFilterDirty(true);
+        setPriceMin(min);
+        setPriceMax(max);
     };
 
     const shouldShowToolbarCategories = showCategories && Boolean(toolbarClassName);
@@ -152,15 +180,11 @@ export const ProductList = ({
     const shouldShowToolbarTitleGroup = Boolean(toolbarTitle) || shouldShowToolbarCategories;
     const shouldShowToolbarSort = showSort && Boolean(toolbarClassName);
     const shouldShowInlineSort = showSort && !toolbarClassName;
-    const categoryRef = useRef<HTMLDivElement>(null);
     const sortRef = useRef<HTMLDivElement>(null);
     const filtersRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
-            if (categoryRef.current && !categoryRef.current.contains(e.target as Node)) {
-                setIsCategoryDropdownOpen(false);
-            }
             if (sortRef.current && !sortRef.current.contains(e.target as Node)) {
                 setIsSortDropdownOpen(false);
             }
@@ -207,7 +231,7 @@ export const ProductList = ({
                 priceMax={priceMax}
                 absoluteMin={absoluteMin}
                 absoluteMax={absoluteMax}
-                onPriceChange={(mn, mx) => { setPriceMin(mn); setPriceMax(mx); }}
+                onPriceChange={handlePriceChange}
                 activeFilterCount={activeFilterCount}
                 onClear={handleClear}
                 onClose={() => setIsFiltersOpen(false)}
@@ -252,8 +276,8 @@ export const ProductList = ({
         <div className={rootClassName}>
             {toolbarClassName && (
                 <div className="sticky top-0 z-20 flex flex-col gap-3 pt-3">
-                    <div className="px-3">
-                        <PageHeader className="flex items-center justify-between gap-4">
+                    <div className="px-4">
+                        <PageHeader className="flex items-center justify-between gap-4" isProductList>
                             {shouldShowToolbarTitleGroup && (
                                 <div className={PRODUCT_LIST_CLASS_NAMES.mainPageToolbarTitleGroup}>
                                     {toolbarTitle && <Link href="/" className={PRODUCT_LIST_CLASS_NAMES.mainPageToolbarTitle}>{toolbarTitle}</Link>}
@@ -270,13 +294,16 @@ export const ProductList = ({
 
                             <div className={PRODUCT_LIST_CLASS_NAMES.mainPageActions}>
                                 {showCreateProductButton && (
-                                    <div className={productCreatorWrapperClassName}>
-                                        <ProductCreator
-                                            categoryOptions={availableCategories}
-                                            onProductCreated={refreshProducts}
-                                            pricingConfig={pricingConfig}
-                                        />
-                                    </div>
+                                    <>
+                                        <AdminSettingsButton />
+                                        <div className={productCreatorWrapperClassName}>
+                                            <ProductCreator
+                                                categoryOptions={availableCategories}
+                                                onProductCreated={refreshProducts}
+                                                pricingConfig={pricingConfig}
+                                            />
+                                        </div>
+                                    </>
                                 )}
                             </div>
                         </PageHeader>
@@ -305,6 +332,7 @@ export const ProductList = ({
 
             <ProductListResults
                 categoryOptions={availableCategories}
+                cartPricingProducts={items}
                 error={error}
                 gridRef={gridRef}
                 gridClassName={gridClassName}

@@ -8,6 +8,7 @@ import {PageHeader} from "@/app/components/PageHeader/PageHeader";
 import {PAGE_CONTENT_PX} from "@/constants/pageLayout";
 import {CART_STORAGE_KEY, getCartItems, clearCart, updateCartQuantity, removeProductFromCart} from "@/lib/cartStorage";
 import {SAVED_PRODUCTS_CHANGE_EVENT} from "@/lib/savedProductsEvents";
+import {getCartRetailTotal, getProductPriceUah, isWholesaleEligible} from "@/lib/wholesalePricing";
 import type {CartProductItem, CartStorageItem} from "@/types/cart";
 import type {ItemConfig} from "@/types/item";
 import type {PricingConfig} from "@/types/pricingConfig";
@@ -19,11 +20,6 @@ interface CheckoutClientProps {
 
 const formatUah = (value: number) =>
     `${new Intl.NumberFormat("uk-UA", {minimumFractionDigits: 2, maximumFractionDigits: 2}).format(value)} ₴`;
-
-const getRetailPriceUah = (usdToUahRate: number | null, priceUsd: number, retailMarkup: number) => {
-    if (!usdToUahRate) return null;
-    return Number((priceUsd * (1 + retailMarkup / 100) * usdToUahRate).toFixed(2));
-};
 
 const getCartProducts = (cartItems: CartStorageItem[], products: ItemConfig[]): CartProductItem[] =>
     cartItems
@@ -56,13 +52,12 @@ export const CheckoutClient = ({products, pricingConfig}: CheckoutClientProps) =
         };
     }, []);
 
-    const usdToUahRate = pricingConfig?.usdToUahRate ?? null;
-    const retailMarkup = pricingConfig?.retailMarkup ?? 30;
-
     const cartProducts = useMemo(() => getCartProducts(cartItems, products), [cartItems, products]);
+    const retailTotalPrice = useMemo(() => getCartRetailTotal(cartProducts, pricingConfig), [cartProducts, pricingConfig]);
+    const isWholesaleActive = isWholesaleEligible(retailTotalPrice, pricingConfig);
     const totalQuantity = cartProducts.reduce((sum, item) => sum + item.quantity, 0);
     const totalPrice = cartProducts.reduce((sum, item) => {
-        const price = getRetailPriceUah(usdToUahRate, item.product.priceUsd ?? 0, retailMarkup);
+        const price = getProductPriceUah(item.product, isWholesaleActive, pricingConfig);
         return sum + (price ?? 0) * item.quantity;
     }, 0);
 
@@ -70,7 +65,7 @@ export const CheckoutClient = ({products, pricingConfig}: CheckoutClientProps) =
         e.preventDefault();
 
         const items = cartProducts.map(({product, quantity}) => {
-            const price = getRetailPriceUah(usdToUahRate, product.priceUsd ?? 0, retailMarkup);
+            const price = getProductPriceUah(product, isWholesaleActive, pricingConfig);
             return {
                 id: product.id,
                 title: product.title,
@@ -149,7 +144,7 @@ export const CheckoutClient = ({products, pricingConfig}: CheckoutClientProps) =
                         <p className="text-[13px] font-semibold uppercase tracking-wide text-[var(--text-secondary)]" style={{marginBottom: '8px'}}>Ваше замовлення</p>
                         <div className="flex flex-col gap-2">
                             {cartProducts.map(({product, quantity}) => {
-                                const price = getRetailPriceUah(usdToUahRate, product.priceUsd ?? 0, retailMarkup);
+                                const price = getProductPriceUah(product, isWholesaleActive, pricingConfig);
                                 const imageUrl = product.imageUrls?.[0] ?? product.imageUrl;
                                 return (
                                     <div key={product.id} className="flex items-center gap-3 rounded-[20px] bg-black/5 p-2 pr-3">
@@ -169,7 +164,7 @@ export const CheckoutClient = ({products, pricingConfig}: CheckoutClientProps) =
                                         {/* Name + info */}
                                         <div className="min-w-0 flex-1">
                                             <p className="truncate text-[13px] font-semibold leading-5">{product.title}</p>
-                                            {price && (
+                                            {typeof price === "number" && (
                                                 <p className="text-[11px] text-[var(--text-secondary)]">
                                                     {quantity} шт. на суму <span className="font-semibold text-[var(--text-primary)]">{formatUah(price * quantity)}</span>
                                                 </p>

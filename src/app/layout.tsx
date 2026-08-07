@@ -3,6 +3,7 @@ import { Unbounded, Playfair_Display, Raleway, Manrope } from "next/font/google"
 import Header from "@/app/components/Header/Header";
 import {Footer} from "@/app/components/Footer/Footer";
 import {DEFAULT_HEADER_CONFIG} from "@/constants/header";
+import {isAdminSession} from "@/lib/adminAuth";
 import "./globals.css";
 
 // Brand name font — варіант 1: Unbounded (геометричний bold)
@@ -41,11 +42,13 @@ export const metadata: Metadata = {
   description: "Інтернет-магазин Vitan",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+    const isAdmin = await isAdminSession();
+
     return (
     <html lang="uk">
         <body
@@ -54,7 +57,7 @@ export default function RootLayout({
             <div className="bg-layer" aria-hidden="true" />
             <Header config={DEFAULT_HEADER_CONFIG} />
             <div className='container min-w-full'>{children}</div>
-            <Footer />
+            <Footer isAdmin={isAdmin} />
         </body>
     </html>
     );

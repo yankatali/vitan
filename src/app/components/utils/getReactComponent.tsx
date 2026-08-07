@@ -11,6 +11,7 @@ export const getReactComponent = (
     const {type, config} = component;
     const headerConfig = options.headerConfig;
     const initialProducts = options.initialProducts ?? EMPTY_PRODUCTS_RESULT;
+    const isAdmin = options.isAdmin ?? false;
     const pricingConfig = options.pricingConfig;
 
     switch (type) {
@@ -21,13 +22,16 @@ export const getReactComponent = (
             return <AboutUs config={config}/>;
 
         case "MainPage":
+            const mainPageProps = {
+                config,
+                headerConfig,
+                initialProducts,
+                isAdmin,
+                ...(isAdmin ? {pricingConfig} : {}),
+            };
+
             return (
-                <MainPage
-                    config={config}
-                    headerConfig={headerConfig}
-                    initialProducts={initialProducts}
-                    pricingConfig={pricingConfig}
-                />
+                <MainPage {...mainPageProps} />
             );
 
         case "Catalog":

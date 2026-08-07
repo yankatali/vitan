@@ -32,16 +32,16 @@ const hasFormDraft = (values: UpdateProductFormValues, initialValues: UpdateProd
 };
 
 const getInitialValues = (
-    {category, description, imageUrl, imageUrls, priceUsd, title}: UseUpdateProductFormParams["product"],
+    {category, description, imageUrl, imageUrls, purchasePriceUah, title}: UseUpdateProductFormParams["product"],
     usdToUahRate: number | null,
 ): UpdateProductFormValues => {
-    const price = typeof priceUsd === "number" ? String(priceUsd) : "";
+    const priceUah = typeof purchasePriceUah === "number" ? String(purchasePriceUah) : "";
 
     return {
         name: title,
         description,
-        price,
-        priceUah: getUahPriceInputFromUsd(price, usdToUahRate),
+        price: getUsdPriceInputFromUah(priceUah, usdToUahRate),
+        priceUah,
         categories: splitProductCategories(category),
         image: [],
         keptImageUrls: imageUrls?.length ? imageUrls : imageUrl ? [imageUrl] : [],
@@ -152,6 +152,7 @@ export const useUpdateProductForm = ({onClose, onProductUpdated, pricingConfig, 
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setError(null);
+
         setUploadProgress(values.image.length > 0 ? 0 : null);
         setIsSubmitting(true);
 

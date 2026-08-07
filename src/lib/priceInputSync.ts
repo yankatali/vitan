@@ -7,7 +7,7 @@ const parsePriceInput = (value: string): number | null => {
     return parsedValue;
 };
 
-const formatUahPriceInput = (value: number) => value.toFixed(2);
+const formatUahPriceInput = (value: number) => String(Math.round(value));
 const formatUsdPriceInput = (value: number) => value.toFixed(2);
 
 export const getUahPriceInputFromUsd = (priceUsd: string, usdToUahRate: number | null | undefined) => {

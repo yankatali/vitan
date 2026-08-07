@@ -4,20 +4,21 @@ import Link from "next/link";
 import {useEffect, useMemo, useState} from "react";
 import {WISHLIST_CLASS_NAMES} from "@/constants/wishlist";
 import {PRODUCT_CARD_ACTION_CLASS_NAMES} from "@/constants/productCardActions";
-import {addProductToCart, CART_STORAGE_KEY, getCartItems, removeProductFromCart} from "@/lib/cartStorage";
+import {addProductToCart, getCartPriceSnapshot, removeProductFromCart} from "@/lib/cartStorage";
 import {SAVED_PRODUCTS_CHANGE_EVENT} from "@/lib/savedProductsEvents";
 import {getWishlistIds, toggleWishlistProduct, WISHLIST_STORAGE_KEY} from "@/lib/wishlistStorage";
-import type {CartStorageItem} from "@/types/cart";
 import type {ItemConfig} from "@/types/item";
-import type {PricingConfig} from "@/types/pricingConfig";
 import type {WishlistProductItem} from "@/types/wishlist";
 import {useBarBottom} from "@/hooks/useBarBottom";
+import {useCartWholesaleStatus} from "@/hooks/useCartWholesaleStatus";
 import {PageHeader} from "@/app/components/PageHeader/PageHeader";
 import {ConfirmModal} from "@/app/components/ConfirmModal/ConfirmModal";
 import {ProductCardSimple} from "@/app/components/ProductCardSimple/ProductCardSimple";
 import {RelatedProductsRow, getCategoriesFromProducts, getRelatedProducts} from "@/app/components/RelatedProductsRow/RelatedProductsRow";
 import CartIcon from "@/app/components/icon/CartIcon";
 import WishlistIcon from "@/app/components/icon/WishlistIcon";
+import {getProductPriceUah, getWholesaleTooltipText} from "@/lib/wholesalePricing";
+import type {PricingConfig} from "@/types/pricingConfig";
 
 interface WishlistClientProps {
     products: ItemConfig[];
@@ -42,21 +43,12 @@ const getWishlistProducts = (wishlistIds: string[], products: ItemConfig[]): Wis
         .filter((item): item is WishlistProductItem => Boolean(item));
 };
 
-const getRetailPriceUah = (usdToUahRate: number | null, priceUsd: number, retailMarkup: number) => {
-    if (!usdToUahRate) return null;
-    return Number((priceUsd * (1 + retailMarkup / 100) * usdToUahRate).toFixed(2));
-};
-
-const getWholesalePriceUah = (usdToUahRate: number | null, priceUsd: number, wholesaleMarkup: number) => {
-    if (!usdToUahRate) return null;
-    return Number((priceUsd * (1 + wholesaleMarkup / 100) * usdToUahRate).toFixed(2));
-};
-
 export const WishlistClient = ({products, pricingConfig}: WishlistClientProps) => {
-    const [cartItems, setCartItems] = useState<CartStorageItem[]>([]);
     const [wishlistIds, setWishlistIds] = useState<string[]>([]);
     const [confirmCartRemoveId, setConfirmCartRemoveId] = useState<string | null>(null);
     const barBottom = useBarBottom();
+    const {cartItems, isWholesaleActive} = useCartWholesaleStatus(products, pricingConfig);
+    const productsById = useMemo(() => new Map(products.map(product => [product.id, product])), [products]);
 
     useEffect(() => {
         if (products.length > 0) {
@@ -69,23 +61,20 @@ export const WishlistClient = ({products, pricingConfig}: WishlistClientProps) =
             }
         }
 
-        const syncAll = () => {
-            setCartItems(getCartItems());
-            setWishlistIds(getWishlistIds());
-        };
+        const syncWishlist = () => setWishlistIds(getWishlistIds());
         const handleStorage = (event: StorageEvent) => {
-            if (event.key === CART_STORAGE_KEY || event.key === WISHLIST_STORAGE_KEY) syncAll();
+            if (event.key === WISHLIST_STORAGE_KEY) syncWishlist();
         };
 
-        syncAll();
-        window.addEventListener(SAVED_PRODUCTS_CHANGE_EVENT, syncAll);
+        syncWishlist();
+        window.addEventListener(SAVED_PRODUCTS_CHANGE_EVENT, syncWishlist);
         window.addEventListener("storage", handleStorage);
-        window.addEventListener("pageshow", syncAll);
+        window.addEventListener("pageshow", syncWishlist);
 
         return () => {
-            window.removeEventListener(SAVED_PRODUCTS_CHANGE_EVENT, syncAll);
+            window.removeEventListener(SAVED_PRODUCTS_CHANGE_EVENT, syncWishlist);
             window.removeEventListener("storage", handleStorage);
-            window.removeEventListener("pageshow", syncAll);
+            window.removeEventListener("pageshow", syncWishlist);
         };
     }, []);
 
@@ -99,18 +88,15 @@ export const WishlistClient = ({products, pricingConfig}: WishlistClientProps) =
         return getRelatedProducts(excludeIds, categories, products);
     }, [wishlistProducts, wishlistIds, products]);
 
-    const usdToUahRate = pricingConfig?.usdToUahRate ?? null;
-    const retailMarkup = pricingConfig?.retailMarkup ?? 30;
-    const wholesaleMarkup = pricingConfig?.wholesaleMarkup ?? 15;
-    const wholesaleDescription = pricingConfig?.wholesaleDescription ?? "";
+    const wholesaleTooltipText = getWholesaleTooltipText(pricingConfig);
 
-    const totalPrice = wishlistProducts.reduce((sum, item) => {
-        const price = getRetailPriceUah(usdToUahRate, item.product.priceUsd ?? 0, retailMarkup);
-        return sum + (price ?? 0);
-    }, 0);
+    const totalPrice = useMemo(() => wishlistProducts.reduce((sum, item) => {
+        return sum + (getProductPriceUah(item.product, isWholesaleActive, pricingConfig) ?? 0);
+    }, 0), [wishlistProducts, isWholesaleActive, pricingConfig]);
 
     const handleAddToCart = (productId: string) => {
-        addProductToCart(productId);
+        const product = productsById.get(productId);
+        addProductToCart(productId, 1, product ? getCartPriceSnapshot(product) : undefined);
     };
 
     const handleRemoveFromCart = (productId: string) => {
@@ -145,8 +131,8 @@ export const WishlistClient = ({products, pricingConfig}: WishlistClientProps) =
                             {wishlistProducts.map(({product: item}) => {
 
                                 const isInCart = cartProductIds.has(item.id);
-                                const priceUah = getRetailPriceUah(usdToUahRate, item.priceUsd ?? 0, retailMarkup);
-                                const priceUahWholesale = getWholesalePriceUah(usdToUahRate, item.priceUsd ?? 0, wholesaleMarkup);
+                                const priceUah = item.priceUah ?? null;
+                                const priceUahWholesale = item.priceUahWholesale ?? null;
 
                                 return (
                                     <ProductCardSimple
@@ -155,7 +141,9 @@ export const WishlistClient = ({products, pricingConfig}: WishlistClientProps) =
                                         item={item}
                                         priceUah={priceUah}
                                         priceUahWholesale={priceUahWholesale}
-                                        wholesaleDescription={wholesaleDescription}
+                                        wholesaleDescription={item.wholesaleDescription ?? ""}
+                                        wholesaleActiveDescription={wholesaleTooltipText}
+                                        wholesaleAsPrimary={isWholesaleActive}
                                         cartAction={
                                             <button
                                                 type="button"
@@ -180,7 +168,6 @@ export const WishlistClient = ({products, pricingConfig}: WishlistClientProps) =
 
                         <RelatedProductsRow
                             products={relatedProducts}
-                            pricingConfig={pricingConfig}
                             onAction={(id) => {
                                 toggleWishlistProduct(id);
                             }}

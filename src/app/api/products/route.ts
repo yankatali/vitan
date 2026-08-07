@@ -1,7 +1,10 @@
 import {NextRequest, NextResponse} from "next/server";
 import {getProducts} from "@/lib/products";
-import {getContentfulRevalidateSeconds, getProductsApiCacheHeaders} from "@/lib/cache";
+import {NO_STORE_CACHE_CONTROL} from "@/constants/cache";
+import {isAdminSession} from "@/lib/adminAuth";
 import {isCatalogSortOption} from "@/lib/catalogSort";
+import {getPricingConfig} from "@/lib/pricingConfig";
+import {getAdminProductsResult, getPublicProductsResult} from "@/lib/publicProducts";
 import {CatalogSortOption} from "@/types/catalog";
 
 const getNumberParam = (value: string | null) => {
@@ -25,7 +28,7 @@ export async function GET(request: NextRequest) {
     const params = request.nextUrl.searchParams;
 
     try {
-        const revalidateSeconds = getContentfulRevalidateSeconds();
+        const isAdmin = await isAdminSession();
         const categoriesParam = params.get("categories");
         const category = categoriesParam ? categoriesParam.split(",").filter(Boolean) : undefined;
 
@@ -35,12 +38,15 @@ export async function GET(request: NextRequest) {
             sortBy: getSortParam(params.get("sortBy")),
             skip: getNumberParam(params.get("skip")),
             limit: getNumberParam(params.get("limit")),
-            revalidateSeconds,
+            revalidateSeconds: 0,
         });
+        const visibleProducts = isAdmin
+            ? getAdminProductsResult(products)
+            : getPublicProductsResult(products, await getPricingConfig(0));
 
-        return NextResponse.json(products, {
+        return NextResponse.json(visibleProducts, {
             headers: {
-                ...getProductsApiCacheHeaders(),
+                "Cache-Control": NO_STORE_CACHE_CONTROL,
                 "CDN-Cache-Control": "no-store",
             },
         });

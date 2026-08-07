@@ -29,7 +29,7 @@ const buildUpdateProductFormData = (values: UpdateProductFormValues) => {
 
     appendTextField(formData, CREATE_PRODUCT_FIELD_NAMES.name, values.name);
     appendTextField(formData, CREATE_PRODUCT_FIELD_NAMES.description, values.description);
-    appendTextField(formData, CREATE_PRODUCT_FIELD_NAMES.price, values.price);
+    appendTextField(formData, CREATE_PRODUCT_FIELD_NAMES.price, values.priceUah);
     appendCategoryFields(formData, values.categories);
     appendKeptImageFields(formData, values.keptImageUrls);
 

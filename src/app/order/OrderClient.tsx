@@ -5,31 +5,21 @@ import Link from "next/link";
 import {useSearchParams} from "next/navigation";
 import {useMemo} from "react";
 import type {ItemConfig} from "@/types/item";
-import type {PricingConfig} from "@/types/pricingConfig";
 
 interface OrderClientProps {
     products: ItemConfig[];
-    pricingConfig?: PricingConfig | null;
 }
 
 const formatUah = (value: number) =>
     `${new Intl.NumberFormat("uk-UA", {minimumFractionDigits: 2, maximumFractionDigits: 2}).format(value)} ₴`;
 
-const getRetailPriceUah = (usdToUahRate: number | null, priceUsd: number, retailMarkup: number) => {
-    if (!usdToUahRate) return null;
-    return Number((priceUsd * (1 + retailMarkup / 100) * usdToUahRate).toFixed(2));
-};
-
-export const OrderClient = ({products, pricingConfig}: OrderClientProps) => {
+export const OrderClient = ({products}: OrderClientProps) => {
     const searchParams = useSearchParams();
 
     const name = searchParams.get("name") ?? "";
     const phone = searchParams.get("phone") ?? "";
     const comment = searchParams.get("comment") ?? "";
     const itemsParam = searchParams.get("items") ?? "";
-
-    const usdToUahRate = pricingConfig?.usdToUahRate ?? null;
-    const retailMarkup = pricingConfig?.retailMarkup ?? 30;
 
     const orderItems = useMemo(() => {
         if (!itemsParam) return [];
@@ -42,7 +32,7 @@ export const OrderClient = ({products, pricingConfig}: OrderClientProps) => {
     }, [itemsParam, products]);
 
     const totalPrice = orderItems.reduce((sum, {product, quantity}) => {
-        const price = getRetailPriceUah(usdToUahRate, product.priceUsd ?? 0, retailMarkup);
+        const price = product.priceUah;
         return sum + (price ?? 0) * quantity;
     }, 0);
 
@@ -110,7 +100,7 @@ export const OrderClient = ({products, pricingConfig}: OrderClientProps) => {
                     </p>
                     <div className="flex flex-col gap-2">
                         {orderItems.map(({product, quantity}) => {
-                            const price = getRetailPriceUah(usdToUahRate, product.priceUsd ?? 0, retailMarkup);
+                            const price = product.priceUah;
                             const imageUrl = product.imageUrls?.[0] ?? product.imageUrl;
                             return (
                                 <div key={product.id} className="flex items-center gap-3 rounded-[16px] bg-black/5 p-2 pr-3">
@@ -130,7 +120,7 @@ export const OrderClient = ({products, pricingConfig}: OrderClientProps) => {
                                         <p className="text-[12px] text-[var(--text-secondary)]">{quantity} шт.</p>
                                     </div>
                                     {/* Price */}
-                                    {price && (
+                                    {typeof price === "number" && (
                                         <p className="shrink-0 text-[14px] font-bold">{formatUah(price * quantity)}</p>
                                     )}
                                 </div>

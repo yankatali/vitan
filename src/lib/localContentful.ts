@@ -84,7 +84,17 @@ const isItemConfig = (config: unknown): config is ItemConfig => {
     if (!config || typeof config !== "object") return false;
     const item = config as Partial<ItemConfig>;
 
-    return typeof item.title === "string" && typeof item.priceUsd === "number";
+    return typeof item.title === "string"
+        && (typeof item.purchasePriceUah === "number" || typeof item.priceUsd === "number");
+};
+
+const normalizeFixtureItem = (item: ItemConfig): ItemConfig => {
+    if (typeof item.purchasePriceUah === "number") return item;
+
+    return {
+        ...item,
+        purchasePriceUah: item.priceUsd,
+    };
 };
 
 const sortItems = (items: ItemConfig[], sortBy?: CatalogSortOption) => {
@@ -92,10 +102,10 @@ const sortItems = (items: ItemConfig[], sortBy?: CatalogSortOption) => {
 
     switch (sortBy) {
         case "priceAsc":
-            sorted.sort((a, b) => (a.priceUsd ?? 0) - (b.priceUsd ?? 0));
+            sorted.sort((a, b) => (a.purchasePriceUah ?? 0) - (b.purchasePriceUah ?? 0));
             break;
         case "priceDesc":
-            sorted.sort((a, b) => (b.priceUsd ?? 0) - (a.priceUsd ?? 0));
+            sorted.sort((a, b) => (b.purchasePriceUah ?? 0) - (a.purchasePriceUah ?? 0));
             break;
         case "titleAsc":
             sorted.sort((a, b) => a.title.localeCompare(b.title, "uk"));
@@ -152,7 +162,7 @@ export const getLocalFixtureProducts = ({
         .map(component => component.config)
         .filter(isItemConfig)
         .map((item, index) => ({
-            ...item,
+            ...normalizeFixtureItem(item),
             id: item.id ?? item.sku ?? item.slug ?? `local-product-${index}`,
         }))
         .filter(item => item.isActive !== false)

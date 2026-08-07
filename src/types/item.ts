@@ -7,6 +7,7 @@ export interface ItemConfig {
     title: string;
     description: string;
     category: string;
+    purchasePriceUah?: number;
     priceUsd?: number;
     priceUah?: number | null;
     priceUahWholesale?: number | null;
@@ -25,10 +26,13 @@ export interface ItemComponentProps {
     item?: ItemConfig;
     title: string;
     description?: string;
+    purchasePriceUah?: number;
     priceUsd?: number;
     priceUah?: number | null;
     priceUahWholesale?: number | null;
     wholesaleDescription?: string;
+    wholesaleActiveDescription?: string;
+    wholesaleAsPrimary?: boolean;
     category?: string;
     showProductActions?: boolean;
     showAdminActions?: boolean;

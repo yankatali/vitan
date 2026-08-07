@@ -1,15 +1,16 @@
 "use client";
 
 import {CREATE_PRODUCT_MODAL_CLASS_NAMES} from "@/constants/createProduct";
+import {getMarkedUpUahPrice} from "@/lib/productPricing";
 import type {PricingConfig} from "@/types/pricingConfig";
 
 interface ProductPricingPreviewProps {
-    priceUsd: string;
+    priceUah: string;
     pricingConfig?: PricingConfig | null;
 }
 
 interface OriginalProductPriceFieldProps {
-    priceUsd?: number;
+    priceUah?: number;
     pricingConfig?: PricingConfig | null;
 }
 
@@ -38,24 +39,22 @@ const formatUah = (value: number) => {
     return `${formatted} грн`;
 };
 
-const getUahValue = (priceUsd: number, pricingConfig?: PricingConfig | null) => {
+const getUsdValue = (priceUah: number, pricingConfig?: PricingConfig | null) => {
     if (!pricingConfig?.usdToUahRate) return null;
 
-    return priceUsd * pricingConfig.usdToUahRate;
+    return priceUah / pricingConfig.usdToUahRate;
 };
 
-const getMarkedUpPrice = (priceUsd: number, markup: number) => priceUsd * (1 + markup / 100);
+const formatPricePair = (priceUah: number, pricingConfig?: PricingConfig | null) => {
+    const priceUsd = getUsdValue(priceUah, pricingConfig);
 
-const formatPricePair = (priceUsd: number, pricingConfig?: PricingConfig | null) => {
-    const priceUah = getUahValue(priceUsd, pricingConfig);
+    if (priceUsd === null) return formatUah(priceUah);
 
-    if (priceUah === null) return usdFormatter.format(priceUsd);
-
-    return `${usdFormatter.format(priceUsd)} / ${formatUah(priceUah)}`;
+    return `${formatUah(priceUah)} / ${usdFormatter.format(priceUsd)}`;
 };
 
-export const ProductPricingPreview = ({priceUsd, pricingConfig}: ProductPricingPreviewProps) => {
-    const parsedPriceUsd = parsePrice(priceUsd);
+export const ProductPricingPreview = ({priceUah, pricingConfig}: ProductPricingPreviewProps) => {
+    const parsedPriceUah = parsePrice(priceUah);
     const retailMarkup = pricingConfig?.retailMarkup ?? 0;
     const wholesaleMarkup = pricingConfig?.wholesaleMarkup ?? 0;
 
@@ -65,19 +64,19 @@ export const ProductPricingPreview = ({priceUsd, pricingConfig}: ProductPricingP
             <div className={CREATE_PRODUCT_MODAL_CLASS_NAMES.priceInfoRows}>
                 <div className={CREATE_PRODUCT_MODAL_CLASS_NAMES.priceInfoRow}>
                     <span>Роздріб +{retailMarkup}%</span>
-                    <strong>{parsedPriceUsd === null ? "-" : formatPricePair(getMarkedUpPrice(parsedPriceUsd, retailMarkup), pricingConfig)}</strong>
+                    <strong>{parsedPriceUah === null ? "-" : formatPricePair(getMarkedUpUahPrice(parsedPriceUah, retailMarkup) ?? 0, pricingConfig)}</strong>
                 </div>
                 <div className={CREATE_PRODUCT_MODAL_CLASS_NAMES.priceInfoRow}>
                     <span>Опт +{wholesaleMarkup}%</span>
-                    <strong>{parsedPriceUsd === null ? "-" : formatPricePair(getMarkedUpPrice(parsedPriceUsd, wholesaleMarkup), pricingConfig)}</strong>
+                    <strong>{parsedPriceUah === null ? "-" : formatPricePair(getMarkedUpUahPrice(parsedPriceUah, wholesaleMarkup) ?? 0, pricingConfig)}</strong>
                 </div>
             </div>
         </div>
     );
 };
 
-export const OriginalProductPriceField = ({priceUsd, pricingConfig}: OriginalProductPriceFieldProps) => {
-    const value = typeof priceUsd === "number" ? formatPricePair(priceUsd, pricingConfig) : "";
+export const OriginalProductPriceField = ({priceUah, pricingConfig}: OriginalProductPriceFieldProps) => {
+    const value = typeof priceUah === "number" ? formatPricePair(priceUah, pricingConfig) : "";
 
     return (
         <label className={CREATE_PRODUCT_MODAL_CLASS_NAMES.label}>

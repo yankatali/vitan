@@ -11,10 +11,11 @@ interface MainPageProps {
     config: MainPageConfig;
     headerConfig?: HeaderConfig;
     initialProducts: ProductsResult;
+    isAdmin?: boolean;
     pricingConfig?: PricingConfig | null;
 }
 
-export const MainPage = ({config, headerConfig, initialProducts, pricingConfig}: MainPageProps) => {
+export const MainPage = ({config, headerConfig, initialProducts, isAdmin = false, pricingConfig}: MainPageProps) => {
     const heading = 'Вітан';
 
     return (
@@ -23,13 +24,14 @@ export const MainPage = ({config, headerConfig, initialProducts, pricingConfig}:
             <ProductList
                 initialProducts={initialProducts}
                 pricingConfig={pricingConfig}
+                categories={config.categories}
                 toolbarButtons={headerConfig?.headerButtons}
                 toolbarTitle={heading}
                 showCategories
                 showSort
                 showCategoryOnCard
-                showCreateProductButton
-                showDeleteProductButton
+                showCreateProductButton={isAdmin}
+                showDeleteProductButton={isAdmin}
                 rootClassName={PRODUCT_LIST_CLASS_NAMES.mainPageRoot}
                 toolbarClassName="toolbar"
                 searchWrapperClassName={PRODUCT_LIST_CLASS_NAMES.mainPageSearch}
@@ -42,4 +44,3 @@ export const MainPage = ({config, headerConfig, initialProducts, pricingConfig}:
         </div>
     );
 };
-

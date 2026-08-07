@@ -15,7 +15,7 @@ export const CREATE_PRODUCT_FIELD_NAMES = {
 
 export const CREATE_PRODUCT_ERROR_MESSAGES = {
     missingName: "Назва товару обов'язкова.",
-    invalidPrice: "Ціна має бути числом більше або дорівнювати 0.",
+    invalidPrice: "Закупочна ціна в грн має бути цілим числом більше або дорівнювати 0.",
     invalidImageType: "Формат фото має бути JPEG, PNG, WebP або GIF.",
     oversizedImage: "Фото має бути не більше 10 MB.",
     unableToCreate: "Не вдалося створити товар у Contentful.",
@@ -33,8 +33,9 @@ export const CREATE_PRODUCT_MODAL_CLASS_NAMES = {
     header: "flex items-start justify-between gap-4 px-5 pb-3 pt-3 pr-14 md:px-6",
     eyebrow: "text-xs uppercase tracking-[0.22em] text-[var(--text-secondary)]",
     title: "text-[20px] font-semibold leading-[25px] tracking-[-0.4px] text-[var(--text-primary)]",
-    closeButton: "absolute right-5 top-5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--fill)] text-[var(--text-secondary)] transition-transform hover:scale-105 active:scale-[0.92]",
-    form: "grid gap-4 overflow-y-auto px-5 pb-5 md:px-6",
+    closeButton: "absolute right-3 top-3 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--fill)] text-[var(--text-secondary)] transition-transform hover:scale-105 active:scale-[0.92]",
+    form: "flex min-h-0 flex-1 flex-col",
+    fields: "grid min-h-0 flex-1 gap-4 overflow-y-auto px-5 md:px-6",
     label: "grid self-start gap-1.5 text-[13px] font-semibold leading-[18px] text-[var(--text-secondary)]",
     input: "rounded-[var(--radius-sm)] bg-[var(--fill-tertiary)] px-4 py-3 text-[17px] leading-[22px] text-[var(--text-primary)] shadow-[inset_0_0_0_1px_var(--separator)] outline-none transition-shadow focus:shadow-[inset_0_0_0_2px_var(--label)]",
     textarea: "min-h-28 resize-y rounded-[var(--radius-sm)] bg-[var(--fill-tertiary)] px-4 py-3 text-[17px] leading-[22px] text-[var(--text-primary)] shadow-[inset_0_0_0_1px_var(--separator)] outline-none transition-shadow focus:shadow-[inset_0_0_0_2px_var(--label)]",
@@ -62,9 +63,9 @@ export const CREATE_PRODUCT_MODAL_CLASS_NAMES = {
     priceInfoRows: "grid gap-1.5",
     priceInfoRow: "flex flex-wrap items-center justify-between gap-2 text-[13px] leading-[18px] text-[var(--text-secondary)] [&_strong]:font-semibold [&_strong]:text-[var(--text-primary)]",
     error: "rounded-[var(--radius-sm)] bg-[rgba(255,59,48,0.1)] px-4 py-3 text-sm text-[var(--destructive)]",
-    actions: "sticky bottom-0 z-10 -mx-5 flex flex-wrap justify-end gap-3 px-5 py-3 md:-mx-6 md:px-6",
+    actions: "z-10 flex shrink-0 flex-wrap justify-end gap-3 px-5 py-3 md:px-6",
     secondaryButton: "rounded-[var(--radius-capsule)] bg-[var(--fill)] px-5 py-2.5 text-sm font-semibold text-[var(--text-primary)] transition-transform hover:bg-[var(--fill-secondary)] active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-50",
-    primaryButton: "vitan-accent-button rounded-[var(--radius-capsule)] px-5 py-2.5 text-sm font-semibold transition-transform active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-50",
+    primaryButton: "vitan-accent-button inline-flex items-center justify-center gap-2 rounded-[var(--radius-capsule)] px-5 py-2.5 text-sm font-semibold transition-transform active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-50",
     trigger: "vitan-accent-button flex h-10 w-10 items-center justify-center rounded-full transition-transform hover:scale-105 active:scale-[0.94]",
 };
 

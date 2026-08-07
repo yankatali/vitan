@@ -1,5 +1,6 @@
 import {getContentfulRevalidateSeconds} from "@/lib/cache";
 import {getPricingConfig} from "@/lib/pricingConfig";
+import {getPublicProductsResult} from "@/lib/publicProducts";
 import {getProducts} from "@/lib/products";
 import {OrderClient} from "./OrderClient";
 
@@ -11,6 +12,7 @@ export default async function OrderPage() {
         getProducts({limit: 100, revalidateSeconds}),
         getPricingConfig(revalidateSeconds),
     ]);
+    const publicProducts = getPublicProductsResult(products, pricingConfig);
 
-    return <OrderClient products={products.items} pricingConfig={pricingConfig} />;
+    return <OrderClient products={publicProducts.items} />;
 }
