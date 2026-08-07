@@ -467,6 +467,20 @@ a {
     -webkit-backdrop-filter: blur(var(--glass-blur-thick)) saturate(var(--glass-saturate));
 }
 
+.vitan-footer-surface {
+    padding-bottom: 100px;
+}
+
+body:has(.vitan-bottom-cta-global) .vitan-footer-surface {
+    padding-bottom: 180px;
+}
+
+@media (max-width: 1023px) {
+    body:has(.vitan-bottom-cta-mobile) .vitan-footer-surface {
+        padding-bottom: 180px;
+    }
+}
+
 @media (prefers-reduced-motion: reduce) {
     *,
     *::before,

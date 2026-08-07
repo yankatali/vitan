@@ -5,7 +5,7 @@ export const CART_CLASS_NAMES = {
 
     homeLink: "whitespace-nowrap text-[22px] font-bold leading-7 tracking-[-0.4px] text-[var(--text-primary)] [font-family:var(--font-brand)]",
     title: "whitespace-nowrap text-[17px] font-bold leading-[22px] text-[var(--text-primary)]",
-    content: `grid gap-4 pt-3 pb-[160px] lg:pb-4 ${PAGE_CONTENT_PX}`,
+    content: `grid gap-4 pt-3 pb-4 ${PAGE_CONTENT_PX}`,
     emptyState: "liquid-surface rounded-3xl p-6 text-sm text-[#6b615b]",
     list: "grid gap-3",
     item: "liquid-surface grid grid-cols-[80px_1fr] gap-3 rounded-3xl p-2 md:grid-cols-[120px_1fr_auto] md:items-center",

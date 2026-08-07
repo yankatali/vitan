@@ -12,7 +12,7 @@ export const PRODUCT_LIST_CLASS_NAMES = {
     mainPageCreator: "flex justify-end",
     mainPageFilters: "flex flex-wrap gap-2 px-4 lg:px-6",
     mainPageSort: "px-4 lg:px-6",
-    mainPageGrid: `grid grid-cols-2 content-start items-stretch ${CARD_GRID_GAP} ${PAGE_CONTENT_PX} pb-36 pt-3 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5`,
+    mainPageGrid: `grid grid-cols-2 content-start items-stretch ${CARD_GRID_GAP} ${PAGE_CONTENT_PX} pb-4 pt-3 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5`,
     mainPageMessage: "col-span-full rounded-[var(--radius-xl)] px-6 py-16 text-center text-[15px] leading-5 text-[var(--text-secondary)]",
     categoryDropdownWrapper: "relative h-11",
     categoryDropdownButton: "vitan-accent-button inline-flex h-11 w-11 items-center justify-center rounded-full transition-transform duration-200 hover:scale-[1.04] active:scale-[0.96]",

@@ -14,7 +14,7 @@ export const HEADER_NAV_CLASS_NAMES = {
 };
 
 export const HEADER_HOME_ICON_NAME = "home";
-export const PRODUCT_GRID_WITH_MOBILE_NAV_SPACING = "pb-36 lg:pb-4";
+export const PRODUCT_GRID_WITH_MOBILE_NAV_SPACING = "pb-4";
 export const DEFAULT_HEADER_CONFIG: HeaderConfig = {
     title: "Vitan",
     headerButtons: [

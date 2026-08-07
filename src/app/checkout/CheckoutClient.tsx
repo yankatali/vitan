@@ -136,7 +136,7 @@ export const CheckoutClient = ({products, pricingConfig}: CheckoutClientProps) =
                 </PageHeader>
             </div>
 
-            <div className={`grid gap-4 pt-3 ${PAGE_CONTENT_PX}`} style={{paddingBottom: '160px'}}>
+            <div className={`grid gap-4 pb-4 pt-3 ${PAGE_CONTENT_PX}`}>
 
                 {/* Order summary */}
                 {cartProducts.length > 0 && (
@@ -273,7 +273,7 @@ export const CheckoutClient = ({products, pricingConfig}: CheckoutClientProps) =
             </div>
 
             {/* Mobile/tablet — fixed above nav + footer */}
-            <div className="fixed left-1/2 z-30 w-[min(calc(100vw-1.5rem),30rem)] -translate-x-1/2 lg:hidden transition-[bottom] duration-200 ease-out" style={{bottom: `${barBottom}px`}}>
+            <div className="vitan-bottom-cta-mobile fixed left-1/2 z-30 w-[min(calc(100vw-1.5rem),30rem)] -translate-x-1/2 lg:hidden" style={{bottom: `${barBottom}px`}}>
                 <button
                     type="submit"
                     form="checkout-form"

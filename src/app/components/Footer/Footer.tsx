@@ -13,7 +13,7 @@ export const Footer = ({isAdmin = false}: FooterProps) => {
 
     return (
         <footer className="mt-5" id="site-footer">
-            <div className="liquid-surface rounded-t-3xl px-4 pt-5 md:px-6 lg:pb-6" style={{paddingBottom: '100px'}}>
+            <div className="vitan-footer-surface liquid-surface rounded-t-3xl px-4 pt-5 md:px-6">
                 <div className="flex flex-col gap-4">
 
                     {/* Brand */}

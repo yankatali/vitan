@@ -258,7 +258,7 @@ export const CartClient = ({products, pricingConfig}: CartClientProps) => {
             </section>
 
             {cartProducts.length > 0 && (
-                <div className="fixed left-1/2 z-30 w-[min(calc(100vw-1.5rem),30rem)] -translate-x-1/2 transition-[bottom] duration-200 ease-out" style={{bottom: `${barBottom}px`}}>
+                <div className="vitan-bottom-cta-global fixed left-1/2 z-30 w-[min(calc(100vw-1.5rem),30rem)] -translate-x-1/2" style={{bottom: `${barBottom}px`}}>
                     <div className="flex items-stretch justify-between gap-2 overflow-hidden rounded-full border-[0.5px] border-white/35 bg-white/50 pl-[27px] pr-[6px] py-[6px] shadow-[0_2px_12px_rgba(0,0,0,0.06)] backdrop-blur-2xl">
                         <div className="flex flex-col justify-center">
                             <p className="text-[10px] text-[var(--text-secondary)]">{totalQuantity} товарів</p>
