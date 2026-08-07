@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import {useEffect, useMemo, useState} from "react";
 import {useBarBottom} from "@/hooks/useBarBottom";
+import {useFooterBottomInset} from "@/hooks/useFooterBottomInset";
 import {PageHeader} from "@/app/components/PageHeader/PageHeader";
 import {PAGE_CONTENT_PX} from "@/constants/pageLayout";
 import {CART_STORAGE_KEY, getCartItems, clearCart, updateCartQuantity, removeProductFromCart} from "@/lib/cartStorage";
@@ -60,6 +61,11 @@ export const CheckoutClient = ({products, pricingConfig}: CheckoutClientProps) =
         const price = getProductPriceUah(item.product, isWholesaleActive, pricingConfig);
         return sum + (price ?? 0) * item.quantity;
     }, 0);
+
+    useFooterBottomInset({
+        enabled: !submitted,
+        mediaQuery: "(max-width: 1023px)",
+    });
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

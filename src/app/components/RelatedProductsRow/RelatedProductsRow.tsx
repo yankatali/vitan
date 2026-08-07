@@ -100,6 +100,7 @@ export const RelatedProductsRow = ({
                         return (
                             <div key={product.id} className="shrink-0" style={{width: "140px"}}>
                                 <ProductCardSimple
+                                    className="vitan-product-card--related"
                                     item={product}
                                     priceUah={prices?.retail ?? null}
                                     priceUahWholesale={prices?.wholesale ?? null}

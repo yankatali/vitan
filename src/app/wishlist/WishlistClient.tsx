@@ -11,6 +11,7 @@ import type {ItemConfig} from "@/types/item";
 import type {WishlistProductItem} from "@/types/wishlist";
 import {useBarBottom} from "@/hooks/useBarBottom";
 import {useCartWholesaleStatus} from "@/hooks/useCartWholesaleStatus";
+import {useFooterBottomInset} from "@/hooks/useFooterBottomInset";
 import {PageHeader} from "@/app/components/PageHeader/PageHeader";
 import {ConfirmModal} from "@/app/components/ConfirmModal/ConfirmModal";
 import {ProductCardSimple} from "@/app/components/ProductCardSimple/ProductCardSimple";
@@ -93,6 +94,8 @@ export const WishlistClient = ({products, pricingConfig}: WishlistClientProps) =
     const totalPrice = useMemo(() => wishlistProducts.reduce((sum, item) => {
         return sum + (getProductPriceUah(item.product, isWholesaleActive, pricingConfig) ?? 0);
     }, 0), [wishlistProducts, isWholesaleActive, pricingConfig]);
+
+    useFooterBottomInset({enabled: wishlistProducts.length > 0});
 
     const handleAddToCart = (productId: string) => {
         const product = productsById.get(productId);
@@ -181,7 +184,7 @@ export const WishlistClient = ({products, pricingConfig}: WishlistClientProps) =
 
             {wishlistProducts.length > 0 && (
                 <div className="vitan-bottom-cta-global fixed left-1/2 z-30 w-[min(calc(100vw-1.5rem),30rem)] -translate-x-1/2" style={{bottom: `${barBottom}px`}}>
-                    <div className="flex items-stretch justify-between gap-2 overflow-hidden rounded-full border-[0.5px] border-white/35 bg-white/50 pl-[27px] pr-[6px] py-[6px] shadow-[0_2px_12px_rgba(0,0,0,0.06)] backdrop-blur-2xl">
+                    <div className="flex items-stretch justify-between gap-2 overflow-hidden rounded-full border-[0.5px] border-white/55 bg-white/90 pl-[27px] pr-[6px] py-[6px] shadow-[0_1px_8px_rgba(0,0,0,0.08)]">
                         <div className="flex flex-col justify-center">
                             <p className="text-[10px] text-[var(--text-secondary)]">{wishlistIds.length} товарів</p>
                             <p className="text-[14px] font-bold leading-5">{formatUah(totalPrice)}</p>

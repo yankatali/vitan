@@ -17,6 +17,7 @@ import {SAVED_PRODUCTS_CHANGE_EVENT} from "@/lib/savedProductsEvents";
 import type {CartProductItem, CartStorageItem} from "@/types/cart";
 import type {ItemConfig} from "@/types/item";
 import {useBarBottom} from "@/hooks/useBarBottom";
+import {useFooterBottomInset} from "@/hooks/useFooterBottomInset";
 import {PageHeader} from "@/app/components/PageHeader/PageHeader";
 import {ConfirmModal} from "@/app/components/ConfirmModal/ConfirmModal";
 import {ImagePlaceholder} from "@/app/components/ImagePlaceholder/ImagePlaceholder";
@@ -119,6 +120,8 @@ export const CartClient = ({products, pricingConfig}: CartClientProps) => {
         totals.totalPrice += (getProductPriceUah(item.product, isWholesaleActive, pricingConfig) ?? 0) * item.quantity;
         return totals;
     }, {totalPrice: 0, totalQuantity: 0}), [cartProducts, isWholesaleActive, pricingConfig]);
+
+    useFooterBottomInset({enabled: cartProducts.length > 0});
 
     const handleQuantityChange = (productId: string, quantity: number) => {
         if (quantity < 1) {
@@ -259,7 +262,7 @@ export const CartClient = ({products, pricingConfig}: CartClientProps) => {
 
             {cartProducts.length > 0 && (
                 <div className="vitan-bottom-cta-global fixed left-1/2 z-30 w-[min(calc(100vw-1.5rem),30rem)] -translate-x-1/2" style={{bottom: `${barBottom}px`}}>
-                    <div className="flex items-stretch justify-between gap-2 overflow-hidden rounded-full border-[0.5px] border-white/35 bg-white/50 pl-[27px] pr-[6px] py-[6px] shadow-[0_2px_12px_rgba(0,0,0,0.06)] backdrop-blur-2xl">
+                    <div className="flex items-stretch justify-between gap-2 overflow-hidden rounded-full border-[0.5px] border-white/55 bg-white/90 pl-[27px] pr-[6px] py-[6px] shadow-[0_1px_8px_rgba(0,0,0,0.08)]">
                         <div className="flex flex-col justify-center">
                             <p className="text-[10px] text-[var(--text-secondary)]">{totalQuantity} товарів</p>
                             <p className="text-[14px] font-bold leading-5">{formatUah(totalPrice)}</p>

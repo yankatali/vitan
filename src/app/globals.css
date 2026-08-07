@@ -430,6 +430,12 @@ a {
     background-image: none;
 }
 
+.vitan-product-card--related {
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.85),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.4);
+}
+
 .vitan-product-card--cart {
     border-color: rgba(0, 0, 0, 0.35);
     box-shadow:
@@ -468,17 +474,11 @@ a {
 }
 
 .vitan-footer-surface {
-    padding-bottom: 100px;
-}
-
-body:has(.vitan-bottom-cta-global) .vitan-footer-surface {
-    padding-bottom: 180px;
-}
-
-@media (max-width: 1023px) {
-    body:has(.vitan-bottom-cta-mobile) .vitan-footer-surface {
-        padding-bottom: 180px;
-    }
+    padding-bottom: var(--vitan-footer-bottom, 100px);
+    box-shadow:
+        inset 0 1px 1px rgba(255, 255, 255, 0.7),
+        inset 0 -1px 1px rgba(0, 0, 0, 0.05),
+        0 -2px 8px rgba(0, 0, 0, 0.06);
 }
 
 @media (prefers-reduced-motion: reduce) {

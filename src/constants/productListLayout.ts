@@ -1,7 +1,7 @@
 import {PAGE_CONTENT_PX, CARD_GRID_GAP} from "@/constants/pageLayout";
 
 export const PRODUCT_LIST_CLASS_NAMES = {
-    mainPageContainer: "flex min-h-screen flex-col gap-2 text-[var(--text-primary)]",
+    mainPageContainer: "flex flex-col gap-2 text-[var(--text-primary)]",
     mainPageRoot: "flex flex-1 flex-col",
 
     mainPageToolbarTitleGroup: "flex items-center gap-3",
