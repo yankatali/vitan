@@ -1,6 +1,6 @@
 # Vitan Commerce
 
-Client-approved public portfolio repository for a production-oriented commerce catalog built with Next.js. The project demonstrates a custom storefront experience, wishlist/cart flows, order submission, and lightweight admin tooling while keeping production credentials and customer-specific operational data outside the repository.
+The project demonstrates a custom storefront experience, wishlist/cart flows, order submission, and lightweight admin tooling while keeping production credentials and customer-specific operational data outside the repository.
 
 ## Overview
 
