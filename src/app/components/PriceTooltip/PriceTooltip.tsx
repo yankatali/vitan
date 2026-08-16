@@ -2,6 +2,7 @@
 
 import {useEffect, useId, useRef, useState} from "react";
 import {createPortal} from "react-dom";
+import {TOOLTIP_GAP, TOOLTIP_WIDTH, VIEWPORT_PADDING} from "@/constants/priceTooltip";
 
 interface PriceTooltipProps {
     text?: string;
@@ -12,10 +13,6 @@ interface TooltipPosition {
     top: number;
     placement: "top" | "bottom";
 }
-
-const TOOLTIP_WIDTH = 208;
-const TOOLTIP_GAP = 7;
-const VIEWPORT_PADDING = 12;
 
 export const PriceTooltip = ({text}: PriceTooltipProps) => {
     const [isOpen, setIsOpen] = useState(false);

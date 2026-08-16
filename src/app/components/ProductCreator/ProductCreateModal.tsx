@@ -1,30 +1,27 @@
-"use client";
-
 import {createPortal} from "react-dom";
 import {
-    CREATE_PRODUCT_BUTTON_LABELS,
     CREATE_PRODUCT_FIELD_NAMES,
     CREATE_PRODUCT_MODAL_CLASS_NAMES,
 } from "@/constants/createProduct";
+import {getCreateProductSubmitButtonLabel} from "@/lib/productCreateModalHelpers";
 import {CloseIcon} from "@/app/components/icon/CloseIcon";
 import {LoadingSpinnerIcon} from "@/app/components/icon/LoadingSpinnerIcon";
 import {PlusIcon} from "@/app/components/icon/PlusIcon";
 import {CategoryMultiSelect} from "@/app/components/CategoryMultiSelect/CategoryMultiSelect";
-import {ProductImagePreviews, ProductImageUploadProgress} from "@/app/components/ProductImagePreviews/ProductImagePreviews";
+import {ProductImagePreviews} from "@/app/components/ProductImagePreviews/ProductImagePreviews";
+import {ProductImageUploadProgress} from "@/app/components/ProductImagePreviews/ProductImageUploadProgress";
 import {ProductPricingPreview} from "@/app/components/ProductPricingPreview/ProductPricingPreview";
-import {useCreateProductForm} from "@/app/components/ProductCreator/useCreateProductForm";
+import {useCreateProductForm} from "@/hooks/useCreateProductForm";
+import {useSiteContent} from "@/app/components/SiteContentProvider/SiteContentProvider";
 import {useLockScroll} from "@/hooks/useLockScroll";
 import type {ProductCreateModalProps} from "@/types/createProduct";
 
-const getSubmitButtonLabel = (isSubmitting: boolean) => {
-    if (isSubmitting) return CREATE_PRODUCT_BUTTON_LABELS.submitting;
-
-    return CREATE_PRODUCT_BUTTON_LABELS.idle;
-};
-
 export const ProductCreateModal = ({categoryOptions, isOpen, onClose, onProductCreated, pricingConfig}: ProductCreateModalProps) => {
-    useLockScroll(isOpen);
     const hasUsdToUahRate = Boolean(pricingConfig?.usdToUahRate);
+    const siteContent = useSiteContent();
+    const copy = siteContent.productForm;
+
+    useLockScroll(isOpen);
     const {
         error,
         handleBackdropClose,
@@ -55,9 +52,9 @@ export const ProductCreateModal = ({categoryOptions, isOpen, onClose, onProductC
                 <span className={CREATE_PRODUCT_MODAL_CLASS_NAMES.grabber} aria-hidden="true" />
                 <div className={CREATE_PRODUCT_MODAL_CLASS_NAMES.header}>
                     <div>
-                        <h2 id="create-product-title" className={CREATE_PRODUCT_MODAL_CLASS_NAMES.title}>Новий товар</h2>
+                        <h2 id="create-product-title" className={CREATE_PRODUCT_MODAL_CLASS_NAMES.title}>{copy.createTitle}</h2>
                     </div>
-                    <button type="button" onClick={handleClose} className={CREATE_PRODUCT_MODAL_CLASS_NAMES.closeButton} aria-label="Закрити">
+                    <button type="button" onClick={handleClose} className={CREATE_PRODUCT_MODAL_CLASS_NAMES.closeButton} aria-label={copy.closeAriaLabel}>
                         <CloseIcon />
                     </button>
                 </div>
@@ -65,7 +62,7 @@ export const ProductCreateModal = ({categoryOptions, isOpen, onClose, onProductC
                 <form onSubmit={handleSubmit} className={CREATE_PRODUCT_MODAL_CLASS_NAMES.form}>
                     <div className={CREATE_PRODUCT_MODAL_CLASS_NAMES.fields}>
                         <label className={CREATE_PRODUCT_MODAL_CLASS_NAMES.label}>
-                            Назва
+                            {copy.fields.name}
                             <input
                                 name={CREATE_PRODUCT_FIELD_NAMES.name}
                                 value={values.name}
@@ -76,7 +73,7 @@ export const ProductCreateModal = ({categoryOptions, isOpen, onClose, onProductC
                         </label>
 
                     <label className={CREATE_PRODUCT_MODAL_CLASS_NAMES.label}>
-                        Закупочна ціна грн
+                        {copy.fields.purchasePriceUah}
                         <input
                             name={CREATE_PRODUCT_FIELD_NAMES.priceUah}
                             value={values.priceUah}
@@ -90,7 +87,7 @@ export const ProductCreateModal = ({categoryOptions, isOpen, onClose, onProductC
                     </label>
 
                     <label className={CREATE_PRODUCT_MODAL_CLASS_NAMES.label}>
-                        Закупочна ціна USD
+                        {copy.fields.purchasePriceUsd}
                         <input
                             name={CREATE_PRODUCT_FIELD_NAMES.price}
                             value={values.price}
@@ -100,14 +97,14 @@ export const ProductCreateModal = ({categoryOptions, isOpen, onClose, onProductC
                             min="0"
                             step="0.01"
                             disabled={!hasUsdToUahRate}
-                            placeholder={hasUsdToUahRate ? undefined : "Немає курсу USD"}
+                            placeholder={hasUsdToUahRate ? undefined : copy.unavailableUsdRatePlaceholder}
                         />
                     </label>
 
                     <ProductPricingPreview priceUah={values.priceUah} pricingConfig={pricingConfig} />
 
                     <label className={CREATE_PRODUCT_MODAL_CLASS_NAMES.label}>
-                        Опис
+                        {copy.fields.description}
                         <textarea
                             name={CREATE_PRODUCT_FIELD_NAMES.description}
                             value={values.description}
@@ -123,9 +120,9 @@ export const ProductCreateModal = ({categoryOptions, isOpen, onClose, onProductC
                     />
 
                     <div className={CREATE_PRODUCT_MODAL_CLASS_NAMES.label}>
-                        <span>Фото</span>
+                        <span>{copy.fields.photo}</span>
                         <div className={CREATE_PRODUCT_MODAL_CLASS_NAMES.existingImages}>
-                            <label className={CREATE_PRODUCT_MODAL_CLASS_NAMES.imageAddTile} aria-label="Додати фото">
+                            <label className={CREATE_PRODUCT_MODAL_CLASS_NAMES.imageAddTile} aria-label={copy.addPhotoAriaLabel}>
                                 <PlusIcon />
                                 <input
                                     name={CREATE_PRODUCT_FIELD_NAMES.image}
@@ -144,7 +141,7 @@ export const ProductCreateModal = ({categoryOptions, isOpen, onClose, onProductC
                         </div>
                         {values.image.length > 0 && (
                             <span className={CREATE_PRODUCT_MODAL_CLASS_NAMES.selectedImages}>
-                                Вибрано фото: {values.image.length}
+                                {copy.selectedImagesPrefix} {values.image.length}
                             </span>
                         )}
                         {uploadProgress !== null && <ProductImageUploadProgress progress={uploadProgress} />}
@@ -155,11 +152,11 @@ export const ProductCreateModal = ({categoryOptions, isOpen, onClose, onProductC
 
                     <div className={CREATE_PRODUCT_MODAL_CLASS_NAMES.actions}>
                         <button type="button" onClick={handleClose} className={CREATE_PRODUCT_MODAL_CLASS_NAMES.secondaryButton} disabled={isSubmitting}>
-                            Скасувати
+                            {copy.cancelButton}
                         </button>
                         <button type="submit" className={CREATE_PRODUCT_MODAL_CLASS_NAMES.primaryButton} disabled={isSubmitting}>
                             {isSubmitting && <LoadingSpinnerIcon />}
-                            {getSubmitButtonLabel(isSubmitting)}
+                            {getCreateProductSubmitButtonLabel(isSubmitting, siteContent.createProduct.buttons)}
                         </button>
                     </div>
                 </form>

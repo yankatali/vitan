@@ -1,6 +1,5 @@
+import {WISHLIST_STORAGE_KEY} from "@/constants/wishlist";
 import {notifySavedProductsChanged} from "@/lib/savedProductsEvents";
-
-export const WISHLIST_STORAGE_KEY = "vitan-favorite-product-ids";
 
 const normalizeWishlistIds = (ids: string[]) => {
     return Array.from(new Set(ids));

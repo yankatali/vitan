@@ -1,23 +1,16 @@
-"use client";
-
-import Image from "next/image";
 import {createPortal} from "react-dom";
 import {useRef, useState, useEffect, type ReactNode} from "react";
 import {useRouter, usePathname, useSearchParams} from "next/navigation";
 import {ImagePlaceholder} from "@/app/components/ImagePlaceholder/ImagePlaceholder";
 import {CloseIcon} from "@/app/components/icon/CloseIcon";
-import {PriceTooltip} from "@/app/components/PriceTooltip/PriceTooltip";
+import {ProductPriceBlock} from "@/app/components/ProductPriceBlock/ProductPriceBlock";
+import {ProductCategoryPills, ProductDetailImages, ProductImageCarousel} from "@/app/components/ProductCardSimple/ProductCardSimpleParts";
+import {useSiteContent} from "@/app/components/SiteContentProvider/SiteContentProvider";
 import {PRODUCT_CARD_CLASS_NAMES} from "@/constants/productCard";
 import {useLockScroll} from "@/hooks/useLockScroll";
+import {getProductImageUrls} from "@/lib/productImages";
+import {splitProductCategories} from "@/lib/productCategories";
 import type {ItemConfig} from "@/types/item";
-
-const formatUah = (value: number) => {
-    const formatted = new Intl.NumberFormat("uk-UA", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-    }).format(value);
-    return `${formatted} ₴`;
-};
 
 interface ProductCardSimpleProps {
     item: ItemConfig;
@@ -52,6 +45,7 @@ export const ProductCardSimple = ({
     const imageScrollerRef = useRef<HTMLDivElement | null>(null);
     const [activeImageIndex, setActiveImageIndex] = useState(0);
     const [isDetailOpen, setIsDetailOpen] = useState(false);
+    const commonCopy = useSiteContent().common;
 
     useLockScroll(isDetailOpen);
 
@@ -71,13 +65,19 @@ export const ProductCardSimple = ({
         router.push(pathname, {scroll: false});
     };
 
-    const productImages = item.imageUrls?.length ? item.imageUrls : item.imageUrl ? [item.imageUrl] : [];
+    const productImages = getProductImageUrls(item.imageUrl, item.imageUrls);
     const shouldShowWholesaleAsPrimary = wholesaleAsPrimary && typeof priceUahWholesale === "number";
     const primaryPriceUah = shouldShowWholesaleAsPrimary ? priceUahWholesale : priceUah;
-    const wholesaleTooltipText = shouldShowWholesaleAsPrimary
-        ? wholesaleActiveDescription ?? wholesaleDescription
-        : wholesaleDescription;
     const showCartActionInDetailPrice = Boolean(cartAction && !modalAction && typeof primaryPriceUah === "number");
+    const priceBlock = (
+        <ProductPriceBlock
+            priceUah={priceUah}
+            priceUahWholesale={priceUahWholesale}
+            wholesaleActiveDescription={wholesaleActiveDescription}
+            wholesaleAsPrimary={wholesaleAsPrimary}
+            wholesaleDescription={wholesaleDescription}
+        />
+    );
 
     const handleImageScroll = () => {
         const node = imageScrollerRef.current;
@@ -92,7 +92,7 @@ export const ProductCardSimple = ({
         setActiveImageIndex(index);
     };
 
-    const categories = item.category ? item.category.split(",").map(c => c.trim()).filter(Boolean) : [];
+    const categories = splitProductCategories(item.category);
 
     return (
         <>
@@ -104,46 +104,15 @@ export const ProductCardSimple = ({
             >
                 <div className={PRODUCT_CARD_CLASS_NAMES.imageWrapper}>
                     {productImages.length > 0 ? (
-                        <>
-                            <div
-                                ref={imageScrollerRef}
-                                className={PRODUCT_CARD_CLASS_NAMES.imageScroller}
-                                onScroll={handleImageScroll}
-                            >
-                                {productImages.map((productImage, index) => (
-                                    <div
-                                        key={`${productImage}-${index}`}
-                                        className={PRODUCT_CARD_CLASS_NAMES.imageButton}
-                                    >
-                                        <Image
-                                            src={productImage}
-                                            alt={item.imageAlt ?? item.title}
-                                            width={560}
-                                            height={420}
-                                            className={PRODUCT_CARD_CLASS_NAMES.image}
-                                        />
-                                    </div>
-                                ))}
-                            </div>
-                            {productImages.length > 1 && (
-                                <div
-                                    className={PRODUCT_CARD_CLASS_NAMES.imageDots}
-                                    aria-label="Фото товару"
-                                    onClick={(e) => e.stopPropagation()}
-                                >
-                                    {productImages.map((_, index) => (
-                                        <button
-                                            key={index}
-                                            type="button"
-                                            className={activeImageIndex === index ? PRODUCT_CARD_CLASS_NAMES.activeImageDot : PRODUCT_CARD_CLASS_NAMES.imageDot}
-                                            onClick={() => handleDotClick(index)}
-                                            aria-label={`Показати фото ${index + 1}`}
-                                            aria-current={activeImageIndex === index}
-                                        />
-                                    ))}
-                                </div>
-                            )}
-                        </>
+                        <ProductImageCarousel
+                            productImages={productImages}
+                            alt={item.imageAlt ?? item.title}
+                            activeImageIndex={activeImageIndex}
+                            imageScrollerRef={imageScrollerRef}
+                            onImageScroll={handleImageScroll}
+                            onDotClick={handleDotClick}
+                            commonCopy={commonCopy}
+                        />
                     ) : (
                         <ImagePlaceholder className={PRODUCT_CARD_CLASS_NAMES.imagePlaceholder} iconSize={48} />
                     )}
@@ -159,45 +128,7 @@ export const ProductCardSimple = ({
                     <div className="flex flex-col gap-1 mt-1">
                         <div className="flex items-end justify-between gap-2">
                             <div className="min-w-0">
-                                {typeof primaryPriceUah === "number" && (
-                                    <>
-                                        {shouldShowWholesaleAsPrimary ? (
-                                            <>
-                                                <div className="flex flex-wrap items-center gap-x-1 text-[#0ba862]">
-                                                    <p className={`${PRODUCT_CARD_CLASS_NAMES.priceUsd} !text-[#0ba862]`}>
-                                                        {formatUah(primaryPriceUah)}
-                                                    </p>
-                                                    <span className="flex items-center gap-1 whitespace-nowrap text-[12px] font-medium leading-4">
-                                                        Опт
-                                                        <PriceTooltip text={wholesaleTooltipText} />
-                                                    </span>
-                                                </div>
-                                                {typeof priceUah === "number" && (
-                                                    <p className="text-[12px] font-semibold leading-4 text-[var(--destructive)] line-through">
-                                                        {formatUah(priceUah)}
-                                                    </p>
-                                                )}
-                                            </>
-                                        ) : typeof priceUahWholesale === "number" ? (
-                                            <>
-                                                <p className={PRODUCT_CARD_CLASS_NAMES.priceUsd}>
-                                                    {formatUah(primaryPriceUah)}
-                                                </p>
-                                                <p className="flex flex-wrap items-center gap-x-1 text-[12px] font-medium leading-4 text-[#0ba862]">
-                                                    <span className="whitespace-nowrap">{formatUah(priceUahWholesale)}</span>
-                                                    <span className="flex items-center gap-1 whitespace-nowrap">
-                                                        Опт
-                                                        <PriceTooltip text={wholesaleTooltipText} />
-                                                    </span>
-                                                </p>
-                                            </>
-                                        ) : (
-                                            <p className={PRODUCT_CARD_CLASS_NAMES.priceUsd}>
-                                                {formatUah(primaryPriceUah)}
-                                            </p>
-                                        )}
-                                    </>
-                                )}
+                                {priceBlock}
                             </div>
                             {cartAction && <div className="shrink-0" onClick={(e) => e.stopPropagation()}>{cartAction}</div>}
                         </div>
@@ -227,47 +158,14 @@ export const ProductCardSimple = ({
                             <CloseIcon />
                         </button>
                         <div className="flex-1 overflow-y-auto">
-                            {productImages.length > 0 ? (
-                                <div className="relative p-3 pb-0">
-                                    <div className="flex w-full snap-x snap-mandatory overflow-x-auto rounded-[var(--radius-lg)] [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                                        {productImages.map((img, i) => (
-                                            <div
-                                                key={`detail-${img}-${i}`}
-                                                className="relative aspect-[4/3] w-full shrink-0 snap-center"
-                                            >
-                                                <Image src={img} alt={`${item.title} ${i + 1}`} fill className="object-cover" />
-                                            </div>
-                                        ))}
-                                    </div>
-                                    {productImages.length > 1 && (
-                                        <div className={PRODUCT_CARD_CLASS_NAMES.imageDots}>
-                                            {productImages.map((_, i) => (
-                                                <span key={i} className={i === 0 ? PRODUCT_CARD_CLASS_NAMES.activeImageDot : PRODUCT_CARD_CLASS_NAMES.imageDot} />
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                            ) : (
-                                <div className="relative p-3 pb-0">
-                                    <ImagePlaceholder
-                                        className="flex aspect-[4/3] w-full items-center justify-center rounded-[var(--radius-lg)] bg-[rgba(255,255,255,0.15)] text-[var(--text-tertiary)]"
-                                        iconSize={48}
-                                    />
-                                </div>
-                            )}
+                            <ProductDetailImages productImages={productImages} title={item.title} />
 
                             <div className="flex flex-col gap-3 p-5">
                                 <h3 className="text-[20px] font-semibold leading-[25px] tracking-[-0.4px] text-[var(--text-primary)]">
                                     {item.title}
                                 </h3>
 
-                                {categories.length > 0 && (
-                                    <div className="flex flex-wrap gap-1.5">
-                                        {categories.map(cat => (
-                                            <span key={cat} className={PRODUCT_CARD_CLASS_NAMES.category}>{cat}</span>
-                                        ))}
-                                    </div>
-                                )}
+                                <ProductCategoryPills categories={categories} />
 
                                 {item.description && (
                                     <p className="text-[15px] leading-[22px] text-[var(--text-secondary)]">
@@ -278,41 +176,7 @@ export const ProductCardSimple = ({
                                 {typeof primaryPriceUah === "number" && (
                                     <div className="mt-px flex items-end justify-between gap-3">
                                         <div className="min-w-0">
-                                            {shouldShowWholesaleAsPrimary ? (
-                                                <>
-                                                    <div className="flex flex-wrap items-center gap-x-1 text-[#0ba862]">
-                                                        <p className={`${PRODUCT_CARD_CLASS_NAMES.priceUsd} !text-[#0ba862]`}>
-                                                            {formatUah(primaryPriceUah)}
-                                                        </p>
-                                                        <span className="flex items-center gap-1 whitespace-nowrap text-[13px] font-medium">
-                                                            Опт
-                                                            <PriceTooltip text={wholesaleTooltipText} />
-                                                        </span>
-                                                    </div>
-                                                    {typeof priceUah === "number" && (
-                                                        <p className="text-[12px] font-semibold leading-4 text-[var(--destructive)] line-through">
-                                                            {formatUah(priceUah)}
-                                                        </p>
-                                                    )}
-                                                </>
-                                        ) : typeof priceUahWholesale === "number" ? (
-                                                <>
-                                                    <p className={PRODUCT_CARD_CLASS_NAMES.priceUsd}>
-                                                        {formatUah(primaryPriceUah)}
-                                                    </p>
-                                                    <p className="flex flex-wrap items-center gap-x-1 text-[13px] font-medium text-[#0ba862]">
-                                                        <span className="whitespace-nowrap">{formatUah(priceUahWholesale)}</span>
-                                                        <span className="flex items-center gap-1 whitespace-nowrap">
-                                                            Опт
-                                                            <PriceTooltip text={wholesaleTooltipText} />
-                                                        </span>
-                                                    </p>
-                                                </>
-                                            ) : (
-                                                <p className={PRODUCT_CARD_CLASS_NAMES.priceUsd}>
-                                                    {formatUah(primaryPriceUah)}
-                                                </p>
-                                            )}
+                                            {priceBlock}
                                         </div>
                                         {showCartActionInDetailPrice && (
                                             <div className="shrink-0" onClick={(e) => e.stopPropagation()}>

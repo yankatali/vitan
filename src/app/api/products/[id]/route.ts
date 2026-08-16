@@ -1,117 +1,32 @@
-import {NextResponse} from "next/server";
-import {revalidatePath, revalidateTag} from "next/cache";
-import {ADMIN_UNAUTHORIZED_MESSAGE} from "@/constants/admin";
-import {CONTENTFUL_PRODUCTS_CACHE_TAG} from "@/constants/cache";
-import {
-    CREATE_PRODUCT_ALLOWED_IMAGE_TYPES,
-    CREATE_PRODUCT_FIELD_NAMES,
-    CREATE_PRODUCT_MAX_IMAGE_SIZE,
-} from "@/constants/createProduct";
-import {DELETE_PRODUCT_ERROR_MESSAGES} from "@/constants/deleteProduct";
-import {UPDATE_PRODUCT_ERROR_MESSAGES} from "@/constants/updateProduct";
+import {NextRequest, NextResponse} from "next/server";
 import {getApiErrorMessage} from "@/lib/apiErrorMessage";
 import {isAdminSession} from "@/lib/adminAuth";
+import {isAdminRequestSecurityValid} from "@/lib/adminRequestSecurity";
 import {deleteContentfulProduct, updateContentfulProduct} from "@/lib/contentfulManagement";
-import type {UpdateProductInput} from "@/types/updateProduct";
+import {revalidateProducts} from "@/lib/productCacheRevalidation";
+import {getUpdateProductInput} from "@/lib/productMutationRequest";
+import {getSiteContent} from "@/lib/siteContent";
+import type {ProductIdRouteContext} from "@/types/productRoute";
 
 export const runtime = "nodejs";
 
-interface DeleteProductRouteContext {
-    params: Promise<{id: string}>;
-}
+export async function DELETE(request: NextRequest, context: ProductIdRouteContext) {
+    const siteContent = await getSiteContent();
+    const copy = siteContent.deleteProduct.errors;
 
-const getStringFormValue = (formData: FormData, name: string) => {
-    const value = formData.get(name);
-
-    if (typeof value !== "string") return "";
-
-    return value.trim();
-};
-
-const getCategories = (formData: FormData) => {
-    return formData
-        .getAll(CREATE_PRODUCT_FIELD_NAMES.categories)
-        .filter(value => typeof value === "string")
-        .map(category => category.trim())
-        .filter(Boolean);
-};
-
-const getImages = (formData: FormData) => {
-    return formData
-        .getAll(CREATE_PRODUCT_FIELD_NAMES.image)
-        .filter((value): value is File => value instanceof File && value.size > 0);
-};
-
-const getKeptImageUrls = (formData: FormData) => {
-    return formData
-        .getAll("keptImageUrls")
-        .filter((value): value is string => typeof value === "string")
-        .map(value => value.trim())
-        .filter(Boolean);
-};
-
-const getPrice = (value: string) => {
-    const price = Number(value.replace(",", "."));
-
-    if (!Number.isFinite(price) || price < 0 || !Number.isInteger(price)) return null;
-
-    return price;
-};
-
-const getUpdateProductInput = (formData: FormData, id: string): UpdateProductInput => {
-    const name = getStringFormValue(formData, CREATE_PRODUCT_FIELD_NAMES.name);
-    const description = getStringFormValue(formData, CREATE_PRODUCT_FIELD_NAMES.description);
-    const priceValue = getStringFormValue(formData, CREATE_PRODUCT_FIELD_NAMES.price);
-    const price = getPrice(priceValue);
-    const categories = getCategories(formData);
-    const images = getImages(formData);
-
-    if (!id) {
-        throw new Error(UPDATE_PRODUCT_ERROR_MESSAGES.missingId);
-    }
-
-    if (!name) {
-        throw new Error(UPDATE_PRODUCT_ERROR_MESSAGES.missingName);
-    }
-
-    if (price === null) {
-        throw new Error(UPDATE_PRODUCT_ERROR_MESSAGES.invalidPrice);
-    }
-
-    if (images.some(image => !CREATE_PRODUCT_ALLOWED_IMAGE_TYPES.includes(image.type))) {
-        throw new Error(UPDATE_PRODUCT_ERROR_MESSAGES.invalidImageType);
-    }
-
-    if (images.some(image => image.size > CREATE_PRODUCT_MAX_IMAGE_SIZE)) {
-        throw new Error(UPDATE_PRODUCT_ERROR_MESSAGES.oversizedImage);
-    }
-
-    return {
-        id,
-        name,
-        description,
-        price,
-        categories,
-        images,
-        keptImageUrls: getKeptImageUrls(formData),
-    };
-};
-
-const revalidateProducts = () => {
-    revalidatePath("/", "layout");
-    revalidateTag(CONTENTFUL_PRODUCTS_CACHE_TAG);
-};
-
-export async function DELETE(_request: Request, context: DeleteProductRouteContext) {
     try {
+        if (!isAdminRequestSecurityValid(request)) {
+            return NextResponse.json({message: siteContent.admin.unauthorized}, {status: 403});
+        }
+
         if (!await isAdminSession()) {
-            return NextResponse.json({message: ADMIN_UNAUTHORIZED_MESSAGE}, {status: 401});
+            return NextResponse.json({message: siteContent.admin.unauthorized}, {status: 401});
         }
 
         const {id} = await context.params;
 
         if (!id) {
-            throw new Error(DELETE_PRODUCT_ERROR_MESSAGES.missingId);
+            throw new Error(copy.missingId);
         }
 
         const product = await deleteContentfulProduct(id);
@@ -120,26 +35,33 @@ export async function DELETE(_request: Request, context: DeleteProductRouteConte
 
         return NextResponse.json({product});
     } catch (error) {
-        const message = getApiErrorMessage(error, DELETE_PRODUCT_ERROR_MESSAGES.unableToDelete);
+        const message = getApiErrorMessage(error, copy.unableToDelete, siteContent.contentful);
         return NextResponse.json({message}, {status: 400});
     }
 }
 
-export async function PUT(request: Request, context: DeleteProductRouteContext) {
+export async function PUT(request: NextRequest, context: ProductIdRouteContext) {
+    const siteContent = await getSiteContent();
+    const copy = siteContent.updateProduct.errors;
+
     try {
+        if (!isAdminRequestSecurityValid(request)) {
+            return NextResponse.json({message: siteContent.admin.unauthorized}, {status: 403});
+        }
+
         if (!await isAdminSession()) {
-            return NextResponse.json({message: ADMIN_UNAUTHORIZED_MESSAGE}, {status: 401});
+            return NextResponse.json({message: siteContent.admin.unauthorized}, {status: 401});
         }
 
         const {id} = await context.params;
         const formData = await request.formData();
-        const product = await updateContentfulProduct(getUpdateProductInput(formData, id));
+        const product = await updateContentfulProduct(getUpdateProductInput(formData, id, copy));
 
         revalidateProducts();
 
         return NextResponse.json({product});
     } catch (error) {
-        const message = getApiErrorMessage(error, UPDATE_PRODUCT_ERROR_MESSAGES.unableToUpdate);
+        const message = getApiErrorMessage(error, copy.unableToUpdate, siteContent.contentful);
         return NextResponse.json({message}, {status: 400});
     }
 }

@@ -1,6 +1,8 @@
 import type {ItemConfig} from "@/types/item";
 
-export const splitProductCategories = (category: string) => {
+export const splitProductCategories = (category?: string | null) => {
+    if (!category) return [];
+
     return category
         .split(",")
         .map(value => value.trim())

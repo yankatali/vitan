@@ -1,28 +1,48 @@
-"use client";
-
-import Image from "next/image";
 import {createPortal} from "react-dom";
+import {ExistingProductImageItem} from "@/app/components/ProductEditModal/ExistingProductImageItem";
 import {CREATE_PRODUCT_FIELD_NAMES, CREATE_PRODUCT_MODAL_CLASS_NAMES} from "@/constants/createProduct";
-import {UPDATE_PRODUCT_BUTTON_LABELS} from "@/constants/updateProduct";
+import {getUpdateProductSubmitButtonLabel} from "@/lib/productEditModalHelpers";
 import {CloseIcon} from "@/app/components/icon/CloseIcon";
 import {LoadingSpinnerIcon} from "@/app/components/icon/LoadingSpinnerIcon";
 import {PlusIcon} from "@/app/components/icon/PlusIcon";
 import {CategoryMultiSelect} from "@/app/components/CategoryMultiSelect/CategoryMultiSelect";
-import {ProductImagePreviews, ProductImageUploadProgress} from "@/app/components/ProductImagePreviews/ProductImagePreviews";
-import {OriginalProductPriceField, ProductPricingPreview} from "@/app/components/ProductPricingPreview/ProductPricingPreview";
-import {useUpdateProductForm} from "@/app/components/ProductEditModal/useUpdateProductForm";
+import {ProductImagePreviews} from "@/app/components/ProductImagePreviews/ProductImagePreviews";
+import {ProductImageUploadProgress} from "@/app/components/ProductImagePreviews/ProductImageUploadProgress";
+import {ProductPricingPreview} from "@/app/components/ProductPricingPreview/ProductPricingPreview";
+import {useUpdateProductForm} from "@/hooks/useUpdateProductForm";
+import {useSiteContent} from "@/app/components/SiteContentProvider/SiteContentProvider";
 import {useLockScroll} from "@/hooks/useLockScroll";
+import {formatPricePair} from "@/lib/productPricingPreviewHelpers";
+import type {PricingConfig} from "@/types/pricingConfig";
 import type {ProductEditModalProps} from "@/types/updateProduct";
 
-const getSubmitButtonLabel = (isSubmitting: boolean) => {
-    if (isSubmitting) return UPDATE_PRODUCT_BUTTON_LABELS.submitting;
+interface OriginalProductPriceFieldProps {
+    priceUah?: number;
+    pricingConfig?: PricingConfig | null;
+}
 
-    return UPDATE_PRODUCT_BUTTON_LABELS.idle;
+const OriginalProductPriceField = ({priceUah, pricingConfig}: OriginalProductPriceFieldProps) => {
+    const value = typeof priceUah === "number" ? formatPricePair(priceUah, pricingConfig) : "";
+    const copy = useSiteContent().productForm;
+
+    return (
+        <label className={CREATE_PRODUCT_MODAL_CLASS_NAMES.label}>
+            {copy.fields.originalPurchasePrice}
+            <input
+                value={value}
+                className={CREATE_PRODUCT_MODAL_CLASS_NAMES.input}
+                readOnly
+            />
+        </label>
+    );
 };
 
 export const ProductEditModal = ({categoryOptions, isOpen, onClose, onProductUpdated, pricingConfig, product}: ProductEditModalProps) => {
-    useLockScroll(isOpen);
     const hasUsdToUahRate = Boolean(pricingConfig?.usdToUahRate);
+    const siteContent = useSiteContent();
+    const copy = siteContent.productForm;
+
+    useLockScroll(isOpen);
     const {
         error,
         handleBackdropClose,
@@ -54,9 +74,9 @@ export const ProductEditModal = ({categoryOptions, isOpen, onClose, onProductUpd
                 <span className={CREATE_PRODUCT_MODAL_CLASS_NAMES.grabber} aria-hidden="true" />
                 <div className={CREATE_PRODUCT_MODAL_CLASS_NAMES.header}>
                     <div>
-                        <h2 id="edit-product-title" className={CREATE_PRODUCT_MODAL_CLASS_NAMES.title}>Змінити товар</h2>
+                        <h2 id="edit-product-title" className={CREATE_PRODUCT_MODAL_CLASS_NAMES.title}>{copy.editTitle}</h2>
                     </div>
-                    <button type="button" onClick={handleClose} className={CREATE_PRODUCT_MODAL_CLASS_NAMES.closeButton} aria-label="Закрити">
+                    <button type="button" onClick={handleClose} className={CREATE_PRODUCT_MODAL_CLASS_NAMES.closeButton} aria-label={copy.closeAriaLabel}>
                         <CloseIcon />
                     </button>
                 </div>
@@ -64,7 +84,7 @@ export const ProductEditModal = ({categoryOptions, isOpen, onClose, onProductUpd
                 <form onSubmit={handleSubmit} className={CREATE_PRODUCT_MODAL_CLASS_NAMES.form}>
                     <div className={CREATE_PRODUCT_MODAL_CLASS_NAMES.fields}>
                         <label className={CREATE_PRODUCT_MODAL_CLASS_NAMES.label}>
-                            Назва
+                            {copy.fields.name}
                             <input
                                 name={CREATE_PRODUCT_FIELD_NAMES.name}
                                 value={values.name}
@@ -77,7 +97,7 @@ export const ProductEditModal = ({categoryOptions, isOpen, onClose, onProductUpd
                     <OriginalProductPriceField priceUah={product.purchasePriceUah} pricingConfig={pricingConfig} />
 
                     <label className={CREATE_PRODUCT_MODAL_CLASS_NAMES.label}>
-                        Закупочна ціна грн
+                        {copy.fields.purchasePriceUah}
                         <input
                             name={CREATE_PRODUCT_FIELD_NAMES.priceUah}
                             value={values.priceUah}
@@ -91,7 +111,7 @@ export const ProductEditModal = ({categoryOptions, isOpen, onClose, onProductUpd
                     </label>
 
                     <label className={CREATE_PRODUCT_MODAL_CLASS_NAMES.label}>
-                        Закупочна ціна USD
+                        {copy.fields.purchasePriceUsd}
                         <input
                             name={CREATE_PRODUCT_FIELD_NAMES.price}
                             value={values.price}
@@ -101,7 +121,7 @@ export const ProductEditModal = ({categoryOptions, isOpen, onClose, onProductUpd
                             min="0"
                             step="0.01"
                             disabled={!hasUsdToUahRate}
-                            placeholder={hasUsdToUahRate ? undefined : "Немає курсу USD"}
+                            placeholder={hasUsdToUahRate ? undefined : copy.unavailableUsdRatePlaceholder}
                         />
                     </label>
 
@@ -114,7 +134,7 @@ export const ProductEditModal = ({categoryOptions, isOpen, onClose, onProductUpd
                     />
 
                     <label className={CREATE_PRODUCT_MODAL_CLASS_NAMES.label}>
-                        Опис
+                        {copy.fields.description}
                         <textarea
                             name={CREATE_PRODUCT_FIELD_NAMES.description}
                             value={values.description}
@@ -124,9 +144,9 @@ export const ProductEditModal = ({categoryOptions, isOpen, onClose, onProductUpd
                     </label>
 
                     <div className={CREATE_PRODUCT_MODAL_CLASS_NAMES.label}>
-                        <span>Фото</span>
+                        <span>{copy.fields.photo}</span>
                         <div className={CREATE_PRODUCT_MODAL_CLASS_NAMES.existingImages}>
-                            <label className={CREATE_PRODUCT_MODAL_CLASS_NAMES.imageAddTile} aria-label="Додати фото">
+                            <label className={CREATE_PRODUCT_MODAL_CLASS_NAMES.imageAddTile} aria-label={copy.addPhotoAriaLabel}>
                                 <PlusIcon />
                                 <input
                                     name={CREATE_PRODUCT_FIELD_NAMES.image}
@@ -138,24 +158,13 @@ export const ProductEditModal = ({categoryOptions, isOpen, onClose, onProductUpd
                                 />
                             </label>
                             {values.keptImageUrls.map((imageUrl, index) => (
-                                <div key={`${imageUrl}-${index}`} className={CREATE_PRODUCT_MODAL_CLASS_NAMES.existingImageItem}>
-                                    <Image
-                                        src={imageUrl}
-                                        alt={`Фото товару ${index + 1}`}
-                                        width={120}
-                                        height={96}
-                                        className={CREATE_PRODUCT_MODAL_CLASS_NAMES.existingImage}
-                                    />
-                                    <button
-                                        type="button"
-                                        className={CREATE_PRODUCT_MODAL_CLASS_NAMES.existingImageRemoveButton}
-                                        onClick={() => removeExistingImage(imageUrl)}
-                                        aria-label={`Видалити фото ${index + 1}`}
-                                        disabled={isSubmitting}
-                                    >
-                                        <CloseIcon />
-                                    </button>
-                                </div>
+                                <ExistingProductImageItem
+                                    key={`${imageUrl}-${index}`}
+                                    imageUrl={imageUrl}
+                                    index={index}
+                                    isSubmitting={isSubmitting}
+                                    onRemove={removeExistingImage}
+                                />
                             ))}
                             <ProductImagePreviews
                                 images={values.image}
@@ -163,10 +172,10 @@ export const ProductEditModal = ({categoryOptions, isOpen, onClose, onProductUpd
                                 onRemove={removeSelectedImage}
                             />
                         </div>
-                        <span className={CREATE_PRODUCT_MODAL_CLASS_NAMES.hint}>Нові фото додадуться до поточних.</span>
+                        <span className={CREATE_PRODUCT_MODAL_CLASS_NAMES.hint}>{copy.newImagesHint}</span>
                         {values.image.length > 0 && (
                             <span className={CREATE_PRODUCT_MODAL_CLASS_NAMES.selectedImages}>
-                                Вибрано нових фото: {values.image.length}
+                                {copy.selectedNewImagesPrefix} {values.image.length}
                             </span>
                         )}
                         {uploadProgress !== null && <ProductImageUploadProgress progress={uploadProgress} />}
@@ -177,11 +186,11 @@ export const ProductEditModal = ({categoryOptions, isOpen, onClose, onProductUpd
 
                     <div className={CREATE_PRODUCT_MODAL_CLASS_NAMES.actions}>
                         <button type="button" onClick={handleClose} className={CREATE_PRODUCT_MODAL_CLASS_NAMES.secondaryButton} disabled={isSubmitting}>
-                            Скасувати
+                            {copy.cancelButton}
                         </button>
                         <button type="submit" className={CREATE_PRODUCT_MODAL_CLASS_NAMES.primaryButton} disabled={isSubmitting}>
                             {isSubmitting && <LoadingSpinnerIcon />}
-                            {getSubmitButtonLabel(isSubmitting)}
+                            {getUpdateProductSubmitButtonLabel(isSubmitting, siteContent.updateProduct.buttons)}
                         </button>
                     </div>
                 </form>

@@ -1,5 +1,4 @@
-const NAV_BOTTOM = 85;
-const BAR_BOTTOM = NAV_BOTTOM + 5;
+import {BAR_BOTTOM} from "@/constants/pageLayout";
 
 export const useBarBottom = () => {
     return BAR_BOTTOM;

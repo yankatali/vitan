@@ -1,3 +1,5 @@
+import {ADMIN_REQUEST_HEADER_NAME, ADMIN_REQUEST_HEADER_VALUE} from "@/constants/admin";
+
 export type UploadProgressHandler = (progress: number) => void;
 
 interface SendFormDataRequestParams<TResponse> {
@@ -41,6 +43,7 @@ export const sendFormDataRequest = <TResponse>({
         const request = new XMLHttpRequest();
 
         request.open(method, url);
+        request.setRequestHeader(ADMIN_REQUEST_HEADER_NAME, ADMIN_REQUEST_HEADER_VALUE);
 
         request.upload.addEventListener("loadstart", () => {
             onUploadProgress?.(0);

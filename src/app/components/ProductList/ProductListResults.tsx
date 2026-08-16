@@ -1,16 +1,10 @@
-"use client";
-
 import {ItemComponent} from "@/app/ItemComponent/ItemComponent";
+import {getCardCategory} from "@/lib/productListResultsHelpers";
+import {useSiteContent} from "@/app/components/SiteContentProvider/SiteContentProvider";
 import {useCartWholesaleStatus} from "@/hooks/useCartWholesaleStatus";
 import {getMarkedUpUahPrice, getUsdPriceFromUah} from "@/lib/productPricing";
 import {getWholesaleDescriptionText, getWholesaleTooltipText} from "@/lib/wholesalePricing";
 import type {ProductListResultsProps} from "@/types/productList";
-
-const getCardCategory = (showCategoryOnCard: boolean, category: string) => {
-    if (showCategoryOnCard) return category;
-
-    return undefined;
-};
 
 export const ProductListResults = ({
     categoryOptions,
@@ -29,25 +23,27 @@ export const ProductListResults = ({
     usdToUahRate,
     pricingConfig,
 }: ProductListResultsProps) => {
+    const siteContent = useSiteContent();
+    const copy = siteContent.catalog.results;
     const effectiveRate = showAdminActions ? pricingConfig?.usdToUahRate ?? usdToUahRate : null;
     const retailMarkup = showAdminActions ? pricingConfig?.retailMarkup ?? 30 : 0;
     const wholesaleMarkup = showAdminActions ? pricingConfig?.wholesaleMarkup ?? 15 : 0;
-    const wholesaleDescription = showAdminActions ? getWholesaleDescriptionText(pricingConfig) : "";
+    const wholesaleDescription = showAdminActions ? getWholesaleDescriptionText(pricingConfig, "", siteContent.wholesale) : "";
     const {
         isWholesaleActive,
     } = useCartWholesaleStatus(cartPricingProducts, pricingConfig);
-    const wholesaleActiveDescription = getWholesaleTooltipText(pricingConfig, wholesaleDescription);
+    const wholesaleActiveDescription = getWholesaleTooltipText(pricingConfig, wholesaleDescription, siteContent.wholesale);
 
     if (error) {
         return <p className={messageClassName} role="alert">{error}</p>;
     }
 
     if (isLoading && !items.length) {
-        return <p className={messageClassName} role="status">Завантаження товарів...</p>;
+        return <p className={messageClassName} role="status">{copy.loading}</p>;
     }
 
     if (!items.length) {
-        return <p className={messageClassName}>За цим пошуком товари не знайдено.</p>;
+        return <p className={messageClassName}>{copy.empty}</p>;
     }
 
     return (

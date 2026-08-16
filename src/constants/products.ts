@@ -14,13 +14,6 @@ export const PRODUCT_SORT_OPTIONS: CatalogSortOption[] = [
     "titleAsc",
 ];
 
-export const PRODUCT_SORT_LABELS: Record<CatalogSortOption, string> = {
-    newest: "Спочатку нові",
-    priceAsc: "Ціна: від дешевих",
-    priceDesc: "Ціна: від дорогих",
-    titleAsc: "Назва: А-Я",
-};
-
 export const EMPTY_PRODUCTS_RESULT: ProductsResult = {
     items: [],
     total: 0,

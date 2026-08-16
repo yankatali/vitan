@@ -1,10 +1,7 @@
+import {CART_STORAGE_KEY, MIN_CART_QUANTITY} from "@/constants/cart";
 import type {CartStorageItem} from "@/types/cart";
 import type {ItemConfig} from "@/types/item";
 import {notifySavedProductsChanged} from "@/lib/savedProductsEvents";
-
-export const CART_STORAGE_KEY = "vitan-cart-product-ids";
-
-const MIN_CART_QUANTITY = 1;
 
 export type CartPriceSnapshot = Pick<CartStorageItem, "priceUah" | "priceUahWholesale">;
 
@@ -30,12 +27,20 @@ const normalizeCartItems = (items: CartStorageItem[]) => {
 
     items.forEach(item => {
         const existingItem = itemsByProductId.get(item.productId);
-        const nextItem = {
+        const nextItem: CartStorageItem = {
             productId: item.productId,
             quantity: (existingItem?.quantity ?? 0) + item.quantity,
-            priceUah: item.priceUah ?? existingItem?.priceUah,
-            priceUahWholesale: item.priceUahWholesale ?? existingItem?.priceUahWholesale,
         };
+        const priceUah = item.priceUah ?? existingItem?.priceUah;
+        const priceUahWholesale = item.priceUahWholesale ?? existingItem?.priceUahWholesale;
+
+        if (priceUah !== undefined) {
+            nextItem.priceUah = priceUah;
+        }
+
+        if (priceUahWholesale !== undefined) {
+            nextItem.priceUahWholesale = priceUahWholesale;
+        }
 
         itemsByProductId.set(item.productId, nextItem);
     });
@@ -91,8 +96,12 @@ export const addProductToCart = (
 
     if (existingItem) {
         existingItem.quantity += Math.max(quantity, MIN_CART_QUANTITY);
-        existingItem.priceUah = priceSnapshot?.priceUah ?? existingItem.priceUah;
-        existingItem.priceUahWholesale = priceSnapshot?.priceUahWholesale ?? existingItem.priceUahWholesale;
+        if (priceSnapshot && "priceUah" in priceSnapshot) {
+            existingItem.priceUah = priceSnapshot.priceUah;
+        }
+        if (priceSnapshot && "priceUahWholesale" in priceSnapshot) {
+            existingItem.priceUahWholesale = priceSnapshot.priceUahWholesale;
+        }
         setCartItems(currentItems);
 
         return existingItem.quantity;

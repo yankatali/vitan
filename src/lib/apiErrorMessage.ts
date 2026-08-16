@@ -1,3 +1,5 @@
+import type {SiteContent} from "@/constants/siteContent";
+
 interface ContentfulValidationError {
     name?: unknown;
     value?: unknown;
@@ -25,7 +27,9 @@ const parseErrorMessagePayload = (message: string): unknown => {
     }
 };
 
-const getContentfulValidationMessage = (payload: unknown) => {
+type ContentfulErrorCopy = SiteContent["contentful"];
+
+const getContentfulValidationMessage = (payload: unknown, copy?: ContentfulErrorCopy) => {
     if (!isRecord(payload)) return null;
 
     const contentfulPayload = payload as ContentfulErrorPayload;
@@ -42,11 +46,13 @@ const getContentfulValidationMessage = (payload: unknown) => {
             ? categoryError.expected.filter((item): item is string => typeof item === "string")
             : [];
 
-        if (value && expected.length) {
-            return `Категорія "${value}" недоступна. Оберіть одну з: ${expected.join(", ")}.`;
+        if (value && expected.length && copy) {
+            return copy.categoryUnavailableWithExpected
+                .replace("{value}", value)
+                .replace("{expected}", expected.join(", "));
         }
 
-        return "Обрана категорія недоступна в Contentful.";
+        return copy?.categoryUnavailable ?? null;
     }
 
     const firstError = validationErrors[0];
@@ -55,13 +61,25 @@ const getContentfulValidationMessage = (payload: unknown) => {
     return typeof contentfulPayload.message === "string" ? contentfulPayload.message : null;
 };
 
-export const getApiErrorMessage = (error: unknown, fallbackMessage: string) => {
+export const getApiErrorMessage = (error: unknown, fallbackMessage: string, contentfulCopy?: ContentfulErrorCopy) => {
     if (error instanceof Error && error.message) {
-        return getContentfulValidationMessage(parseErrorMessagePayload(error.message)) ?? error.message;
+        return getContentfulValidationMessage(parseErrorMessagePayload(error.message), contentfulCopy) ?? error.message;
     }
 
     if (error && typeof error === "object" && "message" in error && typeof error.message === "string") {
-        return getContentfulValidationMessage(parseErrorMessagePayload(error.message)) ?? error.message;
+        return getContentfulValidationMessage(parseErrorMessagePayload(error.message), contentfulCopy) ?? error.message;
+    }
+
+    return fallbackMessage;
+};
+
+export const getPayloadErrorMessage = (payload: unknown, fallbackMessage: string) => {
+    if (payload && typeof payload === "object" && "message" in payload && typeof payload.message === "string") {
+        return payload.message;
+    }
+
+    if (payload && typeof payload === "object" && "error" in payload && typeof payload.error === "string") {
+        return payload.error;
     }
 
     return fallbackMessage;

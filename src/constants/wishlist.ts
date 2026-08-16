@@ -1,5 +1,7 @@
 import {PAGE_CONTENT_PX, CARD_GRID_GAP} from "@/constants/pageLayout";
 
+export const WISHLIST_STORAGE_KEY = "vitan-favorite-product-ids";
+
 export const WISHLIST_CLASS_NAMES = {
     page: "flex flex-col text-[var(--text-primary)] overflow-x-clip",
 

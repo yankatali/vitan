@@ -5,6 +5,7 @@ export const CONTENTFUL_DEFAULT_ENVIRONMENT = "master";
 export const CONTENTFUL_DEFAULT_LOCALE = "en-US";
 export const CONTENTFUL_PRODUCT_CONTENT_TYPE = "product";
 export const CONTENTFUL_PRICING_CONFIG_CONTENT_TYPE = "pricingConfig";
+export const CONTENTFUL_SITE_CONTENT_CONTENT_TYPE = "siteContent";
 
 export const CONTENTFUL_PRODUCT_FIELD_IDS = {
     name: "name",
@@ -23,7 +24,12 @@ export const CONTENTFUL_PRICING_CONFIG_FIELD_IDS = {
     descriptionAfterOptValid: "descriptionAfterOptValid",
 };
 
+export const CONTENTFUL_SITE_CONTENT_FIELD_IDS = {
+    name: "name",
+    config: "config",
+};
+
 export const CONTENTFUL_MISSING_ENV_MESSAGES: Record<string, string> = {
-    [CONTENTFUL_MANAGEMENT_TOKEN_ENV]: "CONTENTFUL_MANAGEMENT_TOKEN не заданий у .env.local. Створення товарів потребує Contentful Management API token.",
-    [CONTENTFUL_SPACE_ID_ENV]: "CONTENTFUL_SPACE_ID не заданий у .env.local.",
+    [CONTENTFUL_MANAGEMENT_TOKEN_ENV]: "Missing required environment variable: CONTENTFUL_MANAGEMENT_TOKEN",
+    [CONTENTFUL_SPACE_ID_ENV]: "Missing required environment variable: CONTENTFUL_SPACE_ID",
 };

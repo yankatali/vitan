@@ -1,5 +1,3 @@
-import type {HeaderConfig} from "@/types/header";
-
 export const HEADER_NAV_CLASS_NAMES = {
     header: "sticky top-0 z-40 w-full border-b-[0.5px] border-white/35 bg-white/40 px-6 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.7),inset_0_-1px_0_rgba(0,0,0,0.03),0_1px_3px_rgba(0,0,0,0.04)] backdrop-blur-2xl backdrop-saturate-[180%] backdrop-brightness-[1.05]",
     content: "flex items-center justify-center lg:justify-between",
@@ -15,11 +13,3 @@ export const HEADER_NAV_CLASS_NAMES = {
 
 export const HEADER_HOME_ICON_NAME = "home";
 export const PRODUCT_GRID_WITH_MOBILE_NAV_SPACING = "pb-4";
-export const DEFAULT_HEADER_CONFIG: HeaderConfig = {
-    title: "Vitan",
-    headerButtons: [
-        {url: "/", label: "Покупки", iconName: "shop"},
-        {url: "/wishlist", label: "Вибране", iconName: "wishlist"},
-        {url: "/cart", label: "Кошик", iconName: "cart"},
-    ],
-};

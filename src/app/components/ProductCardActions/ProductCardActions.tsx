@@ -1,31 +1,19 @@
-"use client";
-
 import dynamic from "next/dynamic";
+import {useState} from "react";
 import CartIcon from "@/app/components/icon/CartIcon";
 import {PencilIcon} from "@/app/components/icon/PencilIcon";
 import {TrashIcon} from "@/app/components/icon/TrashIcon";
-import {PRODUCT_CARD_ACTION_CLASS_NAMES, PRODUCT_CARD_ACTION_LABELS} from "@/constants/productCardActions";
-import {useProductCardActions} from "@/app/components/ProductCardActions/useProductCardActions";
+import {PRODUCT_CARD_ACTION_CLASS_NAMES} from "@/constants/productCardActions";
+import {getCartButtonClassName, getDeleteButtonLabel} from "@/lib/productCardActionHelpers";
+import {useProductCardActions} from "@/hooks/useProductCardActions";
 import type {ProductCardActionsProps} from "@/types/productCardActions";
-import {useState} from "react";
 import {ConfirmModal} from "@/app/components/ConfirmModal/ConfirmModal";
+import {useSiteContent} from "@/app/components/SiteContentProvider/SiteContentProvider";
 
-const ProductEditModal = dynamic(
+const DynamicProductEditModal = dynamic(
     () => import("@/app/components/ProductEditModal/ProductEditModal").then(module => module.ProductEditModal),
     {ssr: false},
 );
-
-const getCartButtonClassName = (isInCart: boolean) => {
-    if (isInCart) return PRODUCT_CARD_ACTION_CLASS_NAMES.activeCartButton;
-
-    return PRODUCT_CARD_ACTION_CLASS_NAMES.cartButton;
-};
-
-const getDeleteButtonLabel = (isDeleting: boolean) => {
-    if (isDeleting) return PRODUCT_CARD_ACTION_LABELS.deleting;
-
-    return PRODUCT_CARD_ACTION_LABELS.delete;
-};
 
 export const ProductCardActions = ({
     categoryOptions,
@@ -35,6 +23,10 @@ export const ProductCardActions = ({
     showAdminActions = false,
     showCartButton = true,
 }: ProductCardActionsProps) => {
+    const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+    const [isCartRemoveConfirmOpen, setIsCartRemoveConfirmOpen] = useState(false);
+    const copy = useSiteContent().productActions;
+
     const {
         closeEdit,
         error,
@@ -46,8 +38,7 @@ export const ProductCardActions = ({
         isInCart,
         openEdit,
     } = useProductCardActions({onProductChanged, product});
-    const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-    const [isCartRemoveConfirmOpen, setIsCartRemoveConfirmOpen] = useState(false);
+
     const handleCartButtonClick = () => {
         if (isInCart) {
             setIsCartRemoveConfirmOpen(true);
@@ -76,7 +67,7 @@ export const ProductCardActions = ({
                         type="button"
                         onClick={openEdit}
                         className={PRODUCT_CARD_ACTION_CLASS_NAMES.iconButton}
-                        aria-label={PRODUCT_CARD_ACTION_LABELS.edit}
+                        aria-label={copy.edit}
                     >
                         <PencilIcon size={20} />
                     </button>
@@ -85,7 +76,7 @@ export const ProductCardActions = ({
                         type="button"
                         onClick={() => setIsConfirmOpen(true)}
                         className={PRODUCT_CARD_ACTION_CLASS_NAMES.dangerButton}
-                        aria-label={getDeleteButtonLabel(isDeleting)}
+                        aria-label={getDeleteButtonLabel(isDeleting, copy)}
                         disabled={isDeleting}
                     >
                         <TrashIcon size={20} />
@@ -96,7 +87,7 @@ export const ProductCardActions = ({
             {error && <p className={PRODUCT_CARD_ACTION_CLASS_NAMES.error}>{error}</p>}
 
             {showAdminActions && (
-                <ProductEditModal
+                <DynamicProductEditModal
                     categoryOptions={categoryOptions}
                     isOpen={isEditOpen}
                     onClose={closeEdit}
@@ -108,7 +99,7 @@ export const ProductCardActions = ({
             {isConfirmOpen && (
                 <ConfirmModal
                     isOpen={isConfirmOpen}
-                    text="Ви точно хочете видалити цей товар?"
+                    text={copy.confirmDelete}
                     isLoading={isDeleting}
                     onCancel={() => setIsConfirmOpen(false)}
                     onConfirm={async () => {
@@ -121,7 +112,7 @@ export const ProductCardActions = ({
             {isCartRemoveConfirmOpen && (
                 <ConfirmModal
                     isOpen={isCartRemoveConfirmOpen}
-                    text="Ви точно хочете видалити цей товар з кошика?"
+                    text={copy.confirmDeleteFromCart}
                     onCancel={() => setIsCartRemoveConfirmOpen(false)}
                     onConfirm={() => {
                         handleCartRemove();

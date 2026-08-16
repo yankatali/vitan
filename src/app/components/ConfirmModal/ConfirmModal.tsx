@@ -1,4 +1,5 @@
 import {createPortal} from "react-dom";
+import {useSiteContent} from "@/app/components/SiteContentProvider/SiteContentProvider";
 import {useLockScroll} from "@/hooks/useLockScroll";
 
 interface ConfirmModalProps {
@@ -10,13 +11,14 @@ interface ConfirmModalProps {
 }
 
 export const ConfirmModal = ({
-                                 isOpen,
-                                 text,
-                                 onCancel,
-                                 onConfirm,
-                                 isLoading = false,
-                             }: ConfirmModalProps) => {
+     isOpen,
+     text,
+     onCancel,
+     onConfirm,
+     isLoading = false,
+ }: ConfirmModalProps) => {
     useLockScroll(isOpen);
+    const copy = useSiteContent().common;
     if (!isOpen || typeof document === "undefined") return null;
 
     return createPortal(
@@ -37,7 +39,7 @@ export const ConfirmModal = ({
                             className="rounded-[var(--radius-capsule)] bg-[var(--fill)] px-5 py-2.5 text-sm font-semibold text-[var(--text-primary)] transition-transform hover:bg-[var(--fill-secondary)] active:scale-[0.96]"
                             onClick={onCancel}
                         >
-                            Скасувати
+                            {copy.confirmCancelButton}
                         </button>
 
                         <button
@@ -52,7 +54,7 @@ export const ConfirmModal = ({
                                     <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
                                 </svg>
                             )}
-                            Видалити
+                            {copy.confirmDeleteButton}
                         </button>
                     </div>
                 </div>

@@ -2,22 +2,25 @@
 
 import Link from "next/link";
 import {useEffect, useMemo, useState} from "react";
-import {WISHLIST_CLASS_NAMES} from "@/constants/wishlist";
-import {PRODUCT_CARD_ACTION_CLASS_NAMES} from "@/constants/productCardActions";
+import {WISHLIST_CLASS_NAMES, WISHLIST_STORAGE_KEY} from "@/constants/wishlist";
+import {PAGE_CONTENT_PX} from "@/constants/pageLayout";
+import {useSiteContent} from "@/app/components/SiteContentProvider/SiteContentProvider";
 import {addProductToCart, getCartPriceSnapshot, removeProductFromCart} from "@/lib/cartStorage";
 import {SAVED_PRODUCTS_CHANGE_EVENT} from "@/lib/savedProductsEvents";
-import {getWishlistIds, toggleWishlistProduct, WISHLIST_STORAGE_KEY} from "@/lib/wishlistStorage";
+import {getWishlistIds, toggleWishlistProduct} from "@/lib/wishlistStorage";
 import type {ItemConfig} from "@/types/item";
-import type {WishlistProductItem} from "@/types/wishlist";
 import {useBarBottom} from "@/hooks/useBarBottom";
 import {useCartWholesaleStatus} from "@/hooks/useCartWholesaleStatus";
 import {useFooterBottomInset} from "@/hooks/useFooterBottomInset";
 import {PageHeader} from "@/app/components/PageHeader/PageHeader";
+import {HeaderBrandLink} from "@/app/components/HeaderBrandLink/HeaderBrandLink";
 import {ConfirmModal} from "@/app/components/ConfirmModal/ConfirmModal";
-import {ProductCardSimple} from "@/app/components/ProductCardSimple/ProductCardSimple";
-import {RelatedProductsRow, getCategoriesFromProducts, getRelatedProducts} from "@/app/components/RelatedProductsRow/RelatedProductsRow";
-import CartIcon from "@/app/components/icon/CartIcon";
+import {RelatedProductsRow} from "@/app/components/RelatedProductsRow/RelatedProductsRow";
+import {WishlistProductCard} from "@/app/wishlist/WishlistProductCard";
+import {getWishlistProducts} from "@/lib/wishlistProducts";
+import {getCategoriesFromProducts, getRelatedProducts} from "@/lib/relatedProducts";
 import WishlistIcon from "@/app/components/icon/WishlistIcon";
+import {formatUah} from "@/lib/formatters";
 import {getProductPriceUah, getWholesaleTooltipText} from "@/lib/wholesalePricing";
 import type {PricingConfig} from "@/types/pricingConfig";
 
@@ -26,30 +29,56 @@ interface WishlistClientProps {
     pricingConfig?: PricingConfig | null;
 }
 
-const formatUah = (value: number) => {
-    const formatted = new Intl.NumberFormat("uk-UA", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-    }).format(value);
-    return `${formatted} ₴`;
-};
+interface WishlistBottomCtaProps {
+    bottom: number;
+    productCount: number;
+    totalPrice: number;
+    buttonText: string;
+}
 
-const getWishlistProducts = (wishlistIds: string[], products: ItemConfig[]): WishlistProductItem[] => {
-    return wishlistIds
-        .map(productId => {
-            const product = products.find(item => item.id === productId);
-            if (!product) return null;
-            return {product};
-        })
-        .filter((item): item is WishlistProductItem => Boolean(item));
+const WishlistBottomCta = ({bottom, productCount, totalPrice, buttonText}: WishlistBottomCtaProps) => {
+    const copy = useSiteContent().common;
+
+    return (
+        <div className="vitan-bottom-cta-global fixed left-1/2 z-30 w-[min(calc(100vw-1.5rem),30rem)] -translate-x-1/2" style={{bottom: `${bottom}px`}}>
+            <div className="flex items-stretch justify-between gap-2 overflow-hidden rounded-full border-[0.5px] border-white/55 bg-white/90 pl-[27px] pr-[6px] py-[6px] shadow-[0_1px_8px_rgba(0,0,0,0.08)]">
+                <div className="flex flex-col justify-center">
+                    <p className="text-[10px] text-[var(--text-secondary)]">{productCount} {copy.productCountSuffix}</p>
+                    <p className="text-[14px] font-bold leading-5">{formatUah(totalPrice)}</p>
+                </div>
+                <Link
+                    href="/cart"
+                    className="vitan-accent-button self-stretch shrink-0 flex items-center rounded-[var(--radius-lg)] px-4 text-[12px] font-semibold whitespace-nowrap"
+                >
+                    {buttonText}
+                </Link>
+            </div>
+        </div>
+    );
 };
 
 export const WishlistClient = ({products, pricingConfig}: WishlistClientProps) => {
     const [wishlistIds, setWishlistIds] = useState<string[]>([]);
     const [confirmCartRemoveId, setConfirmCartRemoveId] = useState<string | null>(null);
+
+    const siteContent = useSiteContent();
+    const copy = siteContent.wishlist;
+    const wholesaleTooltipText = getWholesaleTooltipText(pricingConfig, "", siteContent.wholesale);
     const barBottom = useBarBottom();
     const {cartItems, isWholesaleActive} = useCartWholesaleStatus(products, pricingConfig);
+
     const productsById = useMemo(() => new Map(products.map(product => [product.id, product])), [products]);
+    const wishlistProducts = useMemo(() => getWishlistProducts(wishlistIds, productsById), [productsById, wishlistIds]);
+    const cartProductIds = useMemo(() => new Set(cartItems.map(item => item.productId)), [cartItems]);
+    const relatedProducts = useMemo(() => {
+        const wishlistItemConfigs = wishlistProducts.map(w => w.product);
+        const categories = getCategoriesFromProducts(wishlistItemConfigs);
+        const excludeIds = new Set(wishlistIds);
+        return getRelatedProducts(excludeIds, categories, products);
+    }, [wishlistProducts, wishlistIds, products]);
+    const totalPrice = useMemo(() => wishlistProducts.reduce((sum, item) => {
+        return sum + (getProductPriceUah(item.product, isWholesaleActive, pricingConfig) ?? 0);
+    }, 0), [wishlistProducts, isWholesaleActive, pricingConfig]);
 
     useEffect(() => {
         if (products.length > 0) {
@@ -77,23 +106,7 @@ export const WishlistClient = ({products, pricingConfig}: WishlistClientProps) =
             window.removeEventListener("storage", handleStorage);
             window.removeEventListener("pageshow", syncWishlist);
         };
-    }, []);
-
-    const wishlistProducts = useMemo(() => getWishlistProducts(wishlistIds, products), [products, wishlistIds]);
-    const cartProductIds = useMemo(() => new Set(cartItems.map(item => item.productId)), [cartItems]);
-
-    const relatedProducts = useMemo(() => {
-        const wishlistItemConfigs = wishlistProducts.map(w => w.product);
-        const categories = getCategoriesFromProducts(wishlistItemConfigs);
-        const excludeIds = new Set(wishlistIds);
-        return getRelatedProducts(excludeIds, categories, products);
-    }, [wishlistProducts, wishlistIds, products]);
-
-    const wholesaleTooltipText = getWholesaleTooltipText(pricingConfig);
-
-    const totalPrice = useMemo(() => wishlistProducts.reduce((sum, item) => {
-        return sum + (getProductPriceUah(item.product, isWholesaleActive, pricingConfig) ?? 0);
-    }, 0), [wishlistProducts, isWholesaleActive, pricingConfig]);
+    }, [products]);
 
     useFooterBottomInset({enabled: wishlistProducts.length > 0});
 
@@ -108,17 +121,17 @@ export const WishlistClient = ({products, pricingConfig}: WishlistClientProps) =
 
     return (
         <main className={WISHLIST_CLASS_NAMES.page}>
-            <div className="sticky top-0 z-20 px-3 pt-3">
+            <div className={`sticky top-0 z-20 pt-3 ${PAGE_CONTENT_PX}`}>
                 <PageHeader>
-                    <div className="flex items-center gap-3">
-                        <Link href="/" className="inline-flex h-[28px] w-full items-center justify-start rounded-full text-[var(--text-primary)] transition-opacity active:opacity-60" aria-label="Назад">
+                    <div className="flex items-center gap-1 md:gap-3">
+                        <Link href="/" className="inline-flex h-[28px] w-[28px] shrink-0 items-center justify-start rounded-full text-[var(--text-primary)] transition-opacity active:opacity-60" aria-label={siteContent.navigation.backAriaLabel}>
                             <svg width="12" height="20" viewBox="0 0 12 20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10 2L2 10l8 8"/></svg>
                         </Link>
-                        <Link href="/" className={WISHLIST_CLASS_NAMES.homeLink}>Вітан</Link>
+                        <HeaderBrandLink />
                     </div>
                     <div className="flex items-center gap-1.5">
                         <WishlistIcon size={20} filled />
-                        <h1 className={WISHLIST_CLASS_NAMES.title}>Вибране</h1>
+                        <h1 className={WISHLIST_CLASS_NAMES.title}>{copy.title}</h1>
                     </div>
                 </PageHeader>
             </div>
@@ -126,47 +139,22 @@ export const WishlistClient = ({products, pricingConfig}: WishlistClientProps) =
             <section className={WISHLIST_CLASS_NAMES.content}>
                 {!wishlistIds.length ? (
                     <div className={WISHLIST_CLASS_NAMES.emptyState}>
-                        Список вибраного порожній. Додайте товари з каталогу.
+                        {copy.empty}
                     </div>
                 ) : (
                     <>
                         <div className={WISHLIST_CLASS_NAMES.list}>
-                            {wishlistProducts.map(({product: item}) => {
-
-                                const isInCart = cartProductIds.has(item.id);
-                                const priceUah = item.priceUah ?? null;
-                                const priceUahWholesale = item.priceUahWholesale ?? null;
-
-                                return (
-                                    <ProductCardSimple
-                                        key={item.id}
-                                        className="vitan-product-card--wishlist"
-                                        item={item}
-                                        priceUah={priceUah}
-                                        priceUahWholesale={priceUahWholesale}
-                                        wholesaleDescription={item.wholesaleDescription ?? ""}
-                                        wholesaleActiveDescription={wholesaleTooltipText}
-                                        wholesaleAsPrimary={isWholesaleActive}
-                                        cartAction={
-                                            <button
-                                                type="button"
-                                                onClick={() => {
-                                                    if (isInCart) {
-                                                        setConfirmCartRemoveId(item.id);
-                                                        return;
-                                                    }
-                                                    handleAddToCart(item.id);
-                                                }}
-                                                className={isInCart ? PRODUCT_CARD_ACTION_CLASS_NAMES.activeCartButton : PRODUCT_CARD_ACTION_CLASS_NAMES.cartButton}
-                                                aria-pressed={isInCart}
-                                                aria-label={isInCart ? "У кошику" : "В кошик"}
-                                            >
-                                                <CartIcon size={24} checked={isInCart} />
-                                            </button>
-                                        }
-                                    />
-                                );
-                            })}
+                            {wishlistProducts.map(({product}) => (
+                                <WishlistProductCard
+                                    key={product.id}
+                                    item={product}
+                                    isInCart={cartProductIds.has(product.id)}
+                                    isWholesaleActive={isWholesaleActive}
+                                    wholesaleTooltipText={wholesaleTooltipText}
+                                    onAddToCart={handleAddToCart}
+                                    onRequestCartRemove={setConfirmCartRemoveId}
+                                />
+                            ))}
                         </div>
 
                         <RelatedProductsRow
@@ -183,26 +171,18 @@ export const WishlistClient = ({products, pricingConfig}: WishlistClientProps) =
             </section>
 
             {wishlistProducts.length > 0 && (
-                <div className="vitan-bottom-cta-global fixed left-1/2 z-30 w-[min(calc(100vw-1.5rem),30rem)] -translate-x-1/2" style={{bottom: `${barBottom}px`}}>
-                    <div className="flex items-stretch justify-between gap-2 overflow-hidden rounded-full border-[0.5px] border-white/55 bg-white/90 pl-[27px] pr-[6px] py-[6px] shadow-[0_1px_8px_rgba(0,0,0,0.08)]">
-                        <div className="flex flex-col justify-center">
-                            <p className="text-[10px] text-[var(--text-secondary)]">{wishlistIds.length} товарів</p>
-                            <p className="text-[14px] font-bold leading-5">{formatUah(totalPrice)}</p>
-                        </div>
-                        <Link
-                            href="/cart"
-                            className="vitan-accent-button self-stretch shrink-0 flex items-center rounded-[var(--radius-lg)] px-4 text-[12px] font-semibold whitespace-nowrap"
-                        >
-                            Перейти до кошика
-                        </Link>
-                    </div>
-                </div>
+                <WishlistBottomCta
+                    bottom={barBottom}
+                    productCount={wishlistIds.length}
+                    totalPrice={totalPrice}
+                    buttonText={copy.goToCartButton}
+                />
             )}
 
             {confirmCartRemoveId && (
                 <ConfirmModal
                     isOpen={Boolean(confirmCartRemoveId)}
-                    text="Ви точно хочете видалити цей товар з кошика?"
+                    text={siteContent.cart.confirmRemove}
                     onCancel={() => setConfirmCartRemoveId(null)}
                     onConfirm={() => {
                         handleRemoveFromCart(confirmCartRemoveId);

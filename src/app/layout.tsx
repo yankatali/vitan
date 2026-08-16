@@ -1,45 +1,28 @@
 import type { Metadata } from "next";
-import { Unbounded, Playfair_Display, Raleway, Manrope } from "next/font/google";
+import {manrope, playfair, raleway, unbounded} from "@/app/fonts";
 import Header from "@/app/components/Header/Header";
 import {Footer} from "@/app/components/Footer/Footer";
-import {DEFAULT_HEADER_CONFIG} from "@/constants/header";
+import {SiteContentProvider} from "@/app/components/SiteContentProvider/SiteContentProvider";
 import {isAdminSession} from "@/lib/adminAuth";
+import {getSiteContent} from "@/lib/siteContent";
+import type {HeaderConfig} from "@/types/header";
 import "./globals.css";
 
-// Brand name font — варіант 1: Unbounded (геометричний bold)
-const unbounded = Unbounded({
-  variable: "--font-brand-1",
-  subsets: ["latin", "cyrillic"],
-  weight: ["700", "800"],
-  display: "swap",
-});
+export const generateMetadata = async (): Promise<Metadata> => {
+    const siteContent = await getSiteContent();
 
-// Brand name font — варіант 2: Playfair Display (елегантний serif)
-const playfair = Playfair_Display({
-  variable: "--font-brand-2",
-  subsets: ["latin", "cyrillic"],
-  weight: ["700", "800"],
-  display: "swap",
-});
-
-// Brand name font — варіант 3: Raleway (чистий геометричний)
-const raleway = Raleway({
-  variable: "--font-brand-3",
-  subsets: ["latin", "cyrillic"],
-  weight: ["700", "800"],
-  display: "swap",
-});
-
-// Основний шрифт для всього тексту
-const manrope = Manrope({
-  variable: "--font-manrope",
-  subsets: ["latin", "cyrillic"],
-  display: "swap",
-});
-
-export const metadata: Metadata = {
-  title: "Vitan",
-  description: "Інтернет-магазин Vitan",
+    return {
+        title: siteContent.metadata.title,
+        description: siteContent.metadata.description,
+        icons: {
+            icon: [
+                {url: "/favicon.ico", sizes: "16x16 32x32 48x48"},
+                {url: "/icon.png", type: "image/png", sizes: "312x312"},
+            ],
+            shortcut: "/favicon.ico",
+            apple: [{url: "/icon.png", type: "image/png", sizes: "312x312"}],
+        },
+    };
 };
 
 export default async function RootLayout({
@@ -47,17 +30,30 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-    const isAdmin = await isAdminSession();
+    const [isAdmin, siteContent] = await Promise.all([
+        isAdminSession(),
+        getSiteContent(),
+    ]);
+    const headerConfig: HeaderConfig = {
+        title: siteContent.brand.contentfulTitle,
+        headerButtons: [
+            {url: "/", label: siteContent.navigation.headerButtons.shop, iconName: "shop"},
+            {url: "/wishlist", label: siteContent.navigation.headerButtons.wishlist, iconName: "wishlist"},
+            {url: "/cart", label: siteContent.navigation.headerButtons.cart, iconName: "cart"},
+        ],
+    };
 
     return (
     <html lang="uk">
         <body
-            className={`${unbounded.variable} ${playfair.variable} ${raleway.variable} ${manrope.variable} antialiased`}
+            className={`${unbounded.variable} ${playfair.variable} ${raleway.variable} ${manrope.variable} vitan-app-body antialiased`}
         >
-            <div className="bg-layer" aria-hidden="true" />
-            <Header config={DEFAULT_HEADER_CONFIG} />
-            <div className='container min-w-full'>{children}</div>
-            <Footer isAdmin={isAdmin} />
+            <SiteContentProvider content={siteContent}>
+                <div className="bg-layer" aria-hidden="true" />
+                <Header config={headerConfig} />
+                <div className="vitan-app-main">{children}</div>
+                <Footer isAdmin={isAdmin} />
+            </SiteContentProvider>
         </body>
     </html>
     );

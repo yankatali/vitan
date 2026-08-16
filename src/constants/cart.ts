@@ -1,5 +1,8 @@
 import {PAGE_CONTENT_PX} from "@/constants/pageLayout";
 
+export const CART_STORAGE_KEY = "vitan-cart-product-ids";
+export const MIN_CART_QUANTITY = 1;
+
 export const CART_CLASS_NAMES = {
     page: "flex flex-col text-[var(--text-primary)] overflow-x-clip",
 

@@ -1,103 +1,19 @@
-"use client";
-
 import {useEffect, useRef, useState} from "react";
 import {createPortal} from "react-dom";
-import Image from "next/image";
-import WishlistIcon from "@/app/components/icon/WishlistIcon";
 import {CloseIcon} from "@/app/components/icon/CloseIcon";
 import {ProductCardActions} from "@/app/components/ProductCardActions/ProductCardActions";
 import {ImagePlaceholder} from "@/app/components/ImagePlaceholder/ImagePlaceholder";
-import {PriceTooltip} from "@/app/components/PriceTooltip/PriceTooltip";
+import {ProductPriceBlock} from "@/app/components/ProductPriceBlock/ProductPriceBlock";
+import {FavoriteButton, ItemCategoryPills, ItemDetailImages, ItemImageCarousel} from "@/app/ItemComponent/ItemComponentParts";
+import {useSiteContent} from "@/app/components/SiteContentProvider/SiteContentProvider";
 import {PRODUCT_CARD_CLASS_NAMES} from "@/constants/productCard";
-import {PRODUCT_CARD_ACTION_LABELS} from "@/constants/productCardActions";
-import {isProductInWishlist, toggleWishlistProduct, WISHLIST_STORAGE_KEY} from "@/lib/wishlistStorage";
+import {WISHLIST_STORAGE_KEY} from "@/constants/wishlist";
+import {isProductInWishlist, toggleWishlistProduct} from "@/lib/wishlistStorage";
 import {SAVED_PRODUCTS_CHANGE_EVENT} from "@/lib/savedProductsEvents";
+import {getProductImageUrls} from "@/lib/productImages";
+import {formatUah, formatUsd} from "@/lib/formatters";
 import {useLockScroll} from "@/hooks/useLockScroll";
 import type {ItemComponentProps} from "@/types/item";
-
-const usdFormatter = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-});
-
-const uahFormatter = new Intl.NumberFormat("uk-UA", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-});
-
-const formatUah = (value: number) => `${uahFormatter.format(value)} ₴`;
-
-interface ProductPriceBlockProps {
-    priceUah?: number | null;
-    priceUahWholesale?: number | null;
-    priceUsd?: number;
-    wholesaleActiveDescription?: string;
-    wholesaleAsPrimary?: boolean;
-    wholesaleDescription?: string;
-}
-
-const ProductPriceBlock = ({
-    priceUah,
-    priceUahWholesale,
-    priceUsd,
-    wholesaleActiveDescription,
-    wholesaleAsPrimary = false,
-    wholesaleDescription,
-}: ProductPriceBlockProps) => {
-    const shouldShowWholesaleAsPrimary = wholesaleAsPrimary && typeof priceUahWholesale === "number";
-    const primaryPriceUah = shouldShowWholesaleAsPrimary ? priceUahWholesale : priceUah;
-    const wholesaleTooltipText = shouldShowWholesaleAsPrimary
-        ? wholesaleActiveDescription ?? wholesaleDescription
-        : wholesaleDescription;
-
-    if (typeof primaryPriceUah === "number") {
-        return (
-            <>
-                {shouldShowWholesaleAsPrimary ? (
-                    <div className="flex flex-wrap items-center gap-x-1 text-[#0ba862]">
-                        <p className={`${PRODUCT_CARD_CLASS_NAMES.priceUsd} !text-[#0ba862]`}>
-                            {formatUah(primaryPriceUah)}
-                        </p>
-                        <span className="flex items-center gap-1 whitespace-nowrap text-[12px] font-medium leading-4">
-                            Опт
-                            <PriceTooltip text={wholesaleTooltipText} />
-                        </span>
-                    </div>
-                ) : (
-                    <p className={PRODUCT_CARD_CLASS_NAMES.priceUsd}>
-                        {formatUah(primaryPriceUah)}
-                    </p>
-                )}
-
-                {shouldShowWholesaleAsPrimary && typeof priceUah === "number" && (
-                    <p className="text-[12px] font-semibold leading-4 text-[var(--destructive)] line-through">
-                        {formatUah(priceUah)}
-                    </p>
-                )}
-
-                {!shouldShowWholesaleAsPrimary && typeof priceUahWholesale === "number" && (
-                    <p className="flex flex-wrap items-center gap-x-1 text-[12px] font-medium leading-4 text-[#0ba862]">
-                        <span className="whitespace-nowrap">{formatUah(priceUahWholesale)}</span>
-                        <span className="flex items-center gap-1 whitespace-nowrap">
-                            Опт
-                            <PriceTooltip text={wholesaleTooltipText} />
-                        </span>
-                    </p>
-                )}
-            </>
-        );
-    }
-
-    if (typeof priceUsd === "number") {
-        return (
-            <p className={PRODUCT_CARD_CLASS_NAMES.priceUsd}>
-                {usdFormatter.format(priceUsd)}
-            </p>
-        );
-    }
-
-    return null;
-};
 
 export const ItemComponent = ({
     category,
@@ -123,9 +39,12 @@ export const ItemComponent = ({
     const [activeImageIndex, setActiveImageIndex] = useState(0);
     const [isFavorite, setIsFavorite] = useState(false);
     const [isDetailOpen, setIsDetailOpen] = useState(false);
-    const productImages = images?.length ? images : image ? [image] : [];
+    const productImages = getProductImageUrls(image, images);
     const handleProductChanged = onProductDeleted ?? (() => undefined);
     const productId = item?.id;
+    const siteContent = useSiteContent();
+    const commonCopy = siteContent.common;
+    const productFormCopy = siteContent.productForm;
 
     useLockScroll(isDetailOpen);
 
@@ -185,55 +104,24 @@ export const ItemComponent = ({
         <article className={PRODUCT_CARD_CLASS_NAMES.article} onClick={() => setIsDetailOpen(true)} role="button" tabIndex={0}>
             <div className={PRODUCT_CARD_CLASS_NAMES.imageWrapper}>
                 {productImages.length > 0 ? (
-                    <>
-                        <div
-                            ref={imageScrollerRef}
-                            className={PRODUCT_CARD_CLASS_NAMES.imageScroller}
-                            onScroll={handleImageScroll}
-                        >
-                            {productImages.map((productImage, index) => (
-                                <div
-                                    key={`${productImage}-${index}`}
-                                    className={PRODUCT_CARD_CLASS_NAMES.imageButton}
-                                >
-                                    <Image
-                                        src={productImage}
-                                        alt={title}
-                                        width={560}
-                                        height={420}
-                                        className={PRODUCT_CARD_CLASS_NAMES.image}
-                                    />
-                                </div>
-                            ))}
-                        </div>
-                        {productImages.length > 1 && (
-                            <div className={PRODUCT_CARD_CLASS_NAMES.imageDots} aria-label="Фото товару" onClick={(e) => e.stopPropagation()}>
-                                {productImages.map((productImage, index) => (
-                                    <button
-                                        key={`dot-${productImage}-${index}`}
-                                        type="button"
-                                        className={activeImageIndex === index ? PRODUCT_CARD_CLASS_NAMES.activeImageDot : PRODUCT_CARD_CLASS_NAMES.imageDot}
-                                        onClick={() => handleDotClick(index)}
-                                        aria-label={`Показати фото ${index + 1}`}
-                                        aria-current={activeImageIndex === index}
-                                    />
-                                ))}
-                            </div>
-                        )}
-                    </>
+                    <ItemImageCarousel
+                        productImages={productImages}
+                        alt={title}
+                        activeImageIndex={activeImageIndex}
+                        imageScrollerRef={imageScrollerRef}
+                        onImageScroll={handleImageScroll}
+                        onDotClick={handleDotClick}
+                        commonCopy={commonCopy}
+                    />
                 ) : (
                     <ImagePlaceholder className={PRODUCT_CARD_CLASS_NAMES.imagePlaceholder} iconSize={48} />
                 )}
                 {showProductActions && item && (
-                    <button
-                        type="button"
-                        onClick={(e) => { e.stopPropagation(); handleFavoriteToggle(); }}
-                        className={isFavorite ? PRODUCT_CARD_CLASS_NAMES.favoriteOverlayActive : PRODUCT_CARD_CLASS_NAMES.favoriteOverlay}
-                        aria-label={isFavorite ? PRODUCT_CARD_ACTION_LABELS.favoriteActive : PRODUCT_CARD_ACTION_LABELS.favorite}
-                        aria-pressed={isFavorite}
-                    >
-                        <WishlistIcon size={18} filled={isFavorite} />
-                    </button>
+                    <FavoriteButton
+                        isFavorite={isFavorite}
+                        onToggle={handleFavoriteToggle}
+                        variant="overlay"
+                    />
                 )}
             </div>
 
@@ -278,65 +166,20 @@ export const ItemComponent = ({
                             <CloseIcon />
                         </button>
                         <div className="flex-1 overflow-y-auto">
-                            {productImages.length > 0 ? (
-                                <div className="relative p-3 pb-0">
-                                    <div className="flex w-full snap-x snap-mandatory overflow-x-auto rounded-[var(--radius-lg)] [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                                        {productImages.map((img, i) => (
-                                            <div
-                                                key={`detail-${img}-${i}`}
-                                                className="relative aspect-[4/3] w-full shrink-0 snap-center"
-                                            >
-                                                <Image src={img} alt={`${title} ${i + 1}`} fill className="object-cover" />
-                                            </div>
-                                        ))}
-                                    </div>
-                                    {productImages.length > 1 && (
-                                        <div className={PRODUCT_CARD_CLASS_NAMES.imageDots}>
-                                            {productImages.map((_, i) => (
-                                                <span key={i} className={i === 0 ? PRODUCT_CARD_CLASS_NAMES.activeImageDot : PRODUCT_CARD_CLASS_NAMES.imageDot} />
-                                            ))}
-                                        </div>
-                                    )}
-                                    {showProductActions && item && (
-                                        <button
-                                            type="button"
-                                            onClick={handleFavoriteToggle}
-                                            className={`absolute bottom-2 right-5 z-10 inline-flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] bg-black/25 shadow-[0_1px_3px_rgba(0,0,0,0.15)] backdrop-blur-md transition-transform duration-200 active:scale-[0.9] ${isFavorite ? "text-[var(--favorite)]" : "text-white/90"}`}
-                                        >
-                                            <WishlistIcon size={18} filled={isFavorite} />
-                                        </button>
-                                    )}
-                                </div>
-                            ) : (
-                                <div className="relative p-3 pb-0">
-                                    <ImagePlaceholder
-                                        className="flex aspect-[4/3] w-full items-center justify-center rounded-[var(--radius-lg)] bg-[rgba(255,255,255,0.15)] text-[var(--text-tertiary)]"
-                                        iconSize={48}
-                                    />
-                                    {showProductActions && item && (
-                                        <button
-                                            type="button"
-                                            onClick={handleFavoriteToggle}
-                                            className={`absolute bottom-5 right-5 z-10 inline-flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] bg-black/25 shadow-[0_1px_3px_rgba(0,0,0,0.15)] backdrop-blur-md transition-transform duration-200 active:scale-[0.9] ${isFavorite ? "text-[var(--favorite)]" : "text-white/90"}`}
-                                        >
-                                            <WishlistIcon size={18} filled={isFavorite} />
-                                        </button>
-                                    )}
-                                </div>
-                            )}
+                            <ItemDetailImages
+                                productImages={productImages}
+                                title={title}
+                                showFavorite={showProductActions && Boolean(item)}
+                                isFavorite={isFavorite}
+                                onFavoriteToggle={handleFavoriteToggle}
+                            />
 
                             <div className="flex flex-col gap-2 p-3">
                                 <h3 className="text-[20px] font-semibold leading-[25px] tracking-[-0.4px] text-[var(--text-primary)]">
                                     {title}
                                 </h3>
 
-                                {category && (
-                                    <div className="flex flex-wrap gap-1.5">
-                                        {category.split(",").map(cat => (
-                                            <span key={cat.trim()} className={PRODUCT_CARD_CLASS_NAMES.category}>{cat.trim()}</span>
-                                        ))}
-                                    </div>
-                                )}
+                                <ItemCategoryPills category={category} />
 
                                 {description && (
                                     <p className="text-[15px] leading-[22px] text-[var(--text-secondary)]">
@@ -364,10 +207,10 @@ export const ItemComponent = ({
                                             {showAdminActions && (typeof purchasePriceUah === "number" || typeof priceUsd === "number") && (
                                                 <div className="grid gap-0.5 text-[13px] font-medium text-[var(--text-secondary)]">
                                                     {typeof purchasePriceUah === "number" && (
-                                                        <p>Закупка грн: {formatUah(purchasePriceUah)}</p>
+                                                        <p>{productFormCopy.fields.adminPurchasePriceUah}: {formatUah(purchasePriceUah)}</p>
                                                     )}
                                                     {typeof priceUsd === "number" && (
-                                                        <p>Закупка USD: {usdFormatter.format(priceUsd)}</p>
+                                                        <p>{productFormCopy.fields.adminPurchasePriceUsd}: {formatUsd(priceUsd)}</p>
                                                     )}
                                                 </div>
                                             )}

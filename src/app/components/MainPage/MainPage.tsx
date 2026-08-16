@@ -1,6 +1,7 @@
 "use client";
 
 import {ProductList} from "@/app/components/ProductList/ProductList";
+import {useSiteContent} from "@/app/components/SiteContentProvider/SiteContentProvider";
 import {PRODUCT_LIST_CLASS_NAMES} from "@/constants/productListLayout";
 import type {HeaderConfig} from "@/types/header";
 import type {MainPageConfig} from "@/types/main";
@@ -16,7 +17,7 @@ interface MainPageProps {
 }
 
 export const MainPage = ({config, headerConfig, initialProducts, isAdmin = false, pricingConfig}: MainPageProps) => {
-    const heading = 'Вітан';
+    const heading = useSiteContent().brand.name;
 
     return (
         <div className={PRODUCT_LIST_CLASS_NAMES.mainPageContainer}>

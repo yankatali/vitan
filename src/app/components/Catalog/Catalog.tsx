@@ -1,7 +1,9 @@
 "use client";
 
 import {ProductList} from "@/app/components/ProductList/ProductList";
-import {DEFAULT_PRODUCT_SORT, PRODUCT_SORT_OPTIONS} from "@/constants/products";
+import {getCatalogSortOptions} from "@/lib/catalogHelpers";
+import {useSiteContent} from "@/app/components/SiteContentProvider/SiteContentProvider";
+import {DEFAULT_PRODUCT_SORT} from "@/constants/products";
 import {PRODUCT_GRID_WITH_MOBILE_NAV_SPACING} from "@/constants/header";
 import type {CatalogConfig} from "@/types/catalog";
 import type {ProductsResult} from "@/types/product";
@@ -12,14 +14,9 @@ interface CatalogProps {
     usdToUahRate: number | null;
 }
 
-const getCatalogSortOptions = (config: CatalogConfig) => {
-    if (config.sortOptions?.length) return config.sortOptions;
-
-    return PRODUCT_SORT_OPTIONS;
-};
-
 export const Catalog = ({config, initialProducts, usdToUahRate}: CatalogProps) => {
     const sortOptions = getCatalogSortOptions(config);
+    const copy = useSiteContent().catalog;
 
     return (
         <section className="flex flex-col gap-4 p-4">
@@ -28,7 +25,7 @@ export const Catalog = ({config, initialProducts, usdToUahRate}: CatalogProps) =
                 <ProductList
                     initialProducts={initialProducts}
                     defaultSort={config.defaultSort ?? DEFAULT_PRODUCT_SORT}
-                    searchPlaceholder={config.searchPlaceholder ?? "Пошук товару"}
+                    searchPlaceholder={config.searchPlaceholder ?? copy.searchPlaceholder}
                     categories={config.categories}
                     sortOptions={sortOptions}
                     showCategories

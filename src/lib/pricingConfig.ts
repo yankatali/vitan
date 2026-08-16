@@ -1,23 +1,9 @@
 import {getContentfulFetchCacheOptions} from "@/lib/cache";
+import {PRICING_CONFIG_QUERY} from "@/constants/contentfulQueries";
 import type {PricingConfig} from "@/types/pricingConfig";
 
 const space = process.env.CONTENTFUL_SPACE_ID;
 const accessToken = process.env.CONTENTFUL_ACCESS_TOKEN;
-
-const PRICING_CONFIG_QUERY = `
-query PricingConfig {
-  pricingConfigCollection(limit: 1) {
-    items {
-      usdToUahRate
-      retailMarkup
-      wholesaleMarkup
-      wholesaleDescription
-      optPrice
-      descriptionAfterOptValid
-    }
-  }
-}
-`;
 
 interface PricingConfigGraphqlResponse {
     pricingConfigCollection?: {

@@ -2,9 +2,12 @@ import type {CartProductItem} from "@/types/cart";
 import type {ItemConfig} from "@/types/item";
 import type {PricingConfig} from "@/types/pricingConfig";
 import {getMarkedUpUahPrice} from "@/lib/productPricing";
-
-const DEFAULT_OPT_PRICE = 200;
-const DEFAULT_WHOLESALE_DESCRIPTION = "Оптова ціна діє від {opt_price} грн.";
+import type {SiteContent} from "@/constants/siteContent";
+import {
+    DEFAULT_OLD_UNIT_TOKEN_PATTERN,
+    DEFAULT_OLD_UNIT_TOKEN_REGEX,
+    DEFAULT_OPT_PRICE,
+} from "@/constants/wholesalePricing";
 
 export const getOptPrice = (pricingConfig?: PricingConfig | null) => {
     return pricingConfig?.optPrice ?? DEFAULT_OPT_PRICE;
@@ -14,8 +17,11 @@ export const getPricingDescriptionText = (text: string | null | undefined, prici
     return (text ?? "").replace(/\{opt_price\}/g, String(getOptPrice(pricingConfig)));
 };
 
-const normalizeWholesaleDescription = (text: string) => {
-    return text.replace(/\{opt_price\}\s*од\.?/gi, "{opt_price} грн");
+const normalizeWholesaleDescription = (text: string, copy?: SiteContent["wholesale"]) => {
+    const oldUnitTokenRegex = copy?.oldUnitTokenRegex ?? DEFAULT_OLD_UNIT_TOKEN_REGEX;
+    const oldUnitTokenPattern = copy?.oldUnitTokenPattern ?? DEFAULT_OLD_UNIT_TOKEN_PATTERN;
+
+    return text.replace(new RegExp(oldUnitTokenRegex, "gi"), oldUnitTokenPattern);
 };
 
 export const isWholesaleEligible = (totalRetailPrice: number, pricingConfig?: PricingConfig | null) => {
@@ -51,15 +57,23 @@ export const getWishlistRetailTotal = (items: Array<{product: ItemConfig}>, pric
     return items.reduce((sum, item) => sum + (getRetailPriceUah(item.product, pricingConfig) ?? 0), 0);
 };
 
-export const getWholesaleDescriptionText = (pricingConfig?: PricingConfig | null, fallback = "") => {
-    const description = pricingConfig?.wholesaleDescription?.trim() || fallback.trim() || DEFAULT_WHOLESALE_DESCRIPTION;
+export const getWholesaleDescriptionText = (
+    pricingConfig?: PricingConfig | null,
+    fallback = "",
+    copy?: SiteContent["wholesale"],
+) => {
+    const description = pricingConfig?.wholesaleDescription?.trim() || fallback.trim() || copy?.defaultDescription.trim() || "";
 
-    return getPricingDescriptionText(normalizeWholesaleDescription(description), pricingConfig);
+    return getPricingDescriptionText(normalizeWholesaleDescription(description, copy), pricingConfig);
 };
 
-export const getWholesaleTooltipText = (pricingConfig?: PricingConfig | null, fallback = "") => {
+export const getWholesaleTooltipText = (
+    pricingConfig?: PricingConfig | null,
+    fallback = "",
+    copy?: SiteContent["wholesale"],
+) => {
     const activeDescription = pricingConfig?.descriptionAfterOptValid?.trim();
     if (activeDescription) return getPricingDescriptionText(activeDescription, pricingConfig);
 
-    return getWholesaleDescriptionText(pricingConfig, fallback);
+    return getWholesaleDescriptionText(pricingConfig, fallback, copy);
 };

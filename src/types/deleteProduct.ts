@@ -6,9 +6,7 @@ export interface DeleteProductApiResponse {
     product: DeleteProductResult;
 }
 
-export interface DeleteProductButtonProps {
+export interface UseDeleteProductParams {
     productId: string;
     onDeleted: () => void;
 }
-
-export type UseDeleteProductParams = DeleteProductButtonProps;

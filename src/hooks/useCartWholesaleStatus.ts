@@ -1,7 +1,8 @@
 "use client";
 
 import {useEffect, useMemo, useState} from "react";
-import {CART_STORAGE_KEY, getCartItems} from "@/lib/cartStorage";
+import {CART_STORAGE_KEY} from "@/constants/cart";
+import {getCartItems} from "@/lib/cartStorage";
 import {SAVED_PRODUCTS_CHANGE_EVENT} from "@/lib/savedProductsEvents";
 import {getOptPrice, getRetailPriceUah, isWholesaleEligible} from "@/lib/wholesalePricing";
 import type {CartStorageItem} from "@/types/cart";

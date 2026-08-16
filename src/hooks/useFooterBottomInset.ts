@@ -1,8 +1,7 @@
 "use client";
 
 import {useEffect} from "react";
-
-const FOOTER_BOTTOM_CSS_VAR = "--vitan-footer-bottom";
+import {FOOTER_BOTTOM_CSS_VAR} from "@/constants/footer";
 
 interface UseFooterBottomInsetOptions {
     enabled: boolean;

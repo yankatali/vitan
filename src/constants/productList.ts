@@ -1,0 +1,1 @@
+export const PRODUCT_REFRESH_DELAYS_MS = [0, 1500, 3500, 6500];

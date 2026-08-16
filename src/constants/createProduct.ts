@@ -2,6 +2,8 @@ import type {CreateProductFormValues} from "@/types/createProduct";
 
 export const CREATE_PRODUCT_API_PATH = "/api/products/create";
 export const CREATE_PRODUCT_MAX_IMAGE_SIZE = 10 * 1024 * 1024;
+export const CREATE_PRODUCT_MAX_IMAGE_COUNT = 12;
+export const CREATE_PRODUCT_MAX_TOTAL_IMAGE_SIZE = CREATE_PRODUCT_MAX_IMAGE_SIZE * CREATE_PRODUCT_MAX_IMAGE_COUNT;
 export const CREATE_PRODUCT_ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 
 export const CREATE_PRODUCT_FIELD_NAMES = {
@@ -12,19 +14,6 @@ export const CREATE_PRODUCT_FIELD_NAMES = {
     categories: "categories",
     image: "image",
 } satisfies Record<string, keyof CreateProductFormValues>;
-
-export const CREATE_PRODUCT_ERROR_MESSAGES = {
-    missingName: "Назва товару обов'язкова.",
-    invalidPrice: "Закупочна ціна в грн має бути цілим числом більше або дорівнювати 0.",
-    invalidImageType: "Формат фото має бути JPEG, PNG, WebP або GIF.",
-    oversizedImage: "Фото має бути не більше 10 MB.",
-    unableToCreate: "Не вдалося створити товар у Contentful.",
-};
-
-export const CREATE_PRODUCT_BUTTON_LABELS = {
-    idle: "Створити товар",
-    submitting: "Створюю...",
-};
 
 export const CREATE_PRODUCT_MODAL_CLASS_NAMES = {
     overlay: "fixed inset-0 z-[120] flex items-end justify-center overflow-y-auto bg-black/28 px-2 py-2 backdrop-blur-md md:items-center md:px-4 md:py-6",

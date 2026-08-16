@@ -1,4 +1,4 @@
-import {renderPageByPath} from "@/app/components/utils/getPage";
+import {renderPageByPath} from "@/lib/renderPage";
 
 export const dynamic = "force-dynamic";
 

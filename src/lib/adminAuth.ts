@@ -2,7 +2,10 @@ import {cookies} from "next/headers";
 import {createHmac, pbkdf2Sync, timingSafeEqual} from "crypto";
 import {
     ADMIN_COOKIE_NAME,
+    ADMIN_SESSION_CLOCK_TOLERANCE_MS,
+    ADMIN_SESSION_MAX_AGE_MS,
     ADMIN_SESSION_MAX_AGE_SECONDS,
+    ADMIN_SESSION_SECRET_ENV,
     DEFAULT_ADMIN_PASSWORD_FIELD,
     DEFAULT_ADMIN_PASSWORD_HASH_FIELD,
 } from "@/constants/admin";
@@ -15,6 +18,7 @@ import {
 
 const contentfulAccessToken = process.env.CONTENTFUL_ACCESS_TOKEN;
 const contentfulSpaceId = process.env[CONTENTFUL_SPACE_ID_ENV];
+const adminSessionSecret = process.env[ADMIN_SESSION_SECRET_ENV];
 
 interface ContentfulEntriesResponse {
     items?: Array<{
@@ -96,7 +100,10 @@ const safeEqual = (left: string, right: string) => {
 };
 
 const getAdminSessionSigningKey = (passwordConfig: AdminPasswordConfig) => {
-    return passwordConfig.passwordHash || passwordConfig.password;
+    const passwordMaterial = passwordConfig.passwordHash || passwordConfig.password;
+    if (!passwordMaterial) return "";
+
+    return adminSessionSecret ? `${adminSessionSecret}.${passwordMaterial}` : passwordMaterial;
 };
 
 const signAdminSession = (payload: string, signingKey: string) => {
@@ -140,6 +147,10 @@ export const isValidAdminSessionToken = async (token?: string) => {
 
     const issuedAt = Number(issuedAtValue);
     if (!Number.isFinite(issuedAt)) return false;
+
+    const now = Date.now();
+    if (issuedAt > now + ADMIN_SESSION_CLOCK_TOLERANCE_MS) return false;
+    if (now - issuedAt > ADMIN_SESSION_MAX_AGE_MS) return false;
 
     const passwordConfig = await getAdminPasswordConfigFromContentful();
     const signingKey = getAdminSessionSigningKey(passwordConfig);

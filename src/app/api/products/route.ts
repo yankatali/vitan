@@ -2,27 +2,10 @@ import {NextRequest, NextResponse} from "next/server";
 import {getProducts} from "@/lib/products";
 import {NO_STORE_CACHE_CONTROL} from "@/constants/cache";
 import {isAdminSession} from "@/lib/adminAuth";
-import {isCatalogSortOption} from "@/lib/catalogSort";
 import {getPricingConfig} from "@/lib/pricingConfig";
 import {getAdminProductsResult, getPublicProductsResult} from "@/lib/publicProducts";
-import {CatalogSortOption} from "@/types/catalog";
-
-const getNumberParam = (value: string | null) => {
-    if (!value) return undefined;
-    const parsed = Number(value);
-
-    if (!Number.isFinite(parsed)) return undefined;
-
-    return parsed;
-};
-
-const getSortParam = (value: string | null): CatalogSortOption | undefined => {
-    if (!value) return undefined;
-
-    if (!isCatalogSortOption(value)) return undefined;
-
-    return value;
-};
+import {getNumberParam, getSortParam} from "@/lib/productRouteParams";
+import {getSiteContent} from "@/lib/siteContent";
 
 export async function GET(request: NextRequest) {
     const params = request.nextUrl.searchParams;
@@ -40,9 +23,12 @@ export async function GET(request: NextRequest) {
             limit: getNumberParam(params.get("limit")),
             revalidateSeconds: 0,
         });
+        const [pricingConfig, siteContent] = isAdmin
+            ? [null, null]
+            : await Promise.all([getPricingConfig(0), getSiteContent()]);
         const visibleProducts = isAdmin
             ? getAdminProductsResult(products)
-            : getPublicProductsResult(products, await getPricingConfig(0));
+            : getPublicProductsResult(products, pricingConfig, siteContent?.wholesale);
 
         return NextResponse.json(visibleProducts, {
             headers: {

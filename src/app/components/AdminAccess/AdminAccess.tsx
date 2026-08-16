@@ -3,28 +3,24 @@
 import {FormEvent, useState} from "react";
 import {createPortal} from "react-dom";
 import {useRouter} from "next/navigation";
+import {loginAdmin, logoutAdmin} from "@/lib/adminAccessApi";
 import {CloseIcon} from "@/app/components/icon/CloseIcon";
 import {LoadingSpinnerIcon} from "@/app/components/icon/LoadingSpinnerIcon";
+import {useSiteContent} from "@/app/components/SiteContentProvider/SiteContentProvider";
 import {useLockScroll} from "@/hooks/useLockScroll";
 
 interface AdminAccessProps {
     initialIsAdmin: boolean;
 }
 
-const getErrorMessage = (payload: unknown, fallback: string) => {
-    if (payload && typeof payload === "object" && "message" in payload && typeof payload.message === "string") {
-        return payload.message;
-    }
-
-    return fallback;
-};
-
 export const AdminAccess = ({initialIsAdmin}: AdminAccessProps) => {
-    const router = useRouter();
     const [isOpen, setIsOpen] = useState(false);
     const [password, setPassword] = useState("");
     const [error, setError] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const router = useRouter();
+    const copy = useSiteContent().adminAccess;
 
     useLockScroll(isOpen);
 
@@ -42,25 +38,12 @@ export const AdminAccess = ({initialIsAdmin}: AdminAccessProps) => {
         setIsSubmitting(true);
 
         try {
-            const response = await fetch("/api/admin/login", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({password}),
-            });
-            const payload: unknown = await response.json().catch(() => null);
-
-            if (!response.ok) {
-                setError(getErrorMessage(payload, "Не вдалося увійти в адмін режим."));
-                return;
-            }
-
+            await loginAdmin(password, copy);
             setIsOpen(false);
             setPassword("");
             router.refresh();
-        } catch {
-            setError("Не вдалося увійти в адмін режим.");
+        } catch (error) {
+            setError(error instanceof Error ? error.message : copy.loginRequestError);
         } finally {
             setIsSubmitting(false);
         }
@@ -71,11 +54,11 @@ export const AdminAccess = ({initialIsAdmin}: AdminAccessProps) => {
         setIsSubmitting(true);
 
         try {
-            await fetch("/api/admin/logout", {method: "POST"});
+            await logoutAdmin(copy);
             setIsOpen(false);
             router.refresh();
-        } catch {
-            setError("Не вдалося вийти з адмін режиму.");
+        } catch (error) {
+            setError(error instanceof Error ? error.message : copy.logoutRequestError);
         } finally {
             setIsSubmitting(false);
         }
@@ -87,7 +70,7 @@ export const AdminAccess = ({initialIsAdmin}: AdminAccessProps) => {
                 type="button"
                 className="inline-flex text-left text-[10px] text-[var(--text-secondary)] outline-none transition-colors hover:text-[var(--text-primary)] focus-visible:text-[var(--text-primary)]"
                 onClick={() => setIsOpen(true)}
-                aria-label="Адмін доступ"
+                aria-label={copy.triggerAriaLabel}
             >
                 © {new Date().getFullYear()} Vitan
             </button>
@@ -102,12 +85,12 @@ export const AdminAccess = ({initialIsAdmin}: AdminAccessProps) => {
                         onClick={(event) => event.stopPropagation()}
                     >
                         <div className="flex items-center justify-between gap-4 px-5 py-4">
-                            <h2 className="text-[18px] font-semibold leading-6 text-[var(--text-primary)]">Адмін доступ</h2>
+                            <h2 className="text-[18px] font-semibold leading-6 text-[var(--text-primary)]">{copy.title}</h2>
                             <button
                                 type="button"
                                 className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[var(--fill)] text-[var(--text-secondary)] transition-transform active:scale-[0.92]"
                                 onClick={close}
-                                aria-label="Закрити"
+                                aria-label={copy.closeAriaLabel}
                                 disabled={isSubmitting}
                             >
                                 <CloseIcon />
@@ -117,7 +100,7 @@ export const AdminAccess = ({initialIsAdmin}: AdminAccessProps) => {
                         <div className="grid min-h-0 gap-4 overflow-y-auto px-5 pb-5">
                             {initialIsAdmin ? (
                                 <>
-                                    <p className="text-sm leading-5 text-[var(--text-secondary)]">Адмін режим активний на цьому пристрої.</p>
+                                    <p className="text-sm leading-5 text-[var(--text-secondary)]">{copy.activeMessage}</p>
                                     {error && <p className="rounded-[var(--radius-sm)] bg-[rgba(255,59,48,0.1)] px-4 py-3 text-sm text-[var(--destructive)]">{error}</p>}
                                     <button
                                         type="button"
@@ -126,13 +109,13 @@ export const AdminAccess = ({initialIsAdmin}: AdminAccessProps) => {
                                         disabled={isSubmitting}
                                     >
                                         {isSubmitting && <LoadingSpinnerIcon />}
-                                        Вийти
+                                        {copy.logoutButton}
                                     </button>
                                 </>
                             ) : (
                                 <form className="grid gap-4" onSubmit={handleSubmit}>
                                     <label className="grid gap-1.5 text-[13px] font-semibold leading-[18px] text-[var(--text-secondary)]">
-                                        Пароль
+                                        {copy.passwordLabel}
                                         <input
                                             type="password"
                                             value={password}
@@ -152,7 +135,7 @@ export const AdminAccess = ({initialIsAdmin}: AdminAccessProps) => {
                                         disabled={isSubmitting}
                                     >
                                         {isSubmitting && <LoadingSpinnerIcon />}
-                                        Увійти
+                                        {copy.loginButton}
                                     </button>
                                 </form>
                             )}

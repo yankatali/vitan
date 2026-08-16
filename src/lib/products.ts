@@ -1,6 +1,7 @@
 import {getLocalFixtureProducts} from "@/lib/localContentful";
 import {PRODUCT_MIN_SEARCH_LENGTH, PRODUCT_PAGE_SIZE} from "@/constants/products";
 import {CONTENTFUL_PRODUCTS_CACHE_TAG} from "@/constants/cache";
+import {PRODUCT_QUERY} from "@/constants/contentfulQueries";
 import {getContentfulFetchCacheOptions} from "@/lib/cache";
 import type {CatalogSortOption} from "@/types/catalog";
 import type {ItemConfig} from "@/types/item";
@@ -9,8 +10,6 @@ import type {GetProductsParams, ProductOrder, ProductsResult} from "@/types/prod
 const useLocalFixture = process.env.USE_LOCAL_CONTENTFUL_FIXTURE === "true";
 const space = process.env.CONTENTFUL_SPACE_ID;
 const accessToken = process.env.CONTENTFUL_ACCESS_TOKEN;
-
-const MAX_LIMIT = PRODUCT_PAGE_SIZE;
 
 interface ContentfulAsset {
     url?: string | null;
@@ -38,33 +37,9 @@ interface ProductsGraphqlResponse {
     } | null;
 }
 
-const PRODUCT_QUERY = `
-query Products($limit: Int!, $skip: Int!, $where: ProductFilter, $order: [ProductOrder]) {
-  productCollection(limit: $limit, skip: $skip, where: $where, order: $order) {
-    total
-    items {
-      sys {
-        id
-      }
-      name
-      description
-      price
-      category
-      imagesCollection(limit: 10) {
-        items {
-          url
-          title
-          description
-        }
-      }
-    }
-  }
-}
-`;
-
 const clampLimit = (limit?: number) => {
     if (!Number.isFinite(limit)) return PRODUCT_PAGE_SIZE;
-    return Math.min(Math.max(Number(limit), 1), MAX_LIMIT);
+    return Math.min(Math.max(Number(limit), 1), PRODUCT_PAGE_SIZE);
 };
 
 const normalizeSkip = (skip?: number) => {

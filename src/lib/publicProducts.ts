@@ -1,5 +1,6 @@
 import {getMarkedUpUahPrice} from "@/lib/productPricing";
 import {getWholesaleDescriptionText} from "@/lib/wholesalePricing";
+import type {SiteContent} from "@/constants/siteContent";
 import type {ItemConfig} from "@/types/item";
 import type {PricingConfig} from "@/types/pricingConfig";
 import type {ProductsResult} from "@/types/product";
@@ -12,21 +13,31 @@ const getWholesaleMarkup = (pricingConfig?: PricingConfig | null) => {
     return pricingConfig?.wholesaleMarkup ?? 15;
 };
 
-export const getPublicProduct = (product: ItemConfig, pricingConfig?: PricingConfig | null): ItemConfig => {
-    const {purchasePriceUah, priceUsd: _priceUsd, ...publicProduct} = product;
+export const getPublicProduct = (
+    product: ItemConfig,
+    pricingConfig?: PricingConfig | null,
+    wholesaleCopy?: SiteContent["wholesale"],
+): ItemConfig => {
+    const publicProduct: ItemConfig = {...product};
+    delete publicProduct.purchasePriceUah;
+    delete publicProduct.priceUsd;
 
     return {
         ...publicProduct,
-        priceUah: getMarkedUpUahPrice(purchasePriceUah, getRetailMarkup(pricingConfig)),
-        priceUahWholesale: getMarkedUpUahPrice(purchasePriceUah, getWholesaleMarkup(pricingConfig)),
-        wholesaleDescription: getWholesaleDescriptionText(pricingConfig, product.wholesaleDescription),
+        priceUah: getMarkedUpUahPrice(product.purchasePriceUah, getRetailMarkup(pricingConfig)),
+        priceUahWholesale: getMarkedUpUahPrice(product.purchasePriceUah, getWholesaleMarkup(pricingConfig)),
+        wholesaleDescription: getWholesaleDescriptionText(pricingConfig, product.wholesaleDescription, wholesaleCopy),
     };
 };
 
-export const getPublicProductsResult = (products: ProductsResult, pricingConfig?: PricingConfig | null): ProductsResult => {
+export const getPublicProductsResult = (
+    products: ProductsResult,
+    pricingConfig?: PricingConfig | null,
+    wholesaleCopy?: SiteContent["wholesale"],
+): ProductsResult => {
     return {
         ...products,
-        items: products.items.map(product => getPublicProduct(product, pricingConfig)),
+        items: products.items.map(product => getPublicProduct(product, pricingConfig, wholesaleCopy)),
     };
 };
 
@@ -34,12 +45,10 @@ export const getAdminProductsResult = (products: ProductsResult): ProductsResult
     return {
         ...products,
         items: products.items.map(product => {
-            const {
-                priceUah: _priceUah,
-                priceUahWholesale: _priceUahWholesale,
-                wholesaleDescription: _wholesaleDescription,
-                ...adminProduct
-            } = product;
+            const adminProduct: ItemConfig = {...product};
+            delete adminProduct.priceUah;
+            delete adminProduct.priceUahWholesale;
+            delete adminProduct.wholesaleDescription;
 
             return adminProduct;
         }),
