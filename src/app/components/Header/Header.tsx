@@ -4,7 +4,6 @@ import {useEffect, useMemo, useState, type CSSProperties} from "react";
 import { useMedia } from 'react-use';
 import {getActiveNavIndex, getHeaderNavItems, getIconSize} from "@/lib/headerNavItems";
 import {MediaSize} from "@/types/components";
-import {HeaderConfig} from "@/types/header";
 import {HEADER_NAV_CLASS_NAMES} from "@/constants/header";
 import {useSavedProductCounts} from "@/hooks/useSavedProductCounts";
 import type {HeaderProps} from "@/types/props";

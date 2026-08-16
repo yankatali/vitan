@@ -2,7 +2,7 @@ import fixture from "../../contentful-test-configs.json";
 import type {CatalogSortOption} from "@/types/catalog";
 import type {GetProductsParams, ProductsResult} from "@/types/product";
 import type {ItemConfig} from "@/types/item";
-import type {FixtureComponent, FixtureShape, LocalEntry, LocalPage} from "@/types/localContentful";
+import type {FixtureShape, LocalEntry, LocalPage} from "@/types/localContentful";
 
 
 const localFixture = fixture as FixtureShape;

@@ -1,9 +1,6 @@
 import {CheckoutOrderItem} from "@/app/checkout/CheckoutOrderItem";
-import type {SiteContent} from "@/constants/siteContent";
 import {formatUah} from "@/lib/formatters";
 import {getProductPriceUah} from "@/lib/wholesalePricing";
-import type {CartProductItem} from "@/types/cart";
-import type {PricingConfig} from "@/types/pricingConfig";
 import type {CheckoutOrderSummaryProps} from "@/types/props";
 
 

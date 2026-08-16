@@ -1,8 +1,6 @@
 import Image from "next/image";
-import {type RefObject} from "react";
 import {ImagePlaceholder} from "@/app/components/ImagePlaceholder/ImagePlaceholder";
 import {PRODUCT_CARD_CLASS_NAMES} from "@/constants/productCard";
-import type {SiteContent} from "@/constants/siteContent";
 import type {ProductCategoryPillsProps, ProductDetailImageDotProps, ProductDetailImageSlideProps, ProductDetailImagesProps, ProductImageCarouselProps, ProductImageDotsProps, ProductImageSlideProps} from "@/types/props";
 
 

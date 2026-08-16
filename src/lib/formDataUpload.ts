@@ -1,5 +1,5 @@
 import {ADMIN_REQUEST_HEADER_NAME, ADMIN_REQUEST_HEADER_VALUE} from "@/constants/admin";
-import type {SendFormDataRequestParams, UploadProgressHandler} from "@/types/formDataUpload";
+import type {SendFormDataRequestParams} from "@/types/formDataUpload";
 
 export type {UploadProgressHandler} from "@/types/formDataUpload";
 

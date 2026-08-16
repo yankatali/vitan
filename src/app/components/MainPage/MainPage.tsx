@@ -3,10 +3,6 @@
 import {ProductList} from "@/app/components/ProductList/ProductList";
 import {useSiteContent} from "@/app/components/SiteContentProvider/SiteContentProvider";
 import {PRODUCT_LIST_CLASS_NAMES} from "@/constants/productListLayout";
-import type {HeaderConfig} from "@/types/header";
-import type {MainPageConfig} from "@/types/main";
-import type {PricingConfig} from "@/types/pricingConfig";
-import type {ProductsResult} from "@/types/product";
 import type {MainPageProps} from "@/types/props";
 
 

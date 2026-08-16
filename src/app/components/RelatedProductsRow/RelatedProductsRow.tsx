@@ -1,9 +1,8 @@
-import {type ReactNode, useMemo, useRef, useState, useCallback} from "react";
+import {useMemo, useRef, useState, useCallback} from "react";
 import {useSiteContent} from "@/app/components/SiteContentProvider/SiteContentProvider";
 import {RELATED_PRODUCTS_CLASS_NAMES, RELATED_PRODUCTS_SCROLL_STEP} from "@/constants/relatedProducts";
 import {RelatedProductCard, RelatedProductsScrollButton} from "@/app/components/RelatedProductsRow/RelatedProductsRowParts";
 import {getRelatedProductPriceEntry} from "@/lib/relatedProductsRow";
-import type {ItemConfig} from "@/types/item";
 import type {RelatedProductsRowProps} from "@/types/props";
 
 

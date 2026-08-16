@@ -1,16 +1,11 @@
-import {type MouseEvent, type ReactNode} from "react";
+import {type MouseEvent} from "react";
 import {ProductCardSimple} from "@/app/components/ProductCardSimple/ProductCardSimple";
 import {RELATED_PRODUCTS_CLASS_NAMES} from "@/constants/relatedProducts";
 import {
     getRelatedProductActionButtonClassName,
     getRelatedProductsScrollButtonAriaLabel,
     getRelatedProductsScrollButtonClassName,
-    type RelatedProductActionButtonVariant,
-    type RelatedProductPrices,
-    type RelatedProductsScrollDirection,
 } from "@/lib/relatedProductsRow";
-import type {SiteContent} from "@/constants/siteContent";
-import type {ItemConfig} from "@/types/item";
 import type {RelatedProductActionButtonProps, RelatedProductCardProps, RelatedProductsScrollButtonProps} from "@/types/props";
 
 

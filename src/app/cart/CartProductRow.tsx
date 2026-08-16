@@ -4,8 +4,6 @@ import {CartQuantityControls} from "@/app/cart/CartQuantityControls";
 import {ImagePlaceholder} from "@/app/components/ImagePlaceholder/ImagePlaceholder";
 import {useSiteContent} from "@/app/components/SiteContentProvider/SiteContentProvider";
 import {CART_CLASS_NAMES} from "@/constants/cart";
-import type {ItemConfig} from "@/types/item";
-import type {PricingConfig} from "@/types/pricingConfig";
 import type {CartProductImageProps, CartProductRowProps} from "@/types/props";
 
 

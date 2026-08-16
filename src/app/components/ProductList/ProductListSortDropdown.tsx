@@ -1,7 +1,6 @@
 import {forwardRef} from "react";
 import {PRODUCT_LIST_CLASS_NAMES} from "@/constants/productListLayout";
 import {getProductListSortButtonClassName, getProductListSortOptionButtonClassName} from "@/lib/productListClassNames";
-import type {CatalogSortOption} from "@/types/catalog";
 import type {ProductListSortDropdownProps, ProductListSortOptionButtonProps} from "@/types/props";
 
 

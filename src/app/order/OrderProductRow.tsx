@@ -3,7 +3,6 @@
 import Image from "next/image";
 import {useSiteContent} from "@/app/components/SiteContentProvider/SiteContentProvider";
 import {formatUah} from "@/lib/formatters";
-import type {ItemConfig} from "@/types/item";
 import type {OrderProductRowProps, OrderProductThumbnailProps} from "@/types/props";
 
 

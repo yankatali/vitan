@@ -13,7 +13,6 @@ import {useUpdateProductForm} from "@/hooks/useUpdateProductForm";
 import {useSiteContent} from "@/app/components/SiteContentProvider/SiteContentProvider";
 import {useLockScroll} from "@/hooks/useLockScroll";
 import {formatPricePair} from "@/lib/productPricingPreviewHelpers";
-import type {PricingConfig} from "@/types/pricingConfig";
 import type {ProductEditModalProps} from "@/types/updateProduct";
 import type {OriginalProductPriceFieldProps} from "@/types/props";
 

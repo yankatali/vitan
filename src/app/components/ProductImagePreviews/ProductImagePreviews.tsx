@@ -3,8 +3,6 @@ import {CloseIcon} from "@/app/components/icon/CloseIcon";
 import {useSiteContent} from "@/app/components/SiteContentProvider/SiteContentProvider";
 import {getImageKey} from "@/lib/productImagePreviewsHelpers";
 import {CREATE_PRODUCT_MODAL_CLASS_NAMES} from "@/constants/createProduct";
-import type {SiteContent} from "@/constants/siteContent";
-import type {ProductImagePreview} from "@/types/productImagePreview";
 import type {ProductImagePreviewItemProps, ProductImagePreviewsProps} from "@/types/props";
 
 

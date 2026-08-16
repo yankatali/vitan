@@ -1,11 +1,10 @@
 import Image from "next/image";
-import {type MouseEvent, type RefObject} from "react";
+import {type MouseEvent} from "react";
 import WishlistIcon from "@/app/components/icon/WishlistIcon";
 import {ImagePlaceholder} from "@/app/components/ImagePlaceholder/ImagePlaceholder";
 import {useSiteContent} from "@/app/components/SiteContentProvider/SiteContentProvider";
 import {PRODUCT_CARD_CLASS_NAMES} from "@/constants/productCard";
 import {splitProductCategories} from "@/lib/productCategories";
-import type {SiteContent} from "@/constants/siteContent";
 import type {FavoriteButtonProps, ItemCategoryPillsProps, ItemDetailImageDotProps, ItemDetailImageSlideProps, ItemDetailImagesProps, ItemImageCarouselProps, ItemImageDotsProps, ItemImageSlideProps} from "@/types/props";
 
 

@@ -2,7 +2,6 @@ import {ProductCardSimple} from "@/app/components/ProductCardSimple/ProductCardS
 import CartIcon from "@/app/components/icon/CartIcon";
 import {useSiteContent} from "@/app/components/SiteContentProvider/SiteContentProvider";
 import {PRODUCT_CARD_ACTION_CLASS_NAMES} from "@/constants/productCardActions";
-import type {ItemConfig} from "@/types/item";
 import type {WishlistCartActionButtonProps, WishlistProductCardProps} from "@/types/props";
 
 

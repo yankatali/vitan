@@ -2,7 +2,6 @@ import Link from "next/link";
 import {useSiteContent} from "@/app/components/SiteContentProvider/SiteContentProvider";
 import {HEADER_NAV_CLASS_NAMES} from "@/constants/header";
 import {HEADER_NAV_ICON_MAP} from "@/constants/headerNavIcons";
-import {IconName} from "@/types/header";
 import type {HeaderNavItemProps} from "@/types/props";
 
 

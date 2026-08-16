@@ -1,10 +1,7 @@
 import {PriceTooltip} from "@/app/components/PriceTooltip/PriceTooltip";
 import {CART_CLASS_NAMES} from "@/constants/cart";
-import type {SiteContent} from "@/constants/siteContent";
 import {formatUah} from "@/lib/formatters";
 import {getProductPriceUah, getRetailPriceUah} from "@/lib/wholesalePricing";
-import type {ItemConfig} from "@/types/item";
-import type {PricingConfig} from "@/types/pricingConfig";
 import type {CartProductPriceProps} from "@/types/props";
 
 

@@ -15,7 +15,6 @@ import {
 } from "@/lib/cartStorage";
 import {SAVED_PRODUCTS_CHANGE_EVENT} from "@/lib/savedProductsEvents";
 import type {CartStorageItem} from "@/types/cart";
-import type {ItemConfig} from "@/types/item";
 import {useBarBottom} from "@/hooks/useBarBottom";
 import {useFooterBottomInset} from "@/hooks/useFooterBottomInset";
 import {PageHeader} from "@/app/components/PageHeader/PageHeader";
@@ -28,8 +27,6 @@ import {getCategoriesFromProducts, getRelatedProducts} from "@/lib/relatedProduc
 import CartIcon from "@/app/components/icon/CartIcon";
 import {formatUah} from "@/lib/formatters";
 import {getCartRetailTotal, getOptPrice, getProductPriceUah, getWholesaleTooltipText, isWholesaleEligible} from "@/lib/wholesalePricing";
-import type {SiteContent} from "@/constants/siteContent";
-import type {PricingConfig} from "@/types/pricingConfig";
 import type {CartBottomCtaProps, CartClientProps} from "@/types/props";
 
 

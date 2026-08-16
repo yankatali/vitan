@@ -15,8 +15,6 @@ import {SAVED_PRODUCTS_CHANGE_EVENT} from "@/lib/savedProductsEvents";
 import {formatUah} from "@/lib/formatters";
 import {getCartRetailTotal, isWholesaleEligible} from "@/lib/wholesalePricing";
 import type {CartStorageItem} from "@/types/cart";
-import type {ItemConfig} from "@/types/item";
-import type {PricingConfig} from "@/types/pricingConfig";
 import {CheckoutOrderSummary} from "@/app/checkout/CheckoutOrderSummary";
 import {CheckoutSuccessView} from "@/app/checkout/CheckoutSuccessView";
 import {submitTelegramOrder} from "@/lib/checkoutApi";

@@ -1,5 +1,4 @@
-import type {SiteContent} from "@/constants/siteContent";
-import type {ContentfulErrorCopy, ContentfulErrorPayload, ContentfulValidationError} from "@/types/apiError";
+import type {ContentfulErrorCopy, ContentfulErrorPayload} from "@/types/apiError";
 
 
 const isRecord = (value: unknown): value is Record<string, unknown> => {

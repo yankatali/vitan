@@ -1,4 +1,3 @@
-import type {ReactNode} from "react";
 import {PriceRangeSlider} from "@/app/components/FiltersSheet/PriceRangeSlider";
 import {useSiteContent} from "@/app/components/SiteContentProvider/SiteContentProvider";
 import type {FilterChipProps, FiltersSheetProps} from "@/types/props";

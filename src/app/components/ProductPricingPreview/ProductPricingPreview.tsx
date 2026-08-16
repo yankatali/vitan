@@ -4,7 +4,6 @@ import {CREATE_PRODUCT_MODAL_CLASS_NAMES} from "@/constants/createProduct";
 import {useSiteContent} from "@/app/components/SiteContentProvider/SiteContentProvider";
 import {getMarkedUpUahPrice} from "@/lib/productPricing";
 import {formatPricePair, parsePrice} from "@/lib/productPricingPreviewHelpers";
-import type {PricingConfig} from "@/types/pricingConfig";
 import type {ProductPricingPreviewProps} from "@/types/props";
 
 

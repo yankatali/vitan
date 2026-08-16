@@ -5,7 +5,6 @@ import {HeaderBrandLink} from "@/app/components/HeaderBrandLink/HeaderBrandLink"
 import {PageHeader} from "@/app/components/PageHeader/PageHeader";
 import {useSiteContent} from "@/app/components/SiteContentProvider/SiteContentProvider";
 import {PAGE_CONTENT_PX} from "@/constants/pageLayout";
-import type {SiteContent} from "@/constants/siteContent";
 import type {CheckoutSuccessViewProps} from "@/types/props";
 
 

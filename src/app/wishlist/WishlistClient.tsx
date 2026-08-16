@@ -8,7 +8,6 @@ import {useSiteContent} from "@/app/components/SiteContentProvider/SiteContentPr
 import {addProductToCart, getCartPriceSnapshot, removeProductFromCart} from "@/lib/cartStorage";
 import {SAVED_PRODUCTS_CHANGE_EVENT} from "@/lib/savedProductsEvents";
 import {getWishlistIds, toggleWishlistProduct} from "@/lib/wishlistStorage";
-import type {ItemConfig} from "@/types/item";
 import {useBarBottom} from "@/hooks/useBarBottom";
 import {useCartWholesaleStatus} from "@/hooks/useCartWholesaleStatus";
 import {useFooterBottomInset} from "@/hooks/useFooterBottomInset";
@@ -22,7 +21,6 @@ import {getCategoriesFromProducts, getRelatedProducts} from "@/lib/relatedProduc
 import WishlistIcon from "@/app/components/icon/WishlistIcon";
 import {formatUah} from "@/lib/formatters";
 import {getProductPriceUah, getWholesaleTooltipText} from "@/lib/wholesalePricing";
-import type {PricingConfig} from "@/types/pricingConfig";
 import type {WishlistBottomCtaProps, WishlistClientProps} from "@/types/props";
 
 

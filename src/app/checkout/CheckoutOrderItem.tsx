@@ -2,10 +2,8 @@
 
 import Image from "next/image";
 import {useSiteContent} from "@/app/components/SiteContentProvider/SiteContentProvider";
-import type {SiteContent} from "@/constants/siteContent";
 import {formatUah} from "@/lib/formatters";
 import {removeProductFromCart, updateCartQuantity} from "@/lib/cartStorage";
-import type {ItemConfig} from "@/types/item";
 import type {CheckoutItemThumbnailProps, CheckoutOrderItemProps, CheckoutQuantityControlsProps} from "@/types/props";
 
 

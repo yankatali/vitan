@@ -1,5 +1,5 @@
 import {createPortal} from "react-dom";
-import {useRef, useState, useEffect, type ReactNode} from "react";
+import {useRef, useState, useEffect} from "react";
 import {useRouter, usePathname, useSearchParams} from "next/navigation";
 import {ImagePlaceholder} from "@/app/components/ImagePlaceholder/ImagePlaceholder";
 import {CloseIcon} from "@/app/components/icon/CloseIcon";
@@ -10,7 +10,6 @@ import {PRODUCT_CARD_CLASS_NAMES} from "@/constants/productCard";
 import {useLockScroll} from "@/hooks/useLockScroll";
 import {getProductImageUrls} from "@/lib/productImages";
 import {splitProductCategories} from "@/lib/productCategories";
-import type {ItemConfig} from "@/types/item";
 import type {ProductCardSimpleProps} from "@/types/props";
 
 

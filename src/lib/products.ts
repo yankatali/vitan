@@ -6,7 +6,7 @@ import {getContentfulFetchCacheOptions} from "@/lib/cache";
 import type {CatalogSortOption} from "@/types/catalog";
 import type {ItemConfig} from "@/types/item";
 import type {GetProductsParams, ProductOrder, ProductsResult} from "@/types/product";
-import type {ContentfulAsset, ContentfulProduct, ProductsGraphqlResponse} from "@/types/contentfulResponses";
+import type {ContentfulProduct, ProductsGraphqlResponse} from "@/types/contentfulResponses";
 
 
 const useLocalFixture = process.env.USE_LOCAL_CONTENTFUL_FIXTURE === "true";
