@@ -37,11 +37,9 @@ export async function POST(req: NextRequest) {
         getTelegramOrderMessage(body, orderUrl, (await getSiteContent()).telegramOrder),
     );
 
-    const result = await response.text();
-    console.log("[Telegram] response:", response.status, result);
-
     if (!response.ok) {
-        return NextResponse.json({error: result}, {status: 500});
+        console.error("[Telegram] sendMessage failed:", response.status);
+        return NextResponse.json({error: "Unable to send order"}, {status: 500});
     }
 
     return NextResponse.json({ok: true});
