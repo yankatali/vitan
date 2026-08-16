@@ -3,47 +3,8 @@ import {type RefObject} from "react";
 import {ImagePlaceholder} from "@/app/components/ImagePlaceholder/ImagePlaceholder";
 import {PRODUCT_CARD_CLASS_NAMES} from "@/constants/productCard";
 import type {SiteContent} from "@/constants/siteContent";
+import type {ProductCategoryPillsProps, ProductDetailImageDotProps, ProductDetailImageSlideProps, ProductDetailImagesProps, ProductImageCarouselProps, ProductImageDotsProps, ProductImageSlideProps} from "@/types/props";
 
-interface ProductCategoryPillsProps {
-    categories: string[];
-}
-
-interface ProductImageCarouselProps {
-    productImages: string[];
-    alt: string;
-    activeImageIndex: number;
-    imageScrollerRef: RefObject<HTMLDivElement | null>;
-    onImageScroll: () => void;
-    onDotClick: (index: number) => void;
-    commonCopy: SiteContent["common"];
-}
-
-interface ProductImageSlideProps {
-    imageUrl: string;
-    alt: string;
-}
-
-interface ProductImageDotsProps {
-    count: number;
-    activeImageIndex: number;
-    onDotClick: (index: number) => void;
-    commonCopy: SiteContent["common"];
-}
-
-interface ProductDetailImagesProps {
-    productImages: string[];
-    title: string;
-}
-
-interface ProductDetailImageSlideProps {
-    imageUrl: string;
-    index: number;
-    title: string;
-}
-
-interface ProductDetailImageDotProps {
-    active: boolean;
-}
 
 export const ProductImageCarousel = ({
     productImages,

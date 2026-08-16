@@ -8,10 +8,8 @@ import {CloseIcon} from "@/app/components/icon/CloseIcon";
 import {LoadingSpinnerIcon} from "@/app/components/icon/LoadingSpinnerIcon";
 import {useSiteContent} from "@/app/components/SiteContentProvider/SiteContentProvider";
 import {useLockScroll} from "@/hooks/useLockScroll";
+import type {AdminAccessProps} from "@/types/props";
 
-interface AdminAccessProps {
-    initialIsAdmin: boolean;
-}
 
 export const AdminAccess = ({initialIsAdmin}: AdminAccessProps) => {
     const [isOpen, setIsOpen] = useState(false);

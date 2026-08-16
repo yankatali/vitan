@@ -2,12 +2,8 @@
 
 import {useEffect} from "react";
 import {FOOTER_BOTTOM_CSS_VAR} from "@/constants/footer";
+import type {UseFooterBottomInsetOptions} from "@/types/hookOptions";
 
-interface UseFooterBottomInsetOptions {
-    enabled: boolean;
-    insetPx?: number;
-    mediaQuery?: string;
-}
 
 export const useFooterBottomInset = ({
     enabled,

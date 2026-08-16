@@ -1,14 +1,8 @@
 import {createPortal} from "react-dom";
 import {useSiteContent} from "@/app/components/SiteContentProvider/SiteContentProvider";
 import {useLockScroll} from "@/hooks/useLockScroll";
+import type {ConfirmModalProps} from "@/types/props";
 
-interface ConfirmModalProps {
-    isOpen: boolean;
-    text: string;
-    onCancel: () => void;
-    onConfirm: () => void;
-    isLoading?: boolean;
-}
 
 export const ConfirmModal = ({
      isOpen,

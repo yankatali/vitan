@@ -2,24 +2,8 @@ import {forwardRef} from "react";
 import {PRODUCT_LIST_CLASS_NAMES} from "@/constants/productListLayout";
 import {getProductListSortButtonClassName, getProductListSortOptionButtonClassName} from "@/lib/productListClassNames";
 import type {CatalogSortOption} from "@/types/catalog";
+import type {ProductListSortDropdownProps, ProductListSortOptionButtonProps} from "@/types/props";
 
-interface ProductListSortDropdownProps {
-    open: boolean;
-    active: boolean;
-    sortBy: CatalogSortOption;
-    sortOptions: CatalogSortOption[];
-    sortLabels: Record<CatalogSortOption, string>;
-    sortAriaPrefix: string;
-    onToggle: () => void;
-    onSelect: (sortOption: CatalogSortOption) => void;
-}
-
-interface ProductListSortOptionButtonProps {
-    option: CatalogSortOption;
-    label: string;
-    active: boolean;
-    onSelect: (sortOption: CatalogSortOption) => void;
-}
 
 const ProductListSortIcon = () => {
     return (

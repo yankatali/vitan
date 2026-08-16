@@ -2,11 +2,8 @@ import {
     ADMIN_LOGIN_RATE_LIMIT_MAX_ATTEMPTS,
     ADMIN_LOGIN_RATE_LIMIT_WINDOW_MS,
 } from "@/constants/admin";
+import type {LoginAttemptWindow} from "@/types/rateLimit";
 
-interface LoginAttemptWindow {
-    count: number;
-    expiresAt: number;
-}
 
 const loginAttempts = new Map<string, LoginAttemptWindow>();
 

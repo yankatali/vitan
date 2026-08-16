@@ -3,16 +3,8 @@ import {useSiteContent} from "@/app/components/SiteContentProvider/SiteContentPr
 import {HEADER_NAV_CLASS_NAMES} from "@/constants/header";
 import {HEADER_NAV_ICON_MAP} from "@/constants/headerNavIcons";
 import {IconName} from "@/types/header";
+import type {HeaderNavItemProps} from "@/types/props";
 
-interface HeaderNavItemProps {
-    url: string;
-    label: string;
-    iconName: IconName;
-    iconSize: number;
-    count: number;
-    isActive: boolean;
-    onClick: () => void;
-}
 
 export const HeaderNavItem = ({url, label, iconName, iconSize, count, isActive, onClick}: HeaderNavItemProps) => {
     const Icon = HEADER_NAV_ICON_MAP[iconName];

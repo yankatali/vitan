@@ -7,12 +7,8 @@ import {DEFAULT_PRODUCT_SORT} from "@/constants/products";
 import {PRODUCT_GRID_WITH_MOBILE_NAV_SPACING} from "@/constants/header";
 import type {CatalogConfig} from "@/types/catalog";
 import type {ProductsResult} from "@/types/product";
+import type {CatalogProps} from "@/types/props";
 
-interface CatalogProps {
-    config: CatalogConfig;
-    initialProducts: ProductsResult;
-    usdToUahRate: number | null;
-}
 
 export const Catalog = ({config, initialProducts, usdToUahRate}: CatalogProps) => {
     const sortOptions = getCatalogSortOptions(config);

@@ -12,10 +12,8 @@ import {
 } from "@/constants/footer";
 import {useSiteContent} from "@/app/components/SiteContentProvider/SiteContentProvider";
 import {PAGE_CONTENT_PX} from "@/constants/pageLayout";
+import type {FooterProps} from "@/types/props";
 
-interface FooterProps {
-    isAdmin?: boolean;
-}
 
 export const Footer = ({isAdmin = false}: FooterProps) => {
     const {brand, footer} = useSiteContent();

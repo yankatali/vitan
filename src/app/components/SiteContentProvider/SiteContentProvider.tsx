@@ -2,13 +2,10 @@
 
 import {createContext, type ReactNode, useContext} from "react";
 import type {SiteContent} from "@/constants/siteContent";
+import type {SiteContentProviderProps} from "@/types/props";
+
 
 const SiteContentContext = createContext<SiteContent | null>(null);
-
-interface SiteContentProviderProps {
-    children: ReactNode;
-    content: SiteContent;
-}
 
 export const SiteContentProvider = ({children, content}: SiteContentProviderProps) => (
     <SiteContentContext.Provider value={content}>

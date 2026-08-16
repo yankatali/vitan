@@ -11,31 +11,8 @@ import {
 } from "@/lib/relatedProductsRow";
 import type {SiteContent} from "@/constants/siteContent";
 import type {ItemConfig} from "@/types/item";
+import type {RelatedProductActionButtonProps, RelatedProductCardProps, RelatedProductsScrollButtonProps} from "@/types/props";
 
-interface RelatedProductCardProps {
-    product: ItemConfig;
-    prices?: RelatedProductPrices;
-    active: boolean;
-    actionIcon: ReactNode;
-    activeActionIcon: ReactNode;
-    onAction: (productId: string) => void;
-    copy: SiteContent["relatedProducts"];
-}
-
-interface RelatedProductActionButtonProps {
-    active: boolean;
-    activeIcon: ReactNode;
-    icon: ReactNode;
-    onAction: () => void;
-    variant: RelatedProductActionButtonVariant;
-    copy: SiteContent["relatedProducts"];
-}
-
-interface RelatedProductsScrollButtonProps {
-    direction: RelatedProductsScrollDirection;
-    onClick: () => void;
-    copy: SiteContent["relatedProducts"];
-}
 
 export const RelatedProductCard = ({
     product,

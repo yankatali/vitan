@@ -3,16 +3,9 @@
 import {useEffect, useId, useRef, useState} from "react";
 import {createPortal} from "react-dom";
 import {TOOLTIP_GAP, TOOLTIP_WIDTH, VIEWPORT_PADDING} from "@/constants/priceTooltip";
+import type {PriceTooltipProps} from "@/types/props";
+import type {TooltipPosition} from "@/types/tooltip";
 
-interface PriceTooltipProps {
-    text?: string;
-}
-
-interface TooltipPosition {
-    left: number;
-    top: number;
-    placement: "top" | "bottom";
-}
 
 export const PriceTooltip = ({text}: PriceTooltipProps) => {
     const [isOpen, setIsOpen] = useState(false);

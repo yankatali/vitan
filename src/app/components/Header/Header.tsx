@@ -7,12 +7,9 @@ import {MediaSize} from "@/types/components";
 import {HeaderConfig} from "@/types/header";
 import {HEADER_NAV_CLASS_NAMES} from "@/constants/header";
 import {useSavedProductCounts} from "@/hooks/useSavedProductCounts";
+import type {HeaderProps} from "@/types/props";
 
-interface Props {
-    config: HeaderConfig;
-}
-
-const Header = ({ config }: Props) => {
+const Header = ({ config }: HeaderProps) => {
     const isLg = useMedia(MediaSize.isUpDesktop, false);
     const pathname = usePathname();
     const savedProductCounts = useSavedProductCounts();

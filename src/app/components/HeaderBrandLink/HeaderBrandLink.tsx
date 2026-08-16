@@ -3,11 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import {useSiteContent} from "@/app/components/SiteContentProvider/SiteContentProvider";
+import type {HeaderBrandLinkProps} from "@/types/props";
 
-interface HeaderBrandLinkProps {
-    label?: string;
-    className?: string;
-}
 
 export const HeaderBrandLink = ({label, className = ""}: HeaderBrandLinkProps) => {
     const {brand, navigation} = useSiteContent();

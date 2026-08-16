@@ -1,8 +1,6 @@
 import {NBU_USD_RATE_URL} from "@/constants/exchange";
+import type {NbuRateResponse} from "@/types/exchange";
 
-interface NbuRateResponse {
-    rate?: number;
-}
 
 export async function getUsdToUahRate(revalidateSeconds = 3600): Promise<number | null> {
     try {

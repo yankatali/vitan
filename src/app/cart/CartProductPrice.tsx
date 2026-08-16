@@ -5,14 +5,8 @@ import {formatUah} from "@/lib/formatters";
 import {getProductPriceUah, getRetailPriceUah} from "@/lib/wholesalePricing";
 import type {ItemConfig} from "@/types/item";
 import type {PricingConfig} from "@/types/pricingConfig";
+import type {CartProductPriceProps} from "@/types/props";
 
-interface CartProductPriceProps {
-    product: ItemConfig;
-    pricingConfig?: PricingConfig | null;
-    isWholesaleActive: boolean;
-    wholesaleTooltipText: string;
-    copy: SiteContent["cart"];
-}
 
 export const CartProductPrice = ({
     product,

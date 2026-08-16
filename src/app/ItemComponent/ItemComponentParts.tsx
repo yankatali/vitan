@@ -6,57 +6,8 @@ import {useSiteContent} from "@/app/components/SiteContentProvider/SiteContentPr
 import {PRODUCT_CARD_CLASS_NAMES} from "@/constants/productCard";
 import {splitProductCategories} from "@/lib/productCategories";
 import type {SiteContent} from "@/constants/siteContent";
+import type {FavoriteButtonProps, ItemCategoryPillsProps, ItemDetailImageDotProps, ItemDetailImageSlideProps, ItemDetailImagesProps, ItemImageCarouselProps, ItemImageDotsProps, ItemImageSlideProps} from "@/types/props";
 
-interface ItemImageCarouselProps {
-    productImages: string[];
-    alt: string;
-    activeImageIndex: number;
-    imageScrollerRef: RefObject<HTMLDivElement | null>;
-    onImageScroll: () => void;
-    onDotClick: (index: number) => void;
-    commonCopy: SiteContent["common"];
-}
-
-interface ItemImageSlideProps {
-    imageUrl: string;
-    alt: string;
-}
-
-interface ItemImageDotsProps {
-    productImages: string[];
-    activeImageIndex: number;
-    onDotClick: (index: number) => void;
-    commonCopy: SiteContent["common"];
-}
-
-interface ItemDetailImagesProps {
-    productImages: string[];
-    title: string;
-    showFavorite: boolean;
-    isFavorite: boolean;
-    onFavoriteToggle: () => void;
-}
-
-interface ItemDetailImageSlideProps {
-    imageUrl: string;
-    index: number;
-    title: string;
-}
-
-interface ItemDetailImageDotProps {
-    active: boolean;
-}
-
-interface ItemCategoryPillsProps {
-    category?: string;
-}
-
-interface FavoriteButtonProps {
-    isFavorite: boolean;
-    onToggle: () => void;
-    variant: "overlay" | "detail";
-    className?: string;
-}
 
 export const FavoriteButton = ({isFavorite, onToggle, variant, className}: FavoriteButtonProps) => {
     const copy = useSiteContent().productActions;

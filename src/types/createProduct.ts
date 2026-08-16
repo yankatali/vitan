@@ -1,5 +1,3 @@
-import type {PricingConfig} from "@/types/pricingConfig";
-
 export interface CreateProductFormValues {
     name: string;
     description: string;
@@ -26,15 +24,6 @@ export interface CreateProductApiResponse {
     product: CreateProductResult;
 }
 
-export interface ProductCreatorProps {
-    categoryOptions: string[];
-    onProductCreated: () => void;
-    pricingConfig?: PricingConfig | null;
-}
-
-export interface ProductCreateModalProps extends ProductCreatorProps {
-    isOpen: boolean;
-    onClose: () => void;
-}
-
 export type CreateProductTextField = Exclude<keyof CreateProductFormValues, "categories" | "image">;
+
+export type {ProductCreateModalProps, ProductCreatorProps} from "@/types/props";

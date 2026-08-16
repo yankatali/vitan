@@ -2,8 +2,9 @@ import {CART_STORAGE_KEY, MIN_CART_QUANTITY} from "@/constants/cart";
 import type {CartStorageItem} from "@/types/cart";
 import type {ItemConfig} from "@/types/item";
 import {notifySavedProductsChanged} from "@/lib/savedProductsEvents";
+import type {CartPriceSnapshot} from "@/types/cart";
 
-export type CartPriceSnapshot = Pick<CartStorageItem, "priceUah" | "priceUahWholesale">;
+export type {CartPriceSnapshot} from "@/types/cart";
 
 const isCartStorageItem = (value: unknown): value is CartStorageItem => {
     if (!value || typeof value !== "object") return false;

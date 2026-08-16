@@ -2,14 +2,8 @@ import {useEffect, useRef} from "react";
 import type {PointerEvent} from "react";
 import {useSiteContent} from "@/app/components/SiteContentProvider/SiteContentProvider";
 import {PRICE_RANGE_INPUT_CLASS_NAME, PRICE_RANGE_LABEL_CLASS_NAME, PRICE_RANGE_THUMB_CLASS_NAME} from "@/constants/priceRangeSlider";
+import type {PriceRangeSliderProps} from "@/types/props";
 
-interface PriceRangeSliderProps {
-    min: number;
-    max: number;
-    absoluteMin: number;
-    absoluteMax: number;
-    onChange: (min: number, max: number) => void;
-}
 
 export const PriceRangeSlider = ({min, max, absoluteMin, absoluteMax, onChange}: PriceRangeSliderProps) => {
     const sliderRef = useRef<HTMLDivElement>(null);

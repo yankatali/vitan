@@ -2,38 +2,8 @@ import fixture from "../../contentful-test-configs.json";
 import type {CatalogSortOption} from "@/types/catalog";
 import type {GetProductsParams, ProductsResult} from "@/types/product";
 import type {ItemConfig} from "@/types/item";
+import type {FixtureComponent, FixtureShape, LocalEntry, LocalPage} from "@/types/localContentful";
 
-interface FixtureComponent {
-    entryId: string;
-    type: [string];
-    config: unknown;
-    references?: string[];
-}
-
-interface LocalEntry {
-    sys: { id: string };
-    fields: {
-        type: [string];
-        config: unknown;
-        references?: LocalEntry[];
-    };
-}
-
-interface LocalPage {
-    sys: { id: string };
-    fields: {
-        name: string;
-        references: LocalEntry[];
-    };
-}
-
-interface FixtureShape {
-    page: {
-        name: string;
-        references: string[];
-    };
-    pageComponents: FixtureComponent[];
-}
 
 const localFixture = fixture as FixtureShape;
 

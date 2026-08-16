@@ -2,11 +2,8 @@ import {
     TELEGRAM_ORDER_RATE_LIMIT_MAX_ATTEMPTS,
     TELEGRAM_ORDER_RATE_LIMIT_WINDOW_MS,
 } from "@/constants/telegram";
+import type {TelegramOrderWindow} from "@/types/rateLimit";
 
-interface TelegramOrderWindow {
-    count: number;
-    expiresAt: number;
-}
 
 const orderAttempts = new Map<string, TelegramOrderWindow>();
 

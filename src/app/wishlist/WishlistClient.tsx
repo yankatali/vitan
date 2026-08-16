@@ -23,18 +23,8 @@ import WishlistIcon from "@/app/components/icon/WishlistIcon";
 import {formatUah} from "@/lib/formatters";
 import {getProductPriceUah, getWholesaleTooltipText} from "@/lib/wholesalePricing";
 import type {PricingConfig} from "@/types/pricingConfig";
+import type {WishlistBottomCtaProps, WishlistClientProps} from "@/types/props";
 
-interface WishlistClientProps {
-    products: ItemConfig[];
-    pricingConfig?: PricingConfig | null;
-}
-
-interface WishlistBottomCtaProps {
-    bottom: number;
-    productCount: number;
-    totalPrice: number;
-    buttonText: string;
-}
 
 const WishlistBottomCta = ({bottom, productCount, totalPrice, buttonText}: WishlistBottomCtaProps) => {
     const copy = useSiteContent().common;

@@ -1,33 +1,5 @@
 import type {CatalogSortOption} from "@/types/catalog";
-import type {HeaderButton} from "@/types/header";
-import type {ItemConfig} from "@/types/item";
-import type {PricingConfig} from "@/types/pricingConfig";
 import type {ProductsResult} from "@/types/product";
-
-export interface ProductListProps {
-    initialProducts: ProductsResult;
-    defaultSort?: CatalogSortOption;
-    searchPlaceholder?: string;
-    categories?: string[];
-    sortOptions?: CatalogSortOption[];
-    showCategories?: boolean;
-    showSort?: boolean;
-    showCategoryOnCard?: boolean;
-    showCreateProductButton?: boolean;
-    showDeleteProductButton?: boolean;
-    usdToUahRate?: number | null;
-    pricingConfig?: PricingConfig | null;
-    rootClassName?: string;
-    productCreatorWrapperClassName?: string;
-    toolbarButtons?: HeaderButton[];
-    toolbarClassName?: string;
-    toolbarTitle?: string;
-    searchWrapperClassName?: string;
-    filterWrapperClassName?: string;
-    sortWrapperClassName?: string;
-    gridClassName: string;
-    messageClassName: string;
-}
 
 export interface ProductListRequest {
     query: string;
@@ -49,20 +21,4 @@ export interface LoadProductsParams {
     signal?: AbortSignal;
 }
 
-export interface ProductListResultsProps {
-    categoryOptions: string[];
-    error: string | null;
-    gridRef: React.RefObject<HTMLDivElement | null>;
-    gridClassName: string;
-    hasMore: boolean;
-    isLoading: boolean;
-    items: ItemConfig[];
-    cartPricingProducts: ItemConfig[];
-    loadMoreRef: React.RefObject<HTMLDivElement | null>;
-    messageClassName: string;
-    onProductDeleted: () => void;
-    showCategoryOnCard: boolean;
-    showAdminActions: boolean;
-    usdToUahRate: number | null;
-    pricingConfig?: PricingConfig | null;
-}
+export type {ProductListProps, ProductListResultsProps} from "@/types/props";

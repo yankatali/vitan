@@ -5,11 +5,8 @@ import {useSiteContent} from "@/app/components/SiteContentProvider/SiteContentPr
 import {getMarkedUpUahPrice} from "@/lib/productPricing";
 import {formatPricePair, parsePrice} from "@/lib/productPricingPreviewHelpers";
 import type {PricingConfig} from "@/types/pricingConfig";
+import type {ProductPricingPreviewProps} from "@/types/props";
 
-interface ProductPricingPreviewProps {
-    priceUah: string;
-    pricingConfig?: PricingConfig | null;
-}
 
 export const ProductPricingPreview = ({priceUah, pricingConfig}: ProductPricingPreviewProps) => {
     const parsedPriceUah = parsePrice(priceUah);

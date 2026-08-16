@@ -1,16 +1,7 @@
 import {ADMIN_REQUEST_HEADER_NAME, ADMIN_REQUEST_HEADER_VALUE} from "@/constants/admin";
+import type {SendFormDataRequestParams, UploadProgressHandler} from "@/types/formDataUpload";
 
-export type UploadProgressHandler = (progress: number) => void;
-
-interface SendFormDataRequestParams<TResponse> {
-    body: FormData;
-    fallbackErrorMessage: string;
-    isResponse: (value: unknown) => value is TResponse;
-    method: "POST" | "PUT";
-    onUploadProgress?: UploadProgressHandler;
-    unexpectedResponseMessage: string;
-    url: string;
-}
+export type {UploadProgressHandler} from "@/types/formDataUpload";
 
 const parsePayload = (responseText: string): unknown => {
     if (!responseText) return null;

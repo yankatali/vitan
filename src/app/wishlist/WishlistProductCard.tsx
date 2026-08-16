@@ -3,22 +3,8 @@ import CartIcon from "@/app/components/icon/CartIcon";
 import {useSiteContent} from "@/app/components/SiteContentProvider/SiteContentProvider";
 import {PRODUCT_CARD_ACTION_CLASS_NAMES} from "@/constants/productCardActions";
 import type {ItemConfig} from "@/types/item";
+import type {WishlistCartActionButtonProps, WishlistProductCardProps} from "@/types/props";
 
-interface WishlistProductCardProps {
-    item: ItemConfig;
-    isInCart: boolean;
-    isWholesaleActive: boolean;
-    wholesaleTooltipText: string;
-    onAddToCart: (productId: string) => void;
-    onRequestCartRemove: (productId: string) => void;
-}
-
-interface WishlistCartActionButtonProps {
-    productId: string;
-    isInCart: boolean;
-    onAddToCart: (productId: string) => void;
-    onRequestCartRemove: (productId: string) => void;
-}
 
 const WishlistCartActionButton = ({
     productId,

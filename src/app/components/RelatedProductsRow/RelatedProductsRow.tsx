@@ -4,15 +4,8 @@ import {RELATED_PRODUCTS_CLASS_NAMES, RELATED_PRODUCTS_SCROLL_STEP} from "@/cons
 import {RelatedProductCard, RelatedProductsScrollButton} from "@/app/components/RelatedProductsRow/RelatedProductsRowParts";
 import {getRelatedProductPriceEntry} from "@/lib/relatedProductsRow";
 import type {ItemConfig} from "@/types/item";
+import type {RelatedProductsRowProps} from "@/types/props";
 
-interface RelatedProductsRowProps {
-    title?: string;
-    products: ItemConfig[];
-    onAction: (productId: string) => void;
-    isActive: (productId: string) => boolean;
-    actionIcon: ReactNode;
-    activeActionIcon: ReactNode;
-}
 
 export const RelatedProductsRow = ({
     title,

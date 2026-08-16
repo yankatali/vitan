@@ -1,27 +1,8 @@
 import type {ReactNode} from "react";
 import {PriceRangeSlider} from "@/app/components/FiltersSheet/PriceRangeSlider";
 import {useSiteContent} from "@/app/components/SiteContentProvider/SiteContentProvider";
+import type {FilterChipProps, FiltersSheetProps} from "@/types/props";
 
-interface FiltersSheetProps {
-    open: boolean;
-    categories: string[];
-    selectedCategories: string[];
-    onCategoriesChange: (cats: string[]) => void;
-    priceMin: number;
-    priceMax: number;
-    absoluteMin: number;
-    absoluteMax: number;
-    onPriceChange: (min: number, max: number) => void;
-    activeFilterCount: number;
-    onClear: () => void;
-    onClose: () => void;
-}
-
-interface FilterChipProps {
-    selected: boolean;
-    onClick: () => void;
-    children: ReactNode;
-}
 
 const FilterChip = ({selected, onClick, children}: FilterChipProps) => (
     <button

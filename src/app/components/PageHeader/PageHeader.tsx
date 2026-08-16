@@ -1,11 +1,7 @@
 import type {ReactNode} from "react";
 import {DEFAULT_PAGE_HEADER_PADDING_CLASS_NAME, OTHER_PAGES_HEADER_PADDING_CLASS_NAME} from "@/constants/pageHeader";
+import type {PageHeaderProps} from "@/types/props";
 
-interface PageHeaderProps {
-    children: ReactNode;
-    className?: string;
-    isProductList?: boolean;
-}
 
 export const PageHeader = ({isProductList, children, className = ""}: PageHeaderProps) => (
     <div

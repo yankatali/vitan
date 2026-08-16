@@ -7,6 +7,8 @@ export interface CartStorageItem {
     priceUahWholesale?: number | null;
 }
 
+export type CartPriceSnapshot = Pick<CartStorageItem, "priceUah" | "priceUahWholesale">;
+
 export interface CartProductItem {
     product: ItemConfig;
     quantity: number;

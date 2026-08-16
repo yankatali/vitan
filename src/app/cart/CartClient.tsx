@@ -30,18 +30,8 @@ import {formatUah} from "@/lib/formatters";
 import {getCartRetailTotal, getOptPrice, getProductPriceUah, getWholesaleTooltipText, isWholesaleEligible} from "@/lib/wholesalePricing";
 import type {SiteContent} from "@/constants/siteContent";
 import type {PricingConfig} from "@/types/pricingConfig";
+import type {CartBottomCtaProps, CartClientProps} from "@/types/props";
 
-interface CartClientProps {
-    products: ItemConfig[];
-    pricingConfig?: PricingConfig | null;
-}
-
-interface CartBottomCtaProps {
-    bottom: number;
-    totalQuantity: number;
-    totalPrice: number;
-    copy: SiteContent["cart"];
-}
 
 const CartBottomCta = ({bottom, totalQuantity, totalPrice, copy}: CartBottomCtaProps) => {
     return (

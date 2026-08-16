@@ -1,6 +1,5 @@
-interface SettingsIconProps {
-    size?: number;
-}
+import type {SettingsIconProps} from "@/types/props";
+
 
 export const SettingsIcon = ({size = 18}: SettingsIconProps) => {
     return (

@@ -1,18 +1,10 @@
-import type {PricingConfig} from "@/types/pricingConfig";
+import type {AdminSettingsFieldConfig, AdminSettingsValues} from "@/types/adminSettings";
+
+export type {AdminSettingsFieldConfig, AdminSettingsValues} from "@/types/adminSettings";
 
 export const ADMIN_SETTINGS_API_PATH = "/api/admin/settings";
 export const ADMIN_SETTINGS_TEXT_FIELD_MAX_LENGTH = 256;
 
-export type AdminSettingsValues = Record<keyof PricingConfig, string>;
-
-export interface AdminSettingsFieldConfig {
-    field: keyof AdminSettingsValues;
-    type: "number" | "text";
-    min?: string;
-    step?: string;
-    maxLength?: number;
-    required?: boolean;
-}
 
 export const EMPTY_SETTINGS_VALUES: AdminSettingsValues = {
     usdToUahRate: "",

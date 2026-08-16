@@ -11,20 +11,8 @@ import {useLockScroll} from "@/hooks/useLockScroll";
 import {getProductImageUrls} from "@/lib/productImages";
 import {splitProductCategories} from "@/lib/productCategories";
 import type {ItemConfig} from "@/types/item";
+import type {ProductCardSimpleProps} from "@/types/props";
 
-interface ProductCardSimpleProps {
-    item: ItemConfig;
-    priceUah: number | null;
-    priceUahWholesale: number | null;
-    wholesaleDescription?: string;
-    wholesaleActiveDescription?: string;
-    wholesaleAsPrimary?: boolean;
-    overlayButton?: ReactNode;
-    cartAction?: ReactNode;
-    bottomActions?: ReactNode;
-    modalAction?: ReactNode;
-    className?: string;
-}
 
 export const ProductCardSimple = ({
     item,

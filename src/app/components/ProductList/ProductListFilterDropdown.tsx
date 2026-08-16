@@ -3,22 +3,8 @@ import {FiltersSheet} from "@/app/components/FiltersSheet/FiltersSheet";
 import {PRODUCT_LIST_CLASS_NAMES} from "@/constants/productListLayout";
 import {getProductListFilterButtonClassName} from "@/lib/productListClassNames";
 import {useSiteContent} from "@/app/components/SiteContentProvider/SiteContentProvider";
+import type {ProductListFilterDropdownProps} from "@/types/props";
 
-interface ProductListFilterDropdownProps {
-    open: boolean;
-    categories: string[];
-    selectedCategories: string[];
-    priceMin: number;
-    priceMax: number;
-    absoluteMin: number;
-    absoluteMax: number;
-    activeFilterCount: number;
-    onToggle: () => void;
-    onCategoriesChange: (categories: string[]) => void;
-    onPriceChange: (min: number, max: number) => void;
-    onClear: () => void;
-    onClose: () => void;
-}
 
 const ProductListFilterIcon = () => {
     return (

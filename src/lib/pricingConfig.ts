@@ -1,22 +1,11 @@
 import {getContentfulFetchCacheOptions} from "@/lib/cache";
 import {PRICING_CONFIG_QUERY} from "@/constants/contentfulQueries";
 import type {PricingConfig} from "@/types/pricingConfig";
+import type {PricingConfigGraphqlResponse} from "@/types/contentfulResponses";
+
 
 const space = process.env.CONTENTFUL_SPACE_ID;
 const accessToken = process.env.CONTENTFUL_ACCESS_TOKEN;
-
-interface PricingConfigGraphqlResponse {
-    pricingConfigCollection?: {
-        items?: Array<{
-            usdToUahRate?: number | null;
-            retailMarkup?: number | null;
-            wholesaleMarkup?: number | null;
-            wholesaleDescription?: string | null;
-            optPrice?: number | null;
-            descriptionAfterOptValid?: string | null;
-        }> | null;
-    } | null;
-}
 
 export const getPricingConfig = async (revalidateSeconds?: number): Promise<PricingConfig | null> => {
     if (!space || !accessToken) return null;

@@ -21,11 +21,8 @@ import {CheckoutOrderSummary} from "@/app/checkout/CheckoutOrderSummary";
 import {CheckoutSuccessView} from "@/app/checkout/CheckoutSuccessView";
 import {submitTelegramOrder} from "@/lib/checkoutApi";
 import {getCheckoutCartProducts, getCheckoutPayloadItems, getCheckoutTotals} from "@/lib/checkoutProducts";
+import type {CheckoutClientProps} from "@/types/props";
 
-interface CheckoutClientProps {
-    products: ItemConfig[];
-    pricingConfig?: PricingConfig | null;
-}
 
 export const CheckoutClient = ({products, pricingConfig}: CheckoutClientProps) => {
     const [cartItems, setCartItems] = useState<CartStorageItem[]>([]);
@@ -162,7 +159,6 @@ export const CheckoutClient = ({products, pricingConfig}: CheckoutClientProps) =
                     </button>
                 </form>
             </div>
-
 
             <div
                 className="vitan-bottom-cta-mobile fixed left-1/2 z-30 w-[min(calc(100vw-1.5rem),30rem)] -translate-x-1/2 lg:hidden"

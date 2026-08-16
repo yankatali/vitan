@@ -1,10 +1,8 @@
 import {getUploadProgressLabel} from "@/lib/productImageUploadProgressHelpers";
 import {useSiteContent} from "@/app/components/SiteContentProvider/SiteContentProvider";
 import {CREATE_PRODUCT_MODAL_CLASS_NAMES} from "@/constants/createProduct";
+import type {ProductImageUploadProgressProps} from "@/types/props";
 
-interface ProductImageUploadProgressProps {
-    progress: number;
-}
 
 export const ProductImageUploadProgress = ({progress}: ProductImageUploadProgressProps) => {
     const copy = useSiteContent().productForm;

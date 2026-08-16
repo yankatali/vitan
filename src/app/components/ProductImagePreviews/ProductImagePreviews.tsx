@@ -4,25 +4,9 @@ import {useSiteContent} from "@/app/components/SiteContentProvider/SiteContentPr
 import {getImageKey} from "@/lib/productImagePreviewsHelpers";
 import {CREATE_PRODUCT_MODAL_CLASS_NAMES} from "@/constants/createProduct";
 import type {SiteContent} from "@/constants/siteContent";
+import type {ProductImagePreview} from "@/types/productImagePreview";
+import type {ProductImagePreviewItemProps, ProductImagePreviewsProps} from "@/types/props";
 
-interface ProductImagePreviewsProps {
-    images: File[];
-    isDisabled?: boolean;
-    onRemove: (image: File) => void;
-}
-
-interface ProductImagePreview {
-    image: File;
-    key: string;
-    url: string;
-}
-
-interface ProductImagePreviewItemProps {
-    preview: ProductImagePreview;
-    isDisabled: boolean;
-    onRemove: (image: File) => void;
-    copy: SiteContent["productForm"];
-}
 
 export const ProductImagePreviews = ({images, isDisabled = false, onRemove}: ProductImagePreviewsProps) => {
     const copy = useSiteContent().productForm;

@@ -2,13 +2,8 @@ import Image from "next/image";
 import {CloseIcon} from "@/app/components/icon/CloseIcon";
 import {useSiteContent} from "@/app/components/SiteContentProvider/SiteContentProvider";
 import {CREATE_PRODUCT_MODAL_CLASS_NAMES} from "@/constants/createProduct";
+import type {ExistingProductImageItemProps} from "@/types/props";
 
-interface ExistingProductImageItemProps {
-    imageUrl: string;
-    index: number;
-    isSubmitting: boolean;
-    onRemove: (imageUrl: string) => void;
-}
 
 export const ExistingProductImageItem = ({
     imageUrl,

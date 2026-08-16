@@ -15,6 +15,8 @@ import type {CreateProductInput, CreateProductResult} from "@/types/createProduc
 import type {DeleteProductResult} from "@/types/deleteProduct";
 import type {UpdatePricingConfigInput} from "@/types/pricingConfig";
 import type {UpdateProductInput, UpdateProductResult} from "@/types/updateProduct";
+import type {ContentfulManagementEnvironment} from "@/types/contentfulManagement";
+
 
 const getRequiredEnv = (name: string) => {
     const value = process.env[name];
@@ -36,8 +38,6 @@ const getContentfulManagementEnvironment = async () => {
 
     return space.getEnvironment(getContentfulEnvironmentId());
 };
-
-type ContentfulManagementEnvironment = Awaited<ReturnType<typeof getContentfulManagementEnvironment>>;
 
 const getSafeAssetFileName = (file: File, index: number) => {
     const extension = file.name.match(/\.[a-z0-9]+$/i)?.[0]?.toLowerCase() ?? "";

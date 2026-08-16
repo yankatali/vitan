@@ -6,23 +6,8 @@ import type {SiteContent} from "@/constants/siteContent";
 import {formatUah} from "@/lib/formatters";
 import {removeProductFromCart, updateCartQuantity} from "@/lib/cartStorage";
 import type {ItemConfig} from "@/types/item";
+import type {CheckoutItemThumbnailProps, CheckoutOrderItemProps, CheckoutQuantityControlsProps} from "@/types/props";
 
-interface CheckoutOrderItemProps {
-    product: ItemConfig;
-    quantity: number;
-    price: number | null;
-    copy: SiteContent["checkout"];
-}
-
-interface CheckoutItemThumbnailProps {
-    product: ItemConfig;
-}
-
-interface CheckoutQuantityControlsProps {
-    productId: string;
-    quantity: number;
-    copy: SiteContent["checkout"];
-}
 
 export const CheckoutOrderItem = ({product, quantity, price, copy}: CheckoutOrderItemProps) => {
     const commonCopy = useSiteContent().common;

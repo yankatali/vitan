@@ -15,11 +15,8 @@ import {useLockScroll} from "@/hooks/useLockScroll";
 import {formatPricePair} from "@/lib/productPricingPreviewHelpers";
 import type {PricingConfig} from "@/types/pricingConfig";
 import type {ProductEditModalProps} from "@/types/updateProduct";
+import type {OriginalProductPriceFieldProps} from "@/types/props";
 
-interface OriginalProductPriceFieldProps {
-    priceUah?: number;
-    pricingConfig?: PricingConfig | null;
-}
 
 const OriginalProductPriceField = ({priceUah, pricingConfig}: OriginalProductPriceFieldProps) => {
     const value = typeof priceUah === "number" ? formatPricePair(priceUah, pricingConfig) : "";

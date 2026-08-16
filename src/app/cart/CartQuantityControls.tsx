@@ -2,14 +2,8 @@ import {TrashIcon} from "@/app/components/icon/TrashIcon";
 import {CART_CLASS_NAMES} from "@/constants/cart";
 import type {SiteContent} from "@/constants/siteContent";
 import type {ItemConfig} from "@/types/item";
+import type {CartQuantityControlsProps} from "@/types/props";
 
-interface CartQuantityControlsProps {
-    product: ItemConfig;
-    quantity: number;
-    copy: SiteContent["cart"];
-    onQuantityChange: (productId: string, quantity: number) => void;
-    onRequestRemove: (productId: string) => void;
-}
 
 export const CartQuantityControls = ({
     product,

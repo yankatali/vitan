@@ -7,14 +7,8 @@ import {PlusIcon} from "@/app/components/icon/PlusIcon";
 import SearchIcon from "@/app/components/icon/SearchIcon";
 import {SettingsIcon} from "@/app/components/icon/SettingsIcon";
 import type {ProductCreatorProps} from "@/types/createProduct";
+import type {SearchComponentProps} from "@/types/props";
 
-interface SearchComponentProps {
-    id?: string;
-    name?: string;
-    value?: string;
-    onChange?: (value: string) => void;
-    placeholder?: string;
-}
 
 const DynamicAdminSettingsModal = dynamic(
     () => import("@/app/components/AdminSettings/AdminSettingsModal").then(module => module.AdminSettingsModal),

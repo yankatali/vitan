@@ -7,11 +7,8 @@ import {CloseIcon} from "@/app/components/icon/CloseIcon";
 import {LoadingSpinnerIcon} from "@/app/components/icon/LoadingSpinnerIcon";
 import {useSiteContent} from "@/app/components/SiteContentProvider/SiteContentProvider";
 import {useLockScroll} from "@/hooks/useLockScroll";
+import type {AdminSettingsModalProps} from "@/types/props";
 
-interface AdminSettingsModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-}
 
 export const AdminSettingsModal = ({isOpen, onClose}: AdminSettingsModalProps) => {
     const [values, setValues] = useState<AdminSettingsValues>(EMPTY_SETTINGS_VALUES);

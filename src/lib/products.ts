@@ -6,36 +6,12 @@ import {getContentfulFetchCacheOptions} from "@/lib/cache";
 import type {CatalogSortOption} from "@/types/catalog";
 import type {ItemConfig} from "@/types/item";
 import type {GetProductsParams, ProductOrder, ProductsResult} from "@/types/product";
+import type {ContentfulAsset, ContentfulProduct, ProductsGraphqlResponse} from "@/types/contentfulResponses";
+
 
 const useLocalFixture = process.env.USE_LOCAL_CONTENTFUL_FIXTURE === "true";
 const space = process.env.CONTENTFUL_SPACE_ID;
 const accessToken = process.env.CONTENTFUL_ACCESS_TOKEN;
-
-interface ContentfulAsset {
-    url?: string | null;
-    title?: string | null;
-    description?: string | null;
-}
-
-interface ContentfulProduct {
-    sys: {
-        id: string;
-    };
-    name?: string | null;
-    description?: string | null;
-    price?: number | null;
-    category?: string[] | null;
-    imagesCollection?: {
-        items?: ContentfulAsset[] | null;
-    } | null;
-}
-
-interface ProductsGraphqlResponse {
-    productCollection?: {
-        total: number;
-        items?: ContentfulProduct[] | null;
-    } | null;
-}
 
 const clampLimit = (limit?: number) => {
     if (!Number.isFinite(limit)) return PRODUCT_PAGE_SIZE;

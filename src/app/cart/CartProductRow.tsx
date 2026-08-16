@@ -6,20 +6,8 @@ import {useSiteContent} from "@/app/components/SiteContentProvider/SiteContentPr
 import {CART_CLASS_NAMES} from "@/constants/cart";
 import type {ItemConfig} from "@/types/item";
 import type {PricingConfig} from "@/types/pricingConfig";
+import type {CartProductImageProps, CartProductRowProps} from "@/types/props";
 
-interface CartProductRowProps {
-    product: ItemConfig;
-    quantity: number;
-    pricingConfig?: PricingConfig | null;
-    isWholesaleActive: boolean;
-    wholesaleTooltipText: string;
-    onQuantityChange: (productId: string, quantity: number) => void;
-    onRequestRemove: (productId: string) => void;
-}
-
-interface CartProductImageProps {
-    product: ItemConfig;
-}
 
 const CartProductImage = ({product}: CartProductImageProps) => {
     if (!product.imageUrl) {

@@ -30,15 +30,6 @@ export interface UpdateProductApiResponse {
     product: UpdateProductResult;
 }
 
-export interface ProductEditModalProps {
-    categoryOptions: string[];
-    isOpen: boolean;
-    onClose: () => void;
-    onProductUpdated: () => void;
-    pricingConfig?: PricingConfig | null;
-    product: ItemConfig;
-}
-
 export interface UseUpdateProductFormParams {
     onClose: () => void;
     onProductUpdated: () => void;
@@ -47,3 +38,5 @@ export interface UseUpdateProductFormParams {
 }
 
 export type UpdateProductTextField = Exclude<keyof UpdateProductFormValues, "categories" | "image" | "keptImageUrls">;
+
+export type {ProductEditModalProps} from "@/types/props";

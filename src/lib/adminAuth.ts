@@ -15,21 +15,12 @@ import {
     CONTENTFUL_PRICING_CONFIG_CONTENT_TYPE,
     CONTENTFUL_SPACE_ID_ENV,
 } from "@/constants/contentful";
+import type {AdminPasswordConfig, ContentfulEntriesResponse} from "@/types/contentfulResponses";
+
 
 const contentfulAccessToken = process.env.CONTENTFUL_ACCESS_TOKEN;
 const contentfulSpaceId = process.env[CONTENTFUL_SPACE_ID_ENV];
 const adminSessionSecret = process.env[ADMIN_SESSION_SECRET_ENV];
-
-interface ContentfulEntriesResponse {
-    items?: Array<{
-        fields?: Record<string, unknown>;
-    }>;
-}
-
-interface AdminPasswordConfig {
-    password: string;
-    passwordHash: string;
-}
 
 export const adminCookieOptions = {
     httpOnly: true,

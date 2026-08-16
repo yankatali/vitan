@@ -1,10 +1,7 @@
 import {getMarkedUpUahPrice} from "@/lib/productPricing";
 import type {PricingConfig} from "@/types/pricingConfig";
+import type {ProductListPriceItem} from "@/types/productListPricing";
 
-interface ProductListPriceItem {
-    purchasePriceUah?: number;
-    priceUah?: number | null;
-}
 
 export const getProductListUahPrice = (
     item: ProductListPriceItem,

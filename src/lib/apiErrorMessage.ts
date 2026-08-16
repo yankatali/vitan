@@ -1,19 +1,6 @@
 import type {SiteContent} from "@/constants/siteContent";
+import type {ContentfulErrorCopy, ContentfulErrorPayload, ContentfulValidationError} from "@/types/apiError";
 
-interface ContentfulValidationError {
-    name?: unknown;
-    value?: unknown;
-    expected?: unknown;
-    details?: unknown;
-    path?: unknown;
-}
-
-interface ContentfulErrorPayload {
-    message?: unknown;
-    details?: {
-        errors?: ContentfulValidationError[];
-    };
-}
 
 const isRecord = (value: unknown): value is Record<string, unknown> => {
     return Boolean(value && typeof value === "object");
@@ -26,8 +13,6 @@ const parseErrorMessagePayload = (message: string): unknown => {
         return null;
     }
 };
-
-type ContentfulErrorCopy = SiteContent["contentful"];
 
 const getContentfulValidationMessage = (payload: unknown, copy?: ContentfulErrorCopy) => {
     if (!isRecord(payload)) return null;

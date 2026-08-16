@@ -4,15 +4,8 @@ import {PriceTooltip} from "@/app/components/PriceTooltip/PriceTooltip";
 import {useSiteContent} from "@/app/components/SiteContentProvider/SiteContentProvider";
 import {PRODUCT_CARD_CLASS_NAMES} from "@/constants/productCard";
 import {formatUah, formatUsd} from "@/lib/formatters";
+import type {ProductPriceBlockProps} from "@/types/props";
 
-interface ProductPriceBlockProps {
-    priceUah?: number | null;
-    priceUahWholesale?: number | null;
-    priceUsd?: number;
-    wholesaleActiveDescription?: string;
-    wholesaleAsPrimary?: boolean;
-    wholesaleDescription?: string;
-}
 
 export const ProductPriceBlock = ({
     priceUah,

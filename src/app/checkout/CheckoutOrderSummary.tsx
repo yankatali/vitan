@@ -4,15 +4,8 @@ import {formatUah} from "@/lib/formatters";
 import {getProductPriceUah} from "@/lib/wholesalePricing";
 import type {CartProductItem} from "@/types/cart";
 import type {PricingConfig} from "@/types/pricingConfig";
+import type {CheckoutOrderSummaryProps} from "@/types/props";
 
-interface CheckoutOrderSummaryProps {
-    cartProducts: CartProductItem[];
-    isWholesaleActive: boolean;
-    pricingConfig?: PricingConfig | null;
-    totalQuantity: number;
-    totalPrice: number;
-    copy: SiteContent["checkout"];
-}
 
 export const CheckoutOrderSummary = ({
     cartProducts,

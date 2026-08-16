@@ -4,15 +4,8 @@ import Image from "next/image";
 import {useSiteContent} from "@/app/components/SiteContentProvider/SiteContentProvider";
 import {formatUah} from "@/lib/formatters";
 import type {ItemConfig} from "@/types/item";
+import type {OrderProductRowProps, OrderProductThumbnailProps} from "@/types/props";
 
-interface OrderProductRowProps {
-    product: ItemConfig;
-    quantity: number;
-}
-
-interface OrderProductThumbnailProps {
-    product: ItemConfig;
-}
 
 const OrderProductThumbnail = ({product}: OrderProductThumbnailProps) => {
     const imageUrl = product.imageUrls?.[0] ?? product.imageUrl;

@@ -1,7 +1,5 @@
-interface ImagePlaceholderProps {
-    className?: string;
-    iconSize?: number;
-}
+import type {ImagePlaceholderProps} from "@/types/props";
+
 
 export const ImagePlaceholder = ({className, iconSize = 36}: ImagePlaceholderProps) => (
     <div className={className}>

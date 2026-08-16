@@ -9,10 +9,8 @@ import {useSiteContent} from "@/app/components/SiteContentProvider/SiteContentPr
 import {PAGE_CONTENT_PX} from "@/constants/pageLayout";
 import {formatUah} from "@/lib/formatters";
 import type {ItemConfig} from "@/types/item";
+import type {OrderClientProps} from "@/types/props";
 
-interface OrderClientProps {
-    products: ItemConfig[];
-}
 
 export const OrderClient = ({products}: OrderClientProps) => {
     const searchParams = useSearchParams();

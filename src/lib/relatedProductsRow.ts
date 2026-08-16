@@ -3,14 +3,9 @@ import {PRODUCT_CARD_ACTION_CLASS_NAMES} from "@/constants/productCardActions";
 import {RELATED_PRODUCTS_CLASS_NAMES} from "@/constants/relatedProducts";
 import type {SiteContent} from "@/constants/siteContent";
 import type {ItemConfig} from "@/types/item";
+import type {RelatedProductActionButtonVariant, RelatedProductPrices, RelatedProductsScrollDirection} from "@/types/relatedProducts";
 
-export interface RelatedProductPrices {
-    retail: number | null;
-    wholesale: number | null;
-}
-
-export type RelatedProductActionButtonVariant = "overlay" | "modal";
-export type RelatedProductsScrollDirection = "left" | "right";
+export type {RelatedProductActionButtonVariant, RelatedProductPrices, RelatedProductsScrollDirection} from "@/types/relatedProducts";
 
 export const getRelatedProductPriceEntry = (product: ItemConfig): [string, RelatedProductPrices] => {
     return [product.id, {

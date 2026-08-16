@@ -2,12 +2,8 @@ import {useEffect, useMemo, useRef, useState} from "react";
 import {getOptionsWithSelectedCategories, getSelectionLabel} from "@/lib/categoryMultiSelectHelpers";
 import {useSiteContent} from "@/app/components/SiteContentProvider/SiteContentProvider";
 import {CREATE_PRODUCT_FIELD_NAMES, CREATE_PRODUCT_MODAL_CLASS_NAMES} from "@/constants/createProduct";
+import type {CategoryMultiSelectProps} from "@/types/props";
 
-interface CategoryMultiSelectProps {
-    options: string[];
-    selectedCategories: string[];
-    onToggle: (category: string) => void;
-}
 
 export const CategoryMultiSelect = ({
     onToggle,

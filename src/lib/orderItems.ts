@@ -1,9 +1,6 @@
 import type {ItemConfig} from "@/types/item";
+import type {OrderProductItem} from "@/types/order";
 
-export interface OrderProductItem {
-    product: ItemConfig;
-    quantity: number;
-}
 
 export const getOrderItems = (itemsParam: string, productsById: Map<string, ItemConfig>): OrderProductItem[] => {
     if (!itemsParam) return [];
